@@ -172,6 +172,7 @@ begin
   SourceFile("halcust/EBS/Windows",3);
   SourceFile("halcust/EBS/RActions",3);
   SourceFile("halcust/EBS/Latvian",0);
+  SourceFile("halcust/EBS/WebNG",3);
   SourceFile("halcust/EBS/Level0/RActions",0);
   SourceFile("halcust/EBS/Level0/WebNG",0);
 
