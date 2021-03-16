@@ -1,0 +1,310 @@
+external inner function Boolean HasSIPServerConnection();
+external inner function Boolean StandardHansa();
+external inner function Boolean DisplayAdditionalFields();
+external inner function Boolean IsCloudControllerClient();
+external inner function Boolean HasSalesGroup();
+external inner function UUID GetServerUUIDRemote();
+external inner function Boolean HasAdvancedCRM();
+
+SetLangMode(LangLatvian,"LAT",2);
+
+window WebNGContentStyleDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,v,vm,vs;
+  WindowBegin("Satura stils",WebNGContentStyleDClass,CGview,-);
+  UseView(WebNGContentStyleVc);
+  SetWRect(20,80,500,430);
+  vs = 20;h = 140;h2 =  360; v = 6;
+  Tile(0,190,false,"",-);
+  EditField(h,v,120,"Kods",Normal,Code,false,0);
+  EditField(h,v+=vs,-40,"Komentārs",Normal,Comment,false,0);
+  EditField(h,v+=vs,80,"Elementu skaits",Normal,ElementCount,false,0);
+  EditField(h2,v,80,"Attēlošanas strukt.",Normal,HandlerAppNode,false,WebNGStructSClass); //Possible names?: Hander app, Handler app node, Link handler node 
+  EditField(h,v+=vs,80,"Lapas šablons",Normal,PageTemplate,false,WebNGPageSClass); 
+  EditField(h2,v,80,"Elementa šablons",Normal,ElementTemplate,false,WebNGElementSClass); 
+  TileButton(1,"Saraksts"); 
+  TileButton(2,"Saturs"); 
+  Tile(1,150,true,"1",DivID);
+  EditField(h,v=6,80,"<div> ID",Normal,DivID,false,0);
+  EditField(h2,v,80,"<div> klase",Normal,DivClass,false,0);
+  EditField(h,v+=vs,80,"Kategorijas virsr. klase",Normal,CatHeaderDivClass,false,0);
+  EditField(h2,v,80,"Valsts virsr. klase",Normal,CountryHeaderDivClass,false,0);
+  EditField(h,v+=vs,80,"Virsraksta klase sarakstā",Normal,ListHeadingClass,false,0);
+  EditField(h2,v,80,"Datuma klase sarakstā",Normal,ListDateClass,false,0); 
+  EditField(h,v+=vs,80,"Teksta klase sarakstā",Normal,ListTextClass,false,0);
+  ButtonFrame(h2=70,vm=(v+=45),170,10,"Iestatījumi");//CUST 8>>10
+  CheckBox(h2,v,0,"Drukāt satura datumu sar.",PrintDateList);
+  CheckBox(h2,v+=16,0,"Neievietot <div>",NoDiv);
+  CheckBox(h2,v+=16,0,"Grupu saraksts pēc valsts",GroupByCountry);
+  CheckBox(h2,v+=16,0,"Grupu saraksts pēc kat.",GroupByCategory);
+  CheckBox(h2,v+=16,0,"Show Thumbnails in List",ShowThumbnail);
+  CheckBox(h2,v+=16,0,"Lasīt vēl poga",ReadMoreFlag); 
+  CheckBox(h2,v+=16,0,"Rādīt vēl poga",ShowMoreFlag); 
+  CheckBox(h2,v+=16,0,"Kategorijas izvēlne",ShowCategorySelect); 
+//CUST-BEGIN
+  CheckBox(h2,v+=16,0,"Izmantot saraksta veidni",UseListTemplate); 
+  CheckBox(h2,v+=16,0,"Izmantot satura veidni",UseContentTemplate); 
+//CUST-BEGIN
+  ButtonFrame(h2=300,v=vm,150,3,"Kārtošana");
+  RadioButton(h2,v,0,0,"Sākot ar jaunāko",SortingFlag);
+  RadioButton(h2,v+=16,1,0,"Nejaušs",SortingFlag);
+  RadioButton(h2,v+=16,2,0,"Alfabētiski",SortingFlag);
+  ButtonFrame(h2,v+=45,150,3,"Saraksta teksts");
+  RadioButton(h2,v,0,0,"Drukāt visas rindas",ListViewFlag);
+  RadioButton(h2,v+=16,1,0,"Drukāt vienu nejaušu rindu",ListViewFlag);
+  RadioButton(h2,v+=16,2,0,"Nedrukāt",ListViewFlag);
+  ButtonFrame(h2,v+=45,150,2,"Tulkojuma komentārs sarakstā");
+  RadioButton(h2,v,0,0,"Nedrukāt",CommentListFlag);
+  RadioButton(h2,v+=16,1,0,"Drukāt kā virsrakstu",CommentListFlag);
+
+  Tile(2,150,true,"2",HeadingClass);
+  EditField(h,v=6,80,"Virsraksta klase",Normal,HeadingClass,false,0);
+  EditField(h,v+=vs,80,"Datuma klase",Normal,DateClass,false,0);
+  EditField(h,v+=vs,80,"Teksta klase",Normal,TextClass,false,0); 
+  ButtonFrame(h=70,vm=(v+=45),150,2,"Iestatījumi");
+  CheckBox(h,v,0,"Drukāt satura datumu",PrintDate); 
+  CheckBox(h,v+=16,0,"Rādīt attēlu",ShowCoverImage); 
+  ButtonFrame(h,v+=45,150,2,"Tulkojuma komentārs"); 
+  RadioButton(h,v,0,0,"Nedrukāt",CommentFlag); 
+  RadioButton(h,v+=16,1,0,"Drukāt kā virsrakstu",CommentFlag); 
+
+  EndWindow;
+end;
+
+window USDClass:5
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h1,h2,h3,v,vm,vs,tilenr;
+  WindowBegin("Persona",USDClass,CGview,UserView);
+  SetWRect(64,80,509,380);
+  Sizeable(-1,-1,0,0);
+  UseView(UserVc);
+  Tile(0,70,false,"",Code);
+  vs = 20; h=150; h2 = 290; h3 = 350;
+  EditField(h,v=6, 55,"Paraksts",St_i,Code,false,0);
+  EditField(h,v+=vs,300,"Vārds",Normal,Name,false,0);
+  EditField(h,v+=vs,300,"StandardID",Normal,LoginEmailAddr,false,0);
+  EditField(h,v+=vs,300,"Izruna",Normal,Pronunciation,false,VoiceSynonymSClass);  
+  if (DisplayAdditionalFields) then begin
+    EditField(h,v+=vs,100,"Derīgs līdz",ViewOnly,ExpiryDate,true,0);  
+  end;
+  tilenr = 1;
+  TileButton(tilenr,"Pieeja");  tilenr = tilenr + 1;  
+  TileButton(tilenr,"Numuru sērijas");  tilenr = tilenr + 1;  
+  TileButton(tilenr,"Realiz.");  tilenr = tilenr + 1;  
+  TileButton(tilenr,"Konti");  tilenr = tilenr + 1;  
+  if (StandardHansa==false) then begin
+    TileButton(tilenr,"Projektu kalkulācija");  tilenr = tilenr + 1;  
+    TileButton(tilenr,"Tīm.");  tilenr = tilenr + 1;  
+    TileButton(tilenr,"Laika ieraksts");  tilenr = tilenr + 1;  
+  end;
+  TileButton(tilenr,"Datumu un sk. formāts");  tilenr = tilenr + 1;  
+  if (HasSIPServerConnection) then begin
+  TileButton(tilenr,"Asterisk");  tilenr = tilenr + 1;  //!!SAMETRANSLATION
+  end;
+  CheckBox(h2,6,0,"Slēgts",Closed);  
+  CheckBox(h2+100,6,0,"Nelicenzēts",Unlicensed); 
+  if (IsCloudControllerClient) then begin // Cloud Controller Specific
+    CheckBox(h2+200,6,0,"SSH Aizvērts",SSHClosed); 
+  end;
+  tilenr = 1;
+  Tile(tilenr,210,false,tilenr,AccessGroup);  tilenr = tilenr + 1;
+  EditField(h,v=6,300,"Personu grupas",Normal,AccessGroup,false,AccessSClass);
+  EditField(h,v+=vs,100,"Starta personas līmenis",Normal,StartLevel,false,SetSClass);
+  if (HasSalesGroup) then begin
+  EditField(h,v+=vs,100,"Ierobežotā pieeja",Normal,OneFunction,false,OneFunctionSClass);
+  EditField(h,v+=vs,100,"Aģentu grupa",Normal,SalesGroup,false,SalesGroupSClass);
+  end else begin
+    if (BuildProductCode=="PAYYAPERP") then begin
+      EditField(h,v+=vs,100,"Pārd. grupas",Normal,SalesGroup,false,SalesGroupSClass);  
+    end;
+  end;
+  EditFieldTL(h,v+=vs,100,"Language",M4StrSet,Normal,344,Language,false,StrSetSClass); //!!TRANSLATE
+  if (StandardHansa==false) then begin
+  EditField(h,v+=vs,100,"Klienta ierobežojumi",Normal,CanUseOS,false,SetSClass);
+  end;
+  EditField(h,v+=vs,100,"Kontakta kods",Normal,CustCode,false,ContactCUSClass);
+  if (IsCloudControllerClient) then begin // Cloud Controller Specific
+    EditField(h,v+=vs,100,"SSH Lietotājvārds",Normal,SSHUsername,false,0);
+  end;
+//   EditField(h,v+=vs,100,"Atlaides parole",Normal,OldPassWord,false,0);
+  if (StandardHansa==false) then begin
+  ButtonFrame(h2,v=44,165,3,"Ierobežota pieeja");
+  RadioButton(h2,v,kLimitedAccessNoLimitation,0,"Bez ierobežojumiem",limitedAccess);
+  RadioButton(h2,v+=16,kLimitedAccessGroupOnly,0,"Aģentu grupa",limitedAccess);
+  RadioButton(h2,v+=16,kLimitedAccessUserOnly,0,"Lietotājs",limitedAccess);
+  end;
+  if (HansaWorld) then begin
+  ButtonFrame(h2,v+=40,195,0,"Lietotāja tips");
+    RadioButton(h2,v,0,kTypeOfUserNamed,"Vārdiskais",TypeOfUser);
+    RadioButton(h2,v+=16,kTypeOfUserConcurrent,0,"Vienlaicīgais",TypeOfUser);
+//  RadioButton(h2,v+=16,kTypeOfUserBusinessCommunicator,0,"Business Communicator (named)",TypeOfUser);
+    RadioButton(h2,v+=16,kTypeOfUserTimekeeper,0,"Laika uzskaite",TypeOfUser);
+  RadioButton(h2,v+=16,kTypeOfUserPOS,0,"POS lietotājs",TypeOfUser); 
+  EndFrame;
+    CheckBox(h2,v+=25,0,"Izlaist paroles maiņas",PasswordNeverExpires);
+  if (!blankUUID(GetServerUUIDRemote)) then begin
+  CheckBox(h2,v+=16,0,"Lietotājs ir Admin.",AdminFlag);
+  end;
+  end;
+  Pict_Field(-175,8,-5,178,"");
+  if (GuiType==kGuiCocoa) then begin
+    PushButton(-160,182,-80,202,ToolImagePicker,"Pievienot att.");  
+  end; 
+   //  CheckBox(h2,v+=25,0,"Ļaut FTP pieeju",FTPLogin);
+   //  CheckBox(h2,v+=vs,0,"Only Voice Login",OnlyVoiceLogin); // No code for this
+  Tile(tilenr,150,false,tilenr,LastOrdNr);  tilenr = tilenr + 1;
+	EditField(h,vm=(v=6),65,"Pasūtījumu Nr.",Normal,LastOrdNr,false,0);
+	EditField(h,v+=vs,65,"Nosūtīšanu Nr.",Normal,LastShipNr,false,0);
+	EditField(h,v+=vs,65,"Rēķinu Nr.",Normal,LastInvNr,false,0);
+	EditField(h,v+=vs,65,"Saņemtās preču Nr.",Normal,LastPurNr,false,0);
+	EditField(h,v+=vs,65,"Kases ieņēmumu Nr.",Normal,LastCLInNr,false,0);
+	EditField(h,v+=vs,65,"POS rēķinu Nr.",Normal,LastIVCashNr,false,0);
+  if (StandardHansa==false) then begin
+    EditField(h,v+=vs,65,"Bāra ieraksts",Normal,LastRestAccNr,false,0);
+  end;
+//  EditField(h,v+=vs,100,"Official Inv. No.",Normal,LastOfficialSerNr,false,0);
+	EditField(h3,v=vm,65,"Maksājumu Nr.",Normal,LastPayNr,false,0);
+	EditField(h3,v+=vs,65,"Grāmatojumu Nr.",Normal,LastTRNr,false,0);
+	EditField(h3,v+=vs,65,"Ienākošo rēķinu Nr.",Normal,LastVINr,false,0);
+	EditField(h3,v+=vs,65,"Maks. uzdevumu Nr.",Normal,LastOPNr,false,0);
+  EditField(h3,v+=vs,65,"Pasūtījumu Nr.",Normal,LastPONr,false,0);
+	EditField(h3,v+=vs,65,"Kases izdevumu Nr.",Normal,LastCLOutNr,false,0);
+	EditField(h3,v+=vs,120,"Personīgais ID",Normal,IDCode,false,0);
+  Tile(tilenr,170,false,tilenr,Bonus);  tilenr = tilenr + 1;
+	EditField(h,vm=(v=6),65,"Prēmija",Normal,Bonus,true,0);
+	EditField(h3,v,120,"Atsauksme",Normal,CurOurContact,false,0);
+  EditField(h3+260,v,-20,"Minimālā cenu lapa",Normal,MinPLCode,false,PLDefSClass);
+	EditField(h,v+=vs,65,"Noliktava",Normal,Location,false,LocationSClass);
+	EditField(h3,v,120,"Departaments",Normal,Department,false,MMUserTitleSClass);//CUST >> DepSClass
+  EditField(h3+260,v,-20,"POS ID",Normal,POSOperatorID,false,0); 
+	EditField(h,v+=vs,65,"Servisa atrašanās",Normal,ServLocation,false,LocationSClass);
+	EditField(h3,v,120,"Tālrunis 1",Normal,Phone1,false,0);
+	EditField(h,v+=vs,65,"Pasūtījuma rezerv. vieta",Normal,ReservLocation,false,LocationSClass);
+	EditField(h3,v,120,"Tālrunis 2",Normal,Phone2,false,0);
+  if (StandardHansa==false) then begin
+	EditField(h,v+=vs,-20,"Pasūtījuma rez. piekļuve",Normal,ReservLocAccess,false,ReservLocAccessSClass);
+  end;
+	EditField(h,v+=vs,-20,"E-pasta adrese",Normal,emailAddr,false,0);
+	EditField(h,v+=vs,-20,"Specifikācija",Normal,Spec,false,0);
+	EditField(h,v+=vs,-20,"Komentārs",Normal,Comment,false,0);
+  //  EditField(h,v+=vs,65,"Izmaksu konts",Normal,CostAcc,false,AccSClass);
+  Tile(tilenr,50,false,tilenr,PersAcc);  tilenr = tilenr + 1;
+	EditField(h,vm=(v=6),65,"Konts",Normal,PersAcc,false,AccSClass);
+  EditField(h3,v,120,"Objekts",Normal,PersObjx,false,ObjSClass);
+  EditField(h,v+=vs,65,"Kārt. kods",Normal,SortCode,false,0);  
+  EditField(h3,v,120,"Bankas konts",Normal,BankAcc,false,0);  
+  EditField(h3,v+=vs,-20,"Banka",Normal,BankName,false,BankSClass);  
+  //  EditField(h,v+=vs,65,"Izmaksu konts",Normal,CostAcc,false,AccSClass);   
+  if (StandardHansa==false) then begin
+    Tile(tilenr,170,true,tilenr,JobGroup);  tilenr = tilenr + 1;
+  EditField(h,vm=(v=6),55,"Darba grupa",Normal,JobGroup,false,EGSClass);
+	EditField(h,v+=vs,100,"Darba apraksts",Normal,Job,false,MMUserTitleSClass);//CUST
+	EditField(h,v+=vs,80,"Izmaksas stundā",Normal,CostPrHour,false,0);
+	EditField(h,vm=(v+=vs),80,"Cena stundā",Normal,PricePrHour,false,0);
+	EnterSkip(Math);
+	CheckBox(h2,v=20,0,"Atļaut tikai īsos kodus",DisAllowOther);
+  //  CheckBox(h2,v,0,"Limited Access",limitedAccess);
+	v = v+50;
+	MatrixBegin(h-50,v=(vm+40),h+350,-7,-,99);
+	MatCol(1,24,"Īsais kods",0,Code,false,0);
+	MatCol(1,110,"Projekts",0,PRCode,false,PRSClass);
+	MatCol(1,200,"Komentārs",0,Comment,false,0);
+	EndMatrix;  
+    Tile(tilenr,30,false,tilenr,WebConf);  tilenr = tilenr + 1;
+  EditField(h,vm=(v=6),65,"Interneta konference",Normal,WebConf,true,0);
+  EditField(h3,v,65,"Web sākuma lapa",Normal,WebStartPage,false,0);
+    Tile(tilenr,50,false,tilenr,Supervisor);  tilenr = tilenr + 1;
+  v = 6;
+  EditField(h,vm=v,80,"Vadītājs",Normal,Supervisor,false,UserSClass);
+  EditField(h,v+=20,80,"Izveidošanas datums",ViewOnly,DateCreated,false,0);
+  CheckBox(h2,v=vm,0,"Pieprasīt aktivitāšu ievadi",ForceTimeEntry);
+  end;
+  Tile(tilenr,210,false,tilenr,LeadingZDay);  tilenr = tilenr + 1;
+	h = 70; h1 = h + 210; h2 = h + 330;
+	
+  if (GuiType==kGuiCocoa) then begin
+    CheckBox(h,v,0,"Izmantot personīgos uzstādījumus",UserEditCtlf);
+  end else begin  
+    StaticText(190,v+=11,"Loga izskats",true);
+    DropDownMenu(200,v=6,282,"WindowType",320);  
+    CheckBox(h,v+=20,0,"Izmantot personīgos uzstādījumus",UserEditCtlf);
+  end;	
+	ButtonFrame(h,vm=(v+=42),200,5,"Datumu forma");
+	RadioButton(h,v,0,0,"Mēnesis, diena, gads",DateOrder);
+	RadioButton(h,v+=16,1,0,"Diena, mēnesis, gads",DateOrder);
+	RadioButton(h,v+=16,2,0,"Gads, mēnesis, diena",DateOrder);
+  if (StandardHansa==false and IsSberbankProduct==false) then begin
+    RadioButton(h,v+=16,m4_hijri,0,"Hijri",DateOrder); // We have some enum already in BCD that goes from 0 to 5..   //!!SAMETRANSLATION
+    RadioButton(h,v+=16,m4_persian_date,0,"Persiešu",DateOrder);  
+  end;
+  EndFrame;
+	CheckBox(h,v+=24,0,"Nulle pirms dienas",LeadingZDay);
+	CheckBox(h1,v,0,"Rādīt tūkstošu atdalītāju",thousSepf);
+	CheckBox(h,v+=16,0,"Nulle pirms mēneša",LeadingZMonth);
+	CheckBox(h,v+=16,0,"Gadsimts",LeadingCentury);
+	EditField(h2,v=vm,20,"Datuma atdalītājs",Normal,DateSep,false,0);
+	EditField(h2,v+=20,20,"Decimāldaļ. atdalītājs",Normal,DecimalPt,false,0);
+	EditField(h2,v+=20,20,"Tūkstošdaļ. atdalītājs",Normal,ThousandSep,false,0);
+  if (HasSIPServerConnection) then begin
+  Tile(tilenr,210,false,tilenr,AstPBXConnection);  tilenr = tilenr + 1;
+  h=150;
+    CheckBox(h-22,v=6,0,"Bez rindas pārtraukuma",ExcludeQueueFallbackf); 
+    if (HasSoftphone) then begin
+      CheckBox(h-22,v+=vs,0,"Izmantot Softphone",LinPhonef); 
+    end;
+    EditField(h,v+=vs,100,"PBX savienojums",Normal,AstPBXConnection,false,PBXConnectionSClass); 
+  EditField(h,v+=vs,100,"Lietotājvārds",Normal,AstUserName,false,0); 
+  EditField(h,v+=vs,100,"Parole",Normal,AstPassword,false,0); 
+  EditField(h,v+=vs,100,"Zvanītāja ID numurs",Normal,AstCallerIdNumber,false,0); 
+  end;
+  SpecMenuGroup("",kSpecMenuGroupTypeExtendedPlusMenu,0); 
+  SpecialMenu("Objektu",'o',1,"CreateObjUserDsm");
+  SpecialMenu("Apstiprinājuma e-pastu",'e',2,"ValidateUserEmailAddressDsm");
+  SpecialMenu("Pārbaudīt e-pasta adresi",' ',3,"CheckUserEmailAddressDsm"); 
+  EndWindow;
+end;
+
+window DIDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h1,h2,v,vs;
+  WindowBegin("Artikulu klase",DIDClass,CGview,-);
+  SetWRect(64,80,540,200);
+//  Sizeable(-1,-1,0,0);
+  UseView(DIVc);
+  vs = 20; h1 = 100; h2 = 260;
+  EditField(h1,v=6,40,"Kods",Normal,Code,false,0);
+  EditField(h1,v+=vs,200,"Nosaukums",Normal,Name,false,0);
+  //if (HasAdvancedCRM) then begin
+  EditField(h1,v+=vs,50,"Tips",Normal,CType,false,CTypeSClass);
+  EditField(h1,v+=vs,200,"Klasifikācija",Normal,DispGroups,false,DISClass);
+  EditField(h1,v+=vs,100,"Krāsa",Normal,colnr,false,SetSClass);
+  //end;
+//CUST-BEGIN
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,WebNGLanguageSClass);
+  MatCol(1,74,"Nosaukums",0,Text,false,0);
+  EndMatrix;
+//CUST-END
+  EndWindow;
+end;
+
+window CTypeDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real v;
+  WindowBegin("Klasifikāciju tips",CTypeDClass,CGview,CTypeView);
+  SetWRect(64,80,509,150);
+  UseView(CTypeVc);
+  EditField(120,v=6,50,"Kods",St_i,Code,false,0);
+  EditField(120,v+=20,300,"Komentārs",Normal,Comment,false,0);
+//CUST-BEGIN
+  MatrixBegin(10,v+=20+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,WebNGLanguageSClass);
+  MatCol(1,74,"Nosaukums",0,Text,false,0);
+  EndMatrix;
+//CUST-END
+  EndWindow;
+end;

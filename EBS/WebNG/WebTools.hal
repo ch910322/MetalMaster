@@ -1,0 +1,884 @@
+external inner function string 255 GetLinkToStruct(LongInt,boolean);
+external inner function string 255 StrReplace(string,string,string);
+external inner function string 10 CurrentWebLang();
+external inner function string 255 ToolWebNGTranslateText2(Longint);
+external inner procedure ToolWebOutContentTextFormat(record WebNGContentVc,Boolean);
+external inner function Boolean FindMatchingContentTranslation(record WebNGContentVc,var record WebNGTranslateVc);
+external inner updating procedure SendCustomerLetterWithDetails(record RCVc,string,string,string);
+external inner function Boolean GetNextCustNr(var string);
+external inner function string 10 ToolWebNGGetCountry();
+external inner procedure SetContentTypeForExtension(string);
+external inner function string 255 GetTranslatedNameLanguage(record WebNGLanguageVc);
+external inner procedure AddToSortedArray(string,string,var array string,var array string,var integer);
+external inner function string 255 GetNextValue(var string);
+external inner function string 255 FormatLink(string,string,boolean,boolean);
+
+global
+function Integer SetCompanyBasedOnCountry()
+begin
+  Integer res;
+  record WebNGCompCountryVc WCCr;
+
+  res = -1;
+  WCCr.Country = ToolWebNGGetCountry;
+  if (ReadFirstKey("Country",WCCr,1,true)) then begin
+    if (CurrentCompany!=WCCr.CompanyNr) then begin
+      res = CurrentCompany;
+      SetCompany(WCCr.CompanyNr,false);
+    end;
+  end;
+
+  SetCompanyBasedOnCountry = res;
+  return;
+end;
+
+global
+procedure ResetCompanyBasedOnCountry(Integer oldcomp)
+begin
+  Integer res;
+
+  if (res>0 and res!=CurrentCompany) then begin
+    ResetCompany(oldcomp)
+  end;
+
+  return;
+end;
+
+
+function string 255 OutputBannerImages(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr)
+begin
+  string 255 res,base,large_image,link;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  Integer i;
+  
+  res = res & "<div class='imageSlide'>";
+  res = res & "<picture>";
+  base = GetLinkToStruct(WCSr.HandlerAppNode,false);
+  i = 1;
+  while (ReadRecordLink(WCr,i,Attachr,RLr)) begin
+    link = base & WCr.SerNr & "/images?image=" & Attachr.FileName;
+    if (InString(Attachr.FileName,"_large")) then begin
+      res = res & "<source media='(min-width: 768px)' srcset='" & link & "'>";
+      large_image = link;
+    end;
+    if (InString(Attachr.FileName,"_medium")) then begin
+      res = res & "<source media='(min-width: 481px) and (max-width: 767px)' srcset='" & link & "'>";
+    end;
+    if (InString(Attachr.FileName,"_small")) then begin
+      res = res & "<source media='(min-width: 320px) and (max-width: 480px)' srcset='" & link & "'>";
+    end;
+    if (blank(large_image)) then begin
+      large_image = link;
+    end;
+    i = i + 1;
+  end;
+  if (nonblank(large_image)) then begin
+    res = res & "<img src='" & large_image & "' alt='Slider'>";
+  end;
+  res = res & "</picture>  ";
+  res = res & "</div>";
+
+  OutputBannerImages = res;
+  return;
+end; 
+
+function string 255 GetMatrixText(record WebNGTranslateVc WTr)
+begin
+  string 255 res;
+  row WebNGTranslateVc WTrw;
+  Integer rwcnt,i;
+
+  rwcnt = MatRowCnt(WTr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(WTr,i,WTrw);
+    res = res & WTrw.OverviewText;
+  end;
+
+  GetMatrixText = res;
+  return;
+end;
+
+function string 255 GetFullTranslationText(record WebNGTranslateVc WTr)
+begin
+  string 255 res; 
+  Longint pos;
+
+  pos = 0;
+  while (pos<SizeTextCnt(WTr)) begin
+    res = res & StringFromText(WTr,pos,255);
+    pos = pos + 255;
+  end; 
+
+  GetFullTranslationText = res;
+  return;
+end;
+
+function string 255 GetContentImage(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr,Integer type)
+begin
+  string 255 img,typecls,addcls,link,res,base;
+
+  switch (type) begin
+    case 1:
+      base = GetLinkToStruct(WCSr.HandlerAppNode,true);
+      link = base & WCr.SerNr & "/images?image=" & WCr.ThumbnailImage;
+    case 2:
+      link = WebGetArg("path") & "/images?image=" & WCr.CoverImage;
+  end;
+  switch (type) begin
+    case 1: typecls = "thumb";
+    case 2: typecls = "cover";
+  end;
+  if (blank(link)) then begin
+    addcls = "empty_image";
+  end;
+
+  //res = res & "<div class='content_image " & typecls & " " & addcls &"'>";
+  //if (nonblank(link)) then begin
+  //  res = res & "<img src='" & link & "'>";
+  //end;
+  //res = res & "</div>";  
+
+  res = link;
+
+  GetContentImage = res;
+  return;
+end;
+
+function string 255 GetContentText(record WebNGTranslateVc WTr)
+begin
+  string 255 res;
+  Longint pos;
+
+  pos = 0;
+  while (pos<=SizeTextCnt(WTr)) begin
+    res = res & StringFromText(WTr,pos,255);
+    pos = pos + 255;
+  end;
+
+  GetContentText = res;
+  return;
+end;
+
+function string 255 GetContentImages(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr,record WebNGTranslateVc WTr)
+begin
+  string 255 base,link,res;
+  Integer i;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+
+  i = 1;
+  while (ReadRecordLink(WCr,i,Attachr,RLr)) begin
+    if (Attachr.FileName==WCr.ThumbnailImage) then begin
+      base = GetLinkToStruct(WCSr.HandlerAppNode,true);
+      link = base & WCr.SerNr & "/images?image=" & Attachr.FileName;
+      res = res & "<img class='imageRespon' src='" & link & "' alt='" & WTr.Comment & " " & i & "'>";
+    end;
+    i = i + 1;
+  end;
+  
+  GetContentImages = res;
+  return;
+end;
+
+procedure ShowTranslatedContent(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr,record WebNGTranslateVc WTr,Integer type,Date specdate)
+begin
+  Boolean foundf;
+  Integer i;
+  record NotePadVc Noter;
+  record RLinkVc RLr;
+  string 255 tstr,link;
+  Longint pos;
+  transaction string 255 gContentListStyle; 
+
+  i = 1;
+  while (ReadRecordLink(WCSr,i,Noter,RLr)) begin
+    if (type==1 and RLr.Comment=="LIST" & gContentListStyle) then begin
+      foundf = true;
+    end;
+    if (type==2 and RLr.Comment=="CONTENT") then begin
+      foundf = true;
+    end;
+    if (foundf) then begin
+      pos = 0;
+      while (pos<SizeTextCnt(Noter)) begin
+        tstr = tstr & StringFromText(Noter,pos,255);
+        pos = pos + 255;
+      end; 
+      link = GetLinkToStruct(WCSr.HandlerAppNode,true) & WCr.SerNr;
+      tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
+      tstr = StrReplace(tstr,"{Title}",WTr.Comment);
+      tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
+      tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
+      tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
+      tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
+      tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
+      tstr = StrReplace(tstr,"{link}",link);
+      tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
+      tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
+      tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
+      tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(32521));
+      
+      WebOutString(tstr);
+      goto LShowTranslatedContent;
+    end;
+    i = i + 1;
+  end;
+
+  LShowTranslatedContent:;
+  return;
+end;
+
+global
+function Boolean MM_ShowContentTranslation(string code,string lang,Integer filename,var Boolean lastwastag,record WebNGContentStyleVc WCSr,record WebNGTranslateVc WTr,Date specdate,Boolean printoverview)
+begin
+  Boolean res;
+  record WebNGContentVc WCr;
+
+  if (WTr.FileName==1) then begin
+    WCr.SerNr = StringToLongint(code);
+    if (ReadFirstMain(WCr,1,true)) then begin
+      if (printoverview and WCSr.UseListTemplate==1) then begin
+        ShowTranslatedContent(WCSr,WCr,WTr,1,specdate);
+        res = true;
+      end;
+      if (!printoverview and WCSr.UseContentTemplate==1) then begin
+        ShowTranslatedContent(WCSr,WCr,WTr,2,specdate);
+        res = true;
+      end;
+    end;
+  end;
+
+  MM_ShowContentTranslation = res;
+  return;
+end;
+
+function string 255 GetFieldLabel(record WebNGContactFormFieldVc CFFr)
+begin
+  row WebNGContactFormFieldVc CFFrw;
+  string 255 res,lang;
+  Integer i,rwcnt;
+
+  lang = CurrentWebLang;
+  res = CFFr.Comment;
+  if (nonblank(lang)) then begin
+    rwcnt = MatRowCnt(CFFr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(CFFr,i,CFFrw);
+      if (CFFrw.LangCode==lang) then begin
+        i = rwcnt;
+        res = CFFrw.Text;
+      end;
+    end;
+  end;
+
+  GetFieldLabel = res;
+  return;
+end;
+
+global
+function Boolean MM_ShowContactUsForm(record WebNGContactFormVc CFr)
+begin
+  record NotePadVc Noter;
+  record RLinkVc RLr;
+  Boolean TrHs;
+  record WebNGContactFormFieldVc CFFr;
+  string 255 tstr;
+  Boolean res;
+  Longint pos;
+  Integer i;
+
+  if (ReadRecordLink(CFr,1,Noter,RLr)) begin
+    if (RLr.Comment=="FORM") then begin
+      res = true;
+
+      pos = 0;
+      while (pos<SizeTextCnt(Noter)) begin
+        tstr = tstr & StringFromText(Noter,pos,255);
+        pos = pos + 255;
+      end; 
+
+      CFFr.Code = CFr.Code;
+      TrHs = true;
+      while (LoopKey("Sorting",CFFr,1,TrHs)) begin
+        if (CFFr.Code!=CFr.Code) then begin
+          TrHs = false;
+        end else begin
+          //ShowField
+          tstr = StrReplace(tstr,"{field" & i & "name}",GetFieldLabel(CFFr));
+          tstr = StrReplace(tstr,"{field" & i & "fn}","field" & i);
+          i = i + 1;
+        end;
+      end;
+      tstr = StrReplace(tstr,"{submit}",ToolWebNGTranslateText2(32505));
+      WebOutString(tstr);
+    end;
+  end;
+
+  MM_ShowContactUsForm = res;
+  return;
+end;
+
+
+global
+procedure ShowContentTranslations(record WebNGElementVc WEr)
+begin
+  record WebNGContentVc WCr;
+  record WebNGContentStyleVc WCSr;
+  Boolean firstline;
+  Boolean foundf,testf;
+  Integer maxcnt,cnt;
+  LongInt rcnt,ipos;
+  array record WebNGContentVc aWCr;
+  Integer acnt;
+  string 255 mstyle;
+  array string 255 countries;
+  string 255 key;
+  integer keylen;
+  string 255 currentcountry,currentcategory;
+  record WebNGTranslateVc WTr;
+  string 255 category,style;
+  Boolean fulllistf,outputaspagef;
+
+  style = WEr.HALFunc;
+  category = WEr.WebMenu;
+  outputaspagef = false;
+  fulllistf = true;
+    
+  firstline = true;
+  foundf = true;
+  WCSr.Code = style;
+  if (ReadFirstMain(WCSr,1,true)) then begin
+    maxcnt = 10000;
+    cnt = 0;
+    if (fulllistf==false) then begin
+      maxcnt = WCSr.ElementCount;
+      if (maxcnt<=0) then begin
+        maxcnt = 2;
+      end;
+    end;
+
+    switch (WCSr.SortingFlag) begin
+      case 0: // Newest First
+        key = "ContentStyle";
+        keylen = 2;
+        WCr.ContentStyle = WCSr.Code;
+        WCr.SpecDate = AddYear(CurrentDate,1);
+  
+        if (fulllistf) then begin
+          currentcountry = chr(255);
+          currentcategory = chr(255);
+  
+          if (WCSr.GroupByCountry==1) then begin
+            key = key & "Country";
+            keylen = keylen + 1;
+            WCr.Country = currentcountry;
+          end;
+          if (WCSr.GroupByCategory==1) then begin
+            key = key & "Cat";
+            keylen = keylen + 1;
+            WCr.ContentCategory = currentcategory;
+          end;
+        end;
+        while (LoopBackKey(key,WCr,2,foundf)) begin
+          if (cnt>=maxcnt) then begin
+            foundf = false;
+          end;
+          if (WCr.ContentStyle!=WCSr.Code) then begin
+            foundf = false;
+          end;
+          testf = foundf;
+          if (FindMatchingContentTranslation(WCr,WTr)==false) then begin
+            testf = false;
+          end;
+//CUST-BEGIN
+          if (nonblank(category) and WCr.ContentCategory!=category) then begin
+            testf = false;
+          end;
+//CUST-END
+          if (testf) then begin
+            ToolWebOutContentTextFormat(WCr,false);
+            cnt = cnt + 1;
+          end;
+        end;
+    end;
+  end;
+ 
+ 
+  return;
+end;
+
+global
+procedure ShowContentListCust(record WebNGElementVc WEr)
+begin
+  record WebNGContentVc WCr;
+  record WebNGContentStyleVc WCSr;
+  Boolean firstline;
+  Boolean foundf,testf;
+  Integer maxcnt,cnt;
+  LongInt rcnt,ipos,pos;
+  array record WebNGContentVc aWCr;
+  Integer acnt;
+  string 255 mstyle;
+  array string 255 countries;
+  string 255 key,tmp,tstr;
+  integer keylen;
+  string 255 currentcountry,currentcategory;
+  record WebNGTranslateVc WTr;
+  string 255 category,style;
+  Boolean fulllistf,outputaspagef;
+  Integer showcnt,startpos;
+  transaction string 255 gContentListStyle; 
+
+  style = WEr.HALFunc;
+  tmp = WEr.WebMenu;
+  GetNextSubstring(tmp,pos,"_",tstr);
+  startpos = StringToLongint(tstr);
+  GetNextSubstring(tmp,pos,"_",tstr);
+  showcnt = StringToLongint(tstr);
+  if (WEr.LinkToStruct>0) then begin
+    gContentListStyle = WEr.LinkToStruct;
+  end;
+  outputaspagef = false;
+  fulllistf = true;
+    
+  firstline = true;
+  foundf = true;
+  WCSr.Code = style;
+  if (ReadFirstMain(WCSr,1,true)) then begin
+    maxcnt = 10000;
+    cnt = 0;
+    if (fulllistf==false) then begin
+      maxcnt = WCSr.ElementCount;
+      if (maxcnt<=0) then begin
+        maxcnt = 2;
+      end;
+    end;
+
+    switch (WCSr.SortingFlag) begin
+      case 0: // Newest First
+        key = "ContentStyle";
+        keylen = 2;
+        WCr.ContentStyle = WCSr.Code;
+        WCr.SpecDate = AddYear(CurrentDate,1);
+  
+        if (fulllistf) then begin
+          currentcountry = chr(255);
+          currentcategory = chr(255);
+  
+          if (WCSr.GroupByCountry==1) then begin
+            key = key & "Country";
+            keylen = keylen + 1;
+            WCr.Country = currentcountry;
+          end;
+          if (WCSr.GroupByCategory==1) then begin
+            key = key & "Cat";
+            keylen = keylen + 1;
+            WCr.ContentCategory = currentcategory;
+          end;
+        end;
+        while (LoopBackKey(key,WCr,2,foundf)) begin
+          if (cnt>=maxcnt) then begin
+            foundf = false;
+          end;
+          if (WCr.ContentStyle!=WCSr.Code) then begin
+            foundf = false;
+          end;
+          testf = foundf;
+          if (FindMatchingContentTranslation(WCr,WTr)==false) then begin
+            testf = false;
+          end;
+/*
+//CUST-BEGIN
+          if (nonblank(category) and WCr.ContentCategory!=category) then begin
+            testf = false;
+          end;
+//CUST-END
+*/
+          if (testf) then begin
+            if ((startpos<0 or cnt>=startpos) and (showcnt<0 or cnt<=showcnt)) then begin  
+              ToolWebOutContentTextFormat(WCr,true);
+            end;
+            cnt = cnt + 1;
+            if (showcnt>0 and cnt>showcnt) then begin
+              foundf = false; 
+            end;
+          end;
+        end;
+    end;
+  end;
+ 
+
+  gContentListStyle = "";
+
+  return;
+end;
+
+
+global
+procedure ShowNewsLetterSignup(record WebNGElementVc WEr)
+begin
+  
+  WebOutString("<div class='Subscribe'>");
+  WebOutString("<div class='newsletter-form'><form><input type='hidden' name='id' value='" & WEr.Code & ":" & WEr.HALFunc & "'><input type='text' name='email' placeholder='" & ToolWebNGTranslateText2(90001) & "'><button><svg class='svg-inline--fa fa-angle-right fa-w-6' aria-hidden='true' focusable='false' data-prefix='fal' data-icon='angle-right' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 512' data-fa-i2svg=''><path fill='currentColor' d='M166.9 264.5l-117.8 116c-4.7 4.7-12.3 4.7-17 0l-7.1-7.1c-4.7-4.7-4.7-12.3 0-17L127.3 256 25.1 155.6c-4.7-4.7-4.7-12.3 0-17l7.1-7.1c4.7-4.7 12.3-4.7 17 0l117.8 116c4.6 4.7 4.6 12.3-.1 17z'></path></svg></button></form></div>");
+  WebOutString("</div>");
+
+  return;
+end;
+
+
+updating procedure SendSignupMail(record CUVc CUr)
+begin
+  record MMWebSetBlock WSb;
+  record RcVc RepSpec;
+
+  BlockLoad(WSb);
+  if (nonblank(WSb.NewsLetterMail)) then begin
+    RepSpec.f1 = CUr.Code;
+    SendCustomerLetterWithDetails(RepSpec,WSb.NewsLetterMail,CUr.LangCode,CUr.eMail);
+  end;
+
+  return;
+end;
+
+global
+updating procedure AddContactToMailingList(record PersColVc PersColr,record CUVc CUr)
+begin
+  record PersColListVc PersColListr;
+
+  RecordNew(PersColListr);
+  PersColListr.Code = CUr.Code;
+  if (nonblank(CUr.Person)) then begin
+    PersColListr.Name = CUr.Person;
+  end else begin
+    PersColListr.Name = CUr.Name;
+  end;
+  PersColListr.PersColCode = PersColr.Code;
+  PersColListr.FileName = "CUVc";
+  if (RecordInsert(PersColListr,true)) then begin 
+    //Send mail for submittion
+    SendSignupMail(CUr);
+  end;
+
+  return;
+end;
+
+global webpublic
+updating procedure WebSubmitNewsLetter()
+begin
+  record PersColVc PersColr;
+  record CUVc CUr; 
+  string 255 tstr,email,res,el,id;
+  Longint pos;
+  record WebNGElementVc WEr;
+  Integer oldcomp;
+
+  oldcomp = SetCompanyBasedOnCountry;
+
+  tstr = WebGetArg("id");
+  GetNextSubString(tstr,pos,":",el);
+  GetNextSubString(tstr,pos,":",id);
+  PersColr.Code = id;
+  email = WebGetArg("email");
+  if (ReadFirstMain(PersColr,1,true) and nonblank(email)) then begin
+    Wer.Code = el;
+    if (ReadFirstMain(WEr,1,true) and WEr.HALFunc==id) then begin
+      CUr.eMail = email;
+      if (ReadFirstKey("eMail",Cur,1,true)) then begin
+        AddContactToMailingList(PersColr,CUr);
+        res = ToolWebNGTranslateText2(90004);
+      end else begin
+        RecordNew(CUr);
+        GetNextCustNr(tstr);//
+        CUr.Code = tstr;
+        CUr.eMail = email;
+        if (RecordInsert(CUr,true)) then begin
+          AddContactToMailingList(PersColr,CUr);
+          res = ToolWebNGTranslateText2(90004);
+        end;
+      end;
+    end;
+  end;
+  if (blank(res)) then begin
+    res = ToolWebNGTranslateText2(90003);
+  end;
+  ResetCompanyBasedOnCountry(oldcomp);
+  WebOutString("<res msg='" & res & "'></res>");
+
+  return;
+end;
+
+
+global webpublic
+procedure WebShowEmpPic()
+begin 
+  record UserVc Userr;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  string 255 ext,c;
+  Integer i,j,oldcomp;
+
+  oldcomp = SetCompanyBasedOnCountry;
+
+  Userr.Code = WebGetArg("emp");
+  if (ReadFirstMain(Userr,1,true)) then begin
+    if (ReadRecordLink(Userr,1,Attachr,RLr)) begin
+      for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
+        c = mid(Attachr.FileName,j,1);
+        if (c==".") then begin
+          j = -1;
+        end else begin
+          ext = c & ext;
+        end;
+      end;
+      SetContentTypeForExtension(ext);
+      WebSetContentDisposition("inline; filename=" & Attachr.FileName);
+      WebOutAttachment(Attachr.SerNr);
+    end;
+  end;
+
+  ResetCompanyBasedOnCountry(oldcomp);
+  return;
+end;
+
+function string 255 GetEmplJobTitle(record UserVc Userr)
+begin
+  string 255 res;
+  record MMUserTitleVc UTr;
+  row MMUserTitleVc UTrw;
+  Integer i,rwcnt;
+  string 255 lang;
+
+  lang = CurrentWebLang;
+  UTr.Code = Userr.Job;
+  if (ReadFirstMain(UTr,1,true)) then begin
+    res = UTr.Comment;
+    rwcnt = MatRowCnt(UTr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(UTr,i,UTrw);
+      if (UTrw.LangCode==lang) then begin
+        res = UTrw.RowComment;
+        i = rwcnt;
+      end;
+    end;
+  end;
+
+  GetEmplJobTitle = res;
+  return;
+end;
+
+function string 255 GetEmplDescription(record UserVc Userr)
+begin
+  string 255 res;
+  Integer i;
+  record NotePadVc Noter;
+  record RLinkVc RLr;
+  string 255 lang;
+  Longint pos;
+
+  lang = CurrentWebLang;
+  i = 1;
+  while (ReadRecordLink(Userr,i,Noter,RLr)) begin
+    if (Noter.LangCode==lang or blank(Noter.LangCode)) then begin
+      pos = 0;
+      res = "";
+      while (pos<SizeTextCnt(Noter)) begin
+        res = res & StringFromText(Noter,pos,255);
+        pos = pos + 255;
+      end;
+      if (blank(Noter.LangCode)) then begin
+        goto LGetEmplDescription;
+      end;
+    end;
+    i = i + 1;
+  end;
+
+LGetEmplDescription:;
+  GetEmplDescription = res;
+  return;
+end;
+
+procedure ShowSingleUserOnWeb(record UserVc Userr,record WebNGElementVc WEr)
+begin
+  string 255 link;
+
+/*   
+  link = Userr.Spec;
+  WebOutString("<div class='col-auto single_emp justify-content-center'>");
+  if (nonblank(link)) then begin
+    WebOutString("<a href='" &  link & "' target='blank'>");
+  end;
+  WebOutString("<div class='emp_pic'><img src='/WebShowEmpPic.hal?emp=" & Userr.Code & "' alt='" & Userr.Name & "'></div>")
+  WebOutString("<div class='emp_name'>" & Userr.Name & "</div>")
+  WebOutString("<div class='emp_descr'>" & Userr.Job & "</div>")
+  WebOutString("</div>");
+  if (nonblank(link)) then begin
+    WebOutString("</a>");
+  end;
+*/
+
+  if (WEr.WebMenu=="1") then begin
+    WebOutString("<div class='col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12'>");
+    WebOutString("    <div class='ListTeam'>");
+    WebOutString("        <div class='way'>" & GetEmplJobTitle(Userr) & "</div>");
+    WebOutString("        <div class='ImgTeam'>");
+    WebOutString("            <img class='imageRespon' src='/WebShowEmpPic.hal?emp=" & Userr.Code & "' alt='image'>");
+    WebOutString("        </div>");
+    WebOutString("        <div class='InfoTeam'>");
+    WebOutString("            <h2>" & Userr.Name & "</h2>");
+    WebOutString("            <div class='text'>" & GetEmplDescription(Userr) & "</div>");
+    if (nonblank(Userr.Phone1)) then begin
+      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89005) & Userr.Phone1 & "</div>");
+    end;
+    if (nonblank(Userr.emailAddr)) then begin
+      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89006) & Userr.emailAddr & "</div>");
+    end;
+    WebOutString("        </div>");
+    WebOutString("    </div>");
+    WebOutString("</div>  ");
+  end else begin
+    WebOutString("<div class='SlideTeam-item'>");
+    WebOutString("    <div class='way'>" & GetEmplJobTitle(Userr) & "</div>");
+    WebOutString("    <div class='ImgTeam'>");
+    WebOutString("        <img class='imageRespon' src='/WebShowEmpPic.hal?emp=" & Userr.Code & "' alt='image'>");
+    WebOutString("    </div>");
+    WebOutString("    <div class='InfoTeam'>");
+    WebOutString("        <h2>" & Userr.Name & "</h2>");
+    WebOutString("        <div class='text'>" & GetEmplDescription(Userr) & "</div>");
+    if (nonblank(Userr.Phone1)) then begin
+      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89005) & Userr.Phone1 & "</div>");
+    end;
+    if (nonblank(Userr.emailAddr)) then begin
+      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89006) & Userr.emailAddr & "</div>");
+    end;
+    WebOutString("    </div>");
+    WebOutString("</div>");
+  end;
+
+  return;
+end;
+
+global
+procedure ShowEmployeesOnWeb(record WebNGElementVc WEr)
+begin
+  record UserVc Userr;
+  Boolean TrHs;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  record EGVc EGr;
+  array record UserVc aUser;
+  Integer i;
+  Integer oldcomp;
+
+  oldcomp = SetCompanyBasedOnCountry;
+
+/*
+  EGr.Code = WEr.HALFunc;
+  if (ReadFirstMain(EGr,1,true)) then begin
+    WebOutString("<div class='emplist_head'>" & EGr.Comment & "</div>");
+    WebOutString("<div class='row'>");
+    while (LoopKey("ActCode",Userr,1,true)) begin
+      if (Userr.JobGroup==WEr.HALFunc) then begin
+        if (ReadRecordLink(Userr,1,Attachr,RLr)) then begin
+          aUser[aUser.length] = Userr;
+        end;
+      end;
+    end;
+    SortRecordArray(aUser,"SortCode");
+    for (i=0;i<aUser.length;i=i+1) begin
+      Userr = aUser[i];
+      ShowSingleUserOnWeb(Userr);
+    end;
+    WebOutString("</div>");
+  end;
+*/
+
+    while (LoopKey("ActCode",Userr,1,true)) begin
+      if (blank(WEr.HALFunc) or Userr.Department==WEr.HALFunc) then begin
+        if (ReadRecordLink(Userr,1,Attachr,RLr)) then begin
+          aUser[aUser.length] = Userr;
+        end;
+      end;
+    end;
+    SortRecordArray(aUser,"SortCode");
+    for (i=0;i<aUser.length;i=i+1) begin
+      Userr = aUser[i];
+      ShowSingleUserOnWeb(Userr,WEr);
+    end;
+
+  ResetCompanyBasedOnCountry(oldcomp);
+
+
+  return;
+end;
+
+
+global
+procedure CustShowLanguageSelectElement()
+begin
+  record WebNGLanguageVc WLr;
+  row WebNGLanguageVc WLrw;
+  record WebNGCountryVc WCr;
+  string 10 curlang;
+  string 255 country;
+  string 255 tstr,lang,allowedlangs;
+  boolean showall;
+  array string 20 langlist;
+  array string 20 codelist;
+  integer listlen,i;
+  
+  listlen = 0;
+  curlang = CurrentWebLang;
+  country = ToolWebNGGetCountry;
+  
+  WebOutTagOpen("<form method=""POST"" action=""" & FormatLink("/WebAction.hal","action=changelanguage",true,true) & """>");
+  WebOutStringFormatNL("<input type=""hidden"" id=""path"" name=""path"" value=""" & WebGetArg("path") & """>");
+  WebOutTagOpen("<select id=""langcode"" name=""langcode"" onchange=""submit(this.form)"">");
+  
+  showall = true;
+  if (nonblank(country)) then begin
+    WCr.Code = country;
+    if (ReadFirstMain(WCr,1,true)) then begin
+      if (nonblank(WCr.AllowedLanguages)) then begin
+        showall = false;
+        allowedlangs = WCr.AllowedLanguages;
+        lang = GetNextValue(allowedlangs);
+        while (nonblank(lang)) begin
+          WLr.Code = lang;
+          if (ReadFirstMain(WLr,1,true)) then begin
+            if (WLr.Code==curlang) then begin
+              tstr = " selected";
+            end else begin
+              tstr = "";
+            end;
+            tstr = tstr & " class='" & WLr.Code & "' value=""" & WLr.Code & """";
+            AddToSortedArray(GetTranslatedNameLanguage(WLr),tstr,langlist,codelist,listlen);
+          end;
+          lang = GetNextValue(allowedlangs);
+        end;
+      end;
+    end;
+  end;
+  if (showall) then begin
+    while (LoopMain(WLr,0,true)) begin
+      if (WLr.Code==curlang) then begin
+        tstr = " selected";
+      end else begin
+        tstr = "";
+      end;
+      tstr = tstr & " class='" & WLr.Code & "'  value=""" & WLr.Code & """";
+      AddToSortedArray(GetTranslatedNameLanguage(WLr),tstr,langlist,codelist,listlen);
+    end;
+  end;
+  for (i=0;i<listlen;i=i+1) begin
+    WebOutStringFormat("<option");
+    WebOutStringFormat(codelist[i]);
+    WebOutStringFormat(">");
+    WebOutStringFormat(langlist[i]);
+    WebOutStringFormatNL("</option>");
+  end;
+  WebOutTagClose("</select>");
+  WebOutTagClose("</form>");
+  
+  return;
+end;

@@ -1,0 +1,350 @@
+SetLangMode(LangLatvian,"LAT",2);
+
+window MMWebSetTClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm,tilenr,h2,h3;
+  vs = 20; h2 = 350; h3 = 500;
+  WindowBegin("Tīmekļa iestatījumi",MMWebSetTClass,CGSbl,SRType);
+  SetBlid(MMWebSetBlock);
+  SetWRect(20,80,600,298);
+  Sizeable(-1,-1,0,0);
+  EditField(h=150,v=20,100,"Jaunumu saņēmēji",Normal,NewsLetterMail,false,0);
+  EditField(h,v+=20,100,"Artikula klases tips",Normal,WebShowClass,false,CTypeSClass);
+  EditField(h,v+=20,100,"Filtra tips 2",Normal,Filter2,false,CTypeSClass);
+  EditField(h,v+=20,100,"Filtra tips 3",Normal,Filter3,false,CTypeSClass);
+  EditField(h,v+=20,100,"Filtra tips 4",Normal,Filter4,false,CTypeSClass);
+
+  EditField(h,v+=40,100,"Piegādes veida lapa",Normal,DeliveryTempPage,false,WebNGPageSClass);
+  EditField(h,v+=20,100,"Pabeigta pieprasījuma lapa",Normal,PaymentFinishedTemplPage,false,WebNGPageSClass);
+  EndWindow;
+end;
+
+window MMUserTitleLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Amats",MMUserTitleLClass,CGmlist,-);
+  SetWRect(20,80,560,298);
+  SpawnClass(MMUserTitleDClass);
+  UseView(MMUserTitleVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Comment,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMUserTitleSClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Ievietot amatu",MMUserTitleSClass,CGslist,-);
+  SetWRect(20,80,560,298);
+  SpawnClass(MMUserTitleDClass);
+  UseView(MMUserTitleVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Comment,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMUserTitleDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Amats",MMUserTitleDClass,CGview,-);
+  SetWRect(20,80,500,339);
+  UseView(MMUserTitleVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,150,"Kods",Normal,Code,false,);
+  EditField(h,v+=vs,-40,"Nosaukums",Normal,Comment,false,0);
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,0);
+  MatCol(1,74,"Nosaukums",0,RowComment,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window MMItemSetLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("MM Artikulu variācijass",MMItemSetLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MMItemSetDClass);
+  UseView(MMItemSetVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Artikuls",ArtCode,false,ArtCode);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMItemSetDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("MM Artikulu variācijas",MMItemSetDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MMItemSetVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,150,"Artikuls",Normal,ArtCode,false,INSClass);
+  EditField(h,v+=vs,150,"Nosaukums",Normal,Name,false,0);
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Tips",0,Type,false,MMItemTypeSClass);
+  MatCol(1,104,"Krāsa",0,Color,false,MMItemColorSClass);
+  MatCol(1,224,"Artikuls",0,Item,false,INSClass);
+  EndMatrix;
+  EndWindow;
+end;
+
+window MMItemTypeLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("MM Artikulu tipis",MMItemTypeLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  SpawnClass(MMItemTypeDClass);
+  UseView(MMItemTypeVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMItemTypeSClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Paste MM Artikulu tipi",MMItemTypeSClass,CGslist,-);
+  SetWRect(20,80,660,298);
+  SpawnClass(MMItemTypeDClass);
+  UseView(MMItemTypeVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMItemTypeDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("MM Artikulu tipi",MMItemTypeDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MMItemTypeVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,150,"Kods",Normal,Code,false,);
+  EditField(h,v+=vs,150,"Nosaukums",Normal,Name,false,0);
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,WebNGLanguageSClass);
+  MatCol(1,74,"Nosaukums",0,Text,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window MMItemColorLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("MM Artikulu krāsass",MMItemColorLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  SpawnClass(MMItemColorDClass);
+  UseView(MMItemColorVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window MMItemColorSClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Paste MM Artikulu krāsas",MMItemColorSClass,CGslist,-);
+  SetWRect(20,80,660,298);
+  SpawnClass(MMItemColorDClass);
+  UseView(MMItemColorVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window MMItemColorDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("MM Artikulu krāsas",MMItemColorDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MMItemColorVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,150,"Kods",Normal,Code,false,0);
+  EditField(h,v+=vs,150,"Nosaukums",Normal,Name,false,0);
+  EditField(h,v+=vs,150,"Krāsas kods",Normal,ColorCode,false,0);
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,WebNGLanguageSClass);
+  MatCol(1,74,"Nosaukums",0,Text,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window INDocLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Artikula dokumenti",INDocLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(INDocDClass);
+  UseView(INDocVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Sēr. Nr.",SerNr,false,SerNr);
+  RlCol(100,100,"Artikuls",ArtCode,false);
+  RlCol(230,230,"Nosaukums",Name,false);
+  RlCol(620,620,"Tips",DocType,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window INDocDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Artikula dokuments",INDocDClass,CGview,-);
+  SetWRect(20,80,800,339);
+  Sizeable(-1,-1,0,0);
+  UseView(INDocVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,90,"Sēr. Nr.",Normal,SerNr,false,);
+  EditField(h,v+=vs,150,"Artikuls",Normal,ArtCode,false,INSClass);
+  EditField(h,v+=vs,-40,"Nosaukums",Normal,Name,false,0);
+  EditField(h,v+=vs,-40,"Apraksts",Normal,Description,false,0);
+  EditField(h,v+=vs,150,"Video ID",Normal,VideoID,false,0);
+  EditField(h,v+=vs,150,"Tips",Normal,DocType,false,SetSClass);
+  MatrixBegin(10,v+=vs+40,-40,-20,-,99);
+  MatCol(1,24,"Valoda",0,LangCode,false,0);
+  MatCol(1,74,"Nosaukums",0,RowName,false,0);
+  MatCol(1,200,"Apraksts",0,RowDescription,false,0);
+  EndWindow;
+end;
+
+window MM_DeclarationSetTClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,CGSbl,-);
+  SetBlid(MM_DeclarationSetBlock);
+  SetWRect(20,80,700,298);
+  vs=20; h=150; vs2=16; hm=-100;
+  
+  Tile(0,20,false,"",Decl1Name);
+  TileButton(1,"Declaration 1");  
+  TileButton(2,"Declaration 2");  
+  TileButton(3,"Declaration 3");  
+  TileButton(4,"Declaration 4");  
+
+
+  Tile(1,700,false,"1",Decl1Name);
+  EditField(h,v=6,140,"Name",Normal,Decl1Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl1Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl1CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl1Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl1ControlProcess,false,0);
+
+  Tile(2,700,false,"2",Decl2Name);
+  EditField(h,v=6,140,"Name",Normal,Decl2Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl2Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl2CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl2Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl2ControlProcess,false,0);
+
+  Tile(3,700,false,"3",Decl3Name);
+  EditField(h,v=6,140,"Name",Normal,Decl3Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl3Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl3CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl3Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl3ControlProcess,false,0);
+
+  Tile(4,700,false,"4",Decl4Name);
+  EditField(h,v=6,140,"Name",Normal,Decl4Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl4Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl4CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl4Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl4ControlProcess,false,0);
+
+  EndWindow;
+end;
+
+
+window MM_DeclarationClassLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Metalmaster deklarāciju klasifikācijass",MM_DeclarationClassLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MM_DeclarationClassDClass);
+  UseView(MM_DeclarationClassVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Artikulu grupa",ItemGroup,false,ItemGroup);
+  RlColKey(134,134,"Nosaukums",Description,false,Description);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MM_DeclarationClassDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Metalmaster deklarāciju klasifikācija",MM_DeclarationClassDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MM_DeclarationClassVc);
+  vs=20; h=150; vs2=16; hm=-100;
+  EditField(h,v=6,100,"Item Group",Normal,ItemGroup,false,ITSClass);
+  EditField(h,v+=vs,-40,"Description",Normal,Description,false,0);
+  EditField(h,v+=vs,-40,"Facility Address",Normal,FacilityAddress,false,0);
+  EditField(h,v+=vs,-40,"Perfomance Class",Normal,PerfomanceClass,false,0);
+  EditField(h,v+=vs,-40,"Declaration Method",Normal,DeclMethod,false,0);
+  EditField(h,v+=vs,-40,"Fire Resistance",Normal,FireResistance,false,0);
+  EditField(h,v+=vs,-40,"Cadmium",Normal,Cadmium,false,0);
+  EditField(h,v+=vs,-40,"Radioactivity",Normal,Radioactivity,false,0);
+  EditField(h,v+=vs,-40,"Inspection Standard",Normal,InspectionStandard,false,0);
+  EditField(h,v+=vs,-40,"Control Code",Normal,ControlCode,false,0);
+  EditField(h,v+=vs,-40,"Geometric Inspection",Normal,GeometricInspection,false,0);
+  EditField(h,v+=vs,-40,"Corosion Class",Normal,CorosionClass,false,0);
+  EndWindow;
+end;
+
+procedure ShowDeclarationButton(string bname,real h,var real v,string tag)
+begin
+  
+  if (nonblank(bname)) then begin
+    HalPushButtonTag(h,v,h+180,v+20,"PerformaceDeclarationWClassSubmit",bname,tag);
+    v = v + 30;
+  end;
+
+  return;
+end;
+
+window PerformaceDeclarationWClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  record MM_DeclarationSetBlock Db;
+  real h,v;
+
+  WindowBegin("Print Performance of Declaration",PerformaceDeclarationWClass,CGother,RcType);
+  UseView(RcVc);
+  SetWRect(20,80,240,235);
+  AutoSizeWindow(false);  
+  DynamicWindow;
+  h = 20;
+
+  BlockLoad(Db);
+
+  v = 16;
+  ShowDeclarationButton(Db.Decl1Name,h,v,1);
+  ShowDeclarationButton(Db.Decl2Name,h,v,2);
+  ShowDeclarationButton(Db.Decl3Name,h,v,3);
+  ShowDeclarationButton(Db.Decl4Name,h,v,4);
+
+  EndWindow;
+end;
