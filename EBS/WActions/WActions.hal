@@ -1,0 +1,141 @@
+remote inner procedure PrintEBSDocument(string,string,record RcVc,string,string,var area);
+remote inner function Boolean ExternalDocumentEnabled(string);
+
+global
+procedure OuterGetExternalDocType(string docname,var string type)
+begin
+
+  switch (docname) begin
+    case "CEMarkForm": type = "CEMark";
+    case "DeclarationOfPerformance": type = "DeclOfPerf";
+    case "ProdOrderForm": type = "ProdOrder";
+    
+  end;
+
+  return;
+end;
+
+global
+function Integer OuterShowExternalDocFilters(string docname,string type,real tv)
+begin
+  Integer cnt;
+  real vs,h,v;
+  h = 120; vs = 20;
+  
+  SetLangMode(LangLatvian,"LAT",2);
+  v = tv;
+  switch (type) begin
+    case "DeclOfPerf":
+      ButtonFrame(h,v+=50,280,1,"Filtrēšana");
+      
+      EditFieldTL(h+70,v,150,"Deklarācija",M4Set,Normal,30100,IntVal1,false,SetSClass);
+      v = v + 20;
+  end;
+
+  OuterShowExternalDocFilters = v;
+end;
+
+function Boolean MM_DeclarationClassDClassItemGroupEFAfter(Integer wn,Boolean changedf)
+begin
+  Boolean res;
+  record MM_DeclarationClassVc DCr;
+  record ITVc ITr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,DCr);
+    ITr.Code = DCr.ItemGroup;
+    if (ReadFirstMain(ITr,1,true)) then begin
+      DCr.Description = ITr.Comment;
+    end;
+    PutWindowRecord(wn,DCr);
+  end;
+  MM_DeclarationClassDClassItemGroupEFAfter = res;
+  return;
+end;
+
+global
+function Boolean MM_DeclarationClassDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+begin
+  Boolean res;
+
+  switch (fieldname) begin
+    case "ItemGroup": res = MM_DeclarationClassDClassItemGroupEFAfter(wn,changed!=0);
+  end;
+  MM_DeclarationClassDClassAfterEditField = res;
+  return;
+end;
+
+
+global
+procedure PrintCEMark()
+begin
+  record RcVc RepSpec;
+  string 255 fname;
+  area farea;
+  Integer wn;
+  record ORVc ORr;
+
+  wn = CurWindow;
+  if (WindowState(wn)==Rs_Normal) then begin
+    if (ExternalDocumentEnabled("CEMarkForm")) then begin
+      GetWindowRecord(wn,ORr);
+      fname = SaveFileDialog("","","pdf");
+      if (nonblank(fname)) then begin
+        threadremote.PrintEBSDocument("CEMarkForm","",RepSpec,ORr.SerNr,ORr.LangCode,farea);
+        WriteAreaToFile(farea,fname,0);
+      end;
+    end else begin
+      MessageBox(190000,"");
+    end;
+  end;
+
+  return;
+end;
+
+global
+procedure PrintPerformaceDeclaration()
+begin
+  record RcVc RepSpec;
+  Integer wn;
+  record IVVc IVr;
+
+  wn = CurWindow;
+  if (WindowState(wn)==Rs_Normal) then begin
+    if (ExternalDocumentEnabled("DeclarationOfPerformance")) then begin
+      GetWindowRecord(wn,IVr);
+      RepSpec.flags[0] = wn;
+      OpenWindow("PerformaceDeclarationWClass",0,0,"","",RepSpec);
+    end else begin
+      MessageBox(190000,"");
+    end;
+  end;
+
+  return;
+end;
+
+global
+procedure PerformaceDeclarationWClassSubmit()
+begin
+  string 255 fname;
+  area farea;
+  record RcVc RepSpec,tRepSpec;
+  Integer wn,num;
+  record IVVc IVr;
+ 
+
+  num = StringToInt(PushButtonTag);
+  wn = CurWindow;
+  GetWindowRecord(wn,tRepSpec);
+  if (GetWindowClass(tRepSpec.flags[0])=="IVDClass") then begin
+    GetWindowRecord(tRepSpec.flags[0],IVr);
+    fname = SaveFileDialog("","","pdf");
+    if (nonblank(fname)) then begin
+      RepSpec.long1 = num;
+      threadremote.PrintEBSDocument("DeclarationOfPerformance","",RepSpec,IVr.SerNr,IVr.LangCode,farea);
+      WriteAreaToFile(farea,fname,0);
+    end;
+  end;
+
+  return;
+end;

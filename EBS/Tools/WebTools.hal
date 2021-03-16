@@ -1,0 +1,99 @@
+//<halrule>server-only</halrule>
+remote inner procedure PrintEBSDocument(string,string,record RcVc,string,string,var area);
+remote inner function Boolean ExternalDocumentEnabled(string);
+
+global webpublic
+procedure WebPrintProdOrder()
+begin
+  area a,farea;
+  JSON js;
+  string 255 filename,filename2,size,tstr;
+  Longint sernr;
+  record RcVc RepSpec;
+  Integer i,tot,qty,cnt;
+
+  WebGetRawPostData(a);
+  js = ParseJSONArea(a);
+
+  if (WebLoginStatus==3) then begin
+    if (ExternalDocumentEnabled("ProdOrderForm")) then begin
+      filename = "tmp/ProdOrder_" & sernr & ".pdf";
+      filename2 = "ProdOrder_" & sernr & ".pdf";
+      i = 0;
+      sernr = StringToLongint(WebGetArg("sernr"));
+      RepSpec.f4 = WebGetArg("packages");
+      cnt = StringToInt(WebGetArg("cnt"));
+      for (i=0;i<cnt;i=i+1) begin
+        size = WebGetArg("length" & i);
+        qty = StringToInt(WebGetArg("qty" & i));
+        tstr = size & "|" & ValToString(qty,M4Val,"",".",1);
+        LineTextPut2(RepSpec,i,tstr);
+        tot = tot + qty;
+        i = i + 1;
+      end;
+      RepSpec.f3 = ValToString(tot,M4Val,"",".",1);
+      PrintEBSDocument("ProdOrderForm",filename,RepSpec,sernr,"",farea);
+      
+      if (FileExists(filename)) then begin
+        WebSetContentType("application/pdf");
+        if (true) then begin // TODO: make setting
+          WebSetContentDisposition("inline; filename=" & filename2);
+        end else begin
+          WebSetContentDisposition("attachment; filename=" & filename2);
+        end;
+        WebOutFile(filename);
+        Delete_File(filename);
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+global webpublic
+procedure WebGetProdOrderSizeData()
+begin
+  string 255 item;
+  array string 255 aSize;
+  vector val vSize;
+  Integer i,rwcnt;
+  record ProdOrderVc ProdOrdr;
+  record ORVc ORr;
+  row ORVc ORrw;
+  row ProdOrderVc ProdOrdrw;
+  string 255 tmp;
+  
+  ProdOrdr.SerNr = StringToLongint(WebGetArg("sernr"));
+  if (ReadFirstMain(ProdOrdr,1,true)) then begin
+    ORr.SerNr = ProdOrdr.SalesOrder;
+    if (ReadFirstMain(ORr,1,true)) then begin
+      rwcnt = MatRowCnt(ProdOrdr);
+      for (i=0;i<rwcnt;i=i+1) begin
+        MatRowGet(ProdOrdr,i,ProdOrdrw);
+        if (ProdOrdrw.OutQty>0) then begin
+          item = ProdOrdrw.Item;
+          i = rwcnt;
+        end;
+      end;
+      if (nonblank(item)) then begin
+        rwcnt = MatRowCnt(ORr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(ORr,i,ORrw);
+          if (ORrw.ArtCode==item) then begin
+            tmp = ORrw.UnitZval;
+            vSize[tmp] = vSize[tmp] + ORrw.Coefficient;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  WebOutString("<res>");
+  GetVectorTags(vSize,aSize);
+  for (i=0;i<aSize.length;i=i+1) begin
+    WebOutString("<row><size>" & aSize[i] & "</size><qty>" & ValToString(vSize[aSize[i]],M4Val,"",".",1) & "</qty></row>");
+  end;
+  WebOutString("</res>");
+
+  return;
+end;

@@ -1,0 +1,123 @@
+
+SetLangMode(LangLatvian,"LAT",2);
+
+window MM_DeclarationSetTClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,CGSbl,-);
+  SetBlid(MM_DeclarationSetBlock);
+  SetWRect(20,80,700,298);
+  vs=20; h=150; vs2=16; hm=-100;
+  
+  Tile(0,20,false,"",Decl1Name);
+  TileButton(1,"Declaration 1");  
+  TileButton(2,"Declaration 2");  
+  TileButton(3,"Declaration 3");  
+  TileButton(4,"Declaration 4");  
+
+
+  Tile(1,700,false,"1",Decl1Name);
+  EditField(h,v=6,140,"Name",Normal,Decl1Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl1Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl1CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl1Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl1ControlProcess,false,0);
+
+  Tile(2,700,false,"2",Decl2Name);
+  EditField(h,v=6,140,"Name",Normal,Decl2Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl2Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl2CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl2Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl2ControlProcess,false,0);
+
+  Tile(3,700,false,"3",Decl3Name);
+  EditField(h,v=6,140,"Name",Normal,Decl3Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl3Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl3CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl3Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl3ControlProcess,false,0);
+
+  Tile(4,700,false,"4",Decl4Name);
+  EditField(h,v=6,140,"Name",Normal,Decl4Name,false,0);
+  EditField(h,v+=vs,140,"Standard",Normal,Decl4Std,false,0);
+  EditField(h,v+=vs,140,"Certif. Company",Normal,Decl4CertComp,false,0);
+  EditField(h,v+=vs,140,"Signer",Normal,Decl4Signer,false,UserSClass);
+  EditField(h,v+=vs,140,"Controlling Process",Normal,Decl4ControlProcess,false,0);
+
+  EndWindow;
+end;
+
+
+window MM_DeclarationClassLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Metalmaster deklarāciju klasifikācijass",MM_DeclarationClassLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MM_DeclarationClassDClass);
+  UseView(MM_DeclarationClassVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Artikulu grupa",ItemGroup,false,ItemGroup);
+  RlColKey(134,134,"Nosaukums",Description,false,Description);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MM_DeclarationClassDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Metalmaster deklarāciju klasifikācija",MM_DeclarationClassDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MM_DeclarationClassVc);
+  vs=20; h=150; vs2=16; hm=-100;
+  EditField(h,v=6,100,"Item Group",Normal,ItemGroup,false,ITSClass);
+  EditField(h,v+=vs,-40,"Description",Normal,Description,false,0);
+  EditField(h,v+=vs,-40,"Facility Address",Normal,FacilityAddress,false,0);
+  EditField(h,v+=vs,-40,"Perfomance Class",Normal,PerfomanceClass,false,0);
+  EditField(h,v+=vs,-40,"Declaration Method",Normal,DeclMethod,false,0);
+  EditField(h,v+=vs,-40,"Fire Resistance",Normal,FireResistance,false,0);
+  EditField(h,v+=vs,-40,"Cadmium",Normal,Cadmium,false,0);
+  EditField(h,v+=vs,-40,"Radioactivity",Normal,Radioactivity,false,0);
+  EditField(h,v+=vs,-40,"Inspection Standard",Normal,InspectionStandard,false,0);
+  EditField(h,v+=vs,-40,"Control Code",Normal,ControlCode,false,0);
+  EditField(h,v+=vs,-40,"Geometric Inspection",Normal,GeometricInspection,false,0);
+  EditField(h,v+=vs,-40,"Corosion Class",Normal,CorosionClass,false,0);
+  EndWindow;
+end;
+
+procedure ShowDeclarationButton(string bname,real h,var real v,string tag)
+begin
+  
+  if (nonblank(bname)) then begin
+    HalPushButtonTag(h,v,h+180,v+20,"PerformaceDeclarationWClassSubmit",bname,tag);
+    v = v + 30;
+  end;
+
+  return;
+end;
+
+window PerformaceDeclarationWClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  record MM_DeclarationSetBlock Db;
+  real h,v;
+
+  WindowBegin("Print Performance of Declaration",PerformaceDeclarationWClass,CGother,RcType);
+  UseView(RcVc);
+  SetWRect(20,80,240,235);
+  AutoSizeWindow(false);  
+  DynamicWindow;
+  h = 20;
+
+  BlockLoad(Db);
+
+  v = 16;
+  ShowDeclarationButton(Db.Decl1Name,h,v,1);
+  ShowDeclarationButton(Db.Decl2Name,h,v,2);
+  ShowDeclarationButton(Db.Decl3Name,h,v,3);
+  ShowDeclarationButton(Db.Decl4Name,h,v,4);
+
+  EndWindow;
+end;
