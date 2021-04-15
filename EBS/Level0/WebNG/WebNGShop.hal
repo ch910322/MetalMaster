@@ -231,8 +231,6 @@ begin
   boolean res;
   longint structnode;
   
-  logtext(0,"ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2");
-  
   mpath = path;
   node = removenextnode(mpath);
 
@@ -270,10 +268,7 @@ begin
   if (usenextnode) then begin
     node = removenextnode(mpath);
   end;
-	
-	
-	logtext(0,"node+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-	logtext(0,node);
+
   switch (node) begin
     case "":
       //TempWelcomePage(WSr);
@@ -281,6 +276,7 @@ begin
     case "catalog":
       //ShopCatalogApp(WSr,mpath);
       MM_ShowProductCatalog(WSr,mpath);
+
     case "basket":
       //ShopBasketApp(WSr,mpath);
       MM_ShopBasketApp(WSr,mpath);
