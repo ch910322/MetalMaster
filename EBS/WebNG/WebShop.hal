@@ -499,7 +499,7 @@ begin
       WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
       WebOutString("</div></div>");
       WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
-      WebOutString("</div>111111111111111111111111111111</div>");
+      WebOutString("</div>" & arrDocs[i] & "</div>");
       WebOutString("</div>22222222222222222222222222222222</div>");
       WebOutString("</div></div>");
   end;
