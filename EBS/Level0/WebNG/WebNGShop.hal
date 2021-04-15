@@ -41,7 +41,6 @@ external outer procedure MM_ProductImageDownloadApp(string);
 external outer procedure MM_ShopProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopBasketApp(record WebNGStructVc,string);
 external outer procedure MM_ShowDeliveryOptions(record WebNGStructVc,string);
-external outer procedure MM_ShowDocumentsCatalog(record WebNGStructVc,string);
 //CUST-END
 
 global
@@ -282,9 +281,6 @@ begin
     case "catalog":
       //ShopCatalogApp(WSr,mpath);
       MM_ShowProductCatalog(WSr,mpath);
-    case "documents":
-    	logtext(0,"documents===================================");
-      MM_ShowDocumentsCatalog(WSr,mpath);
     case "basket":
       //ShopBasketApp(WSr,mpath);
       MM_ShopBasketApp(WSr,mpath);
