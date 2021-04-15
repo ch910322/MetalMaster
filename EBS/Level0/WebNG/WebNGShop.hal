@@ -278,6 +278,7 @@ begin
       //ShopCatalogApp(WSr,mpath);
       MM_ShowProductCatalog(WSr,mpath);
     case "documents":
+    	logtext(0,"documents===================================");
       MM_ShowDocumentsCatalog(WSr,mpath);
     case "basket":
       //ShopBasketApp(WSr,mpath);
