@@ -269,7 +269,10 @@ begin
   if (usenextnode) then begin
     node = removenextnode(mpath);
   end;
-
+	
+	
+	logtext(0,"node+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	logtext(0,node);
   switch (node) begin
     case "":
       //TempWelcomePage(WSr);
