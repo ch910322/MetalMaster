@@ -482,7 +482,7 @@ begin
 end;
 
 
-procedure ShowDocumentsCatalog(array string arrDocs,record MMWebSetBlock WSb)
+procedure ShowDocumentsCatalog(array string arrDocsPdf,array longint arrDocsPdfSerNr,array string arrDocsDocx,array longint arrDocsDocxSerNr,record MMWebSetBlock WSb)
 begin
   Integer i;
   record INVc INr;
@@ -492,14 +492,29 @@ begin
   
   WebOutString("<div class='row product-catalog-list'>");
   lang = CurrentWebLang;
-  for (i=0;i<arrDocs.length;i=i+1) begin
+  for (i=0;i<arrDocsPdf.length;i=i+1) begin
       WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
       WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
       WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
       WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
       WebOutString("</div></div>");
       WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
-      WebOutString("</div>" & arrDocs[i] & "</div>");
+      WebOutString("</div>" & arrDocsPdf[i] & "</div>");
+      WebOutString("</div>22222222222222222222222222222222</div>");
+      WebOutString("</div></div>");
+  end;
+
+  WebOutString("</div>");
+  WebOutString("<div class='row product-catalog-list'>");
+  lang = CurrentWebLang;
+  for (i=0;i<arrDocsPdf.length;i=i+1) begin
+      WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
+      WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
+      WebOutString("</div>" & arrDocsDocx[i] & "</div>");
       WebOutString("</div>22222222222222222222222222222222</div>");
       WebOutString("</div></div>");
   end;
@@ -517,10 +532,14 @@ begin
   record WebNGShopBlock WebShopb;
   Boolean TrHs;
   record WebNGPageVc WPr;
-  array string 255 arrDocs;
+  array string 255 arrDocsPdf,arrDocsDocx;
+  array longint arrDocsPdfSerNr,arrDocsDocxSerNr;
   record ConfVc Confr;
   record MailVc Mailr;
   string 255 ckey;
+  record Attach2Vc Attach2r;
+  integer filenr;
+  record RLinkVc RLr;
 
   //sorting?
   BlockLoad(WebShopb);
@@ -542,13 +561,23 @@ begin
     ckey = "UserTime:" & Confr.SerNr;
       TrHs = true;
       while (LoopKey(ckey,Mailr,1,TrHs)) begin
-        arrDocs[arrDocs.length] = Mailr.Header;
-        logtext(0,Mailr.Header);
+        filenr = 1;
+        while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
+          if (right(Attach2r.FileName,4)==".pdf") then begin
+            arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
+            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr;
+          end;
+          if (right(Attach2r.FileName,5)==".docx") then begin
+            arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
+            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr;
+          end;
+          filenr = filenr + 1;
+        end;
       end;
     
   end;
   
-  ShowDocumentsCatalog(arrDocs,WSb);
+  ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsPdf,arrDocsPdfSerNr,WSb);
 
   ShowWebAppPageEnd(WPr);
 
