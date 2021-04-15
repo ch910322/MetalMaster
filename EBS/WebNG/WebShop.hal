@@ -1608,8 +1608,8 @@ begin
   record Attach2Vc Attach2r;
   integer filenr;
   record RLinkVc RLr;
-
   
+  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
   
   Confr.AddrName = "Rekini";
   if(readfirstkey("AddrName",Confr,1,true))then begin

@@ -19,7 +19,9 @@ global
 function boolean ShowSpecialWebElementInternal(record WebNGElementVc WEr)
 begin
   boolean res;
-
+	
+	logtext(0,"ShowSpecialWebElementInternalShowSpecialWebElementInternalShowSpecialWebElementInternal");
+	
   res = true;
   switch (WEr.Type) begin
     case 200:
