@@ -232,6 +232,8 @@ begin
   boolean res;
   longint structnode;
   
+  logtext(0,"ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2ShopApp2");
+  
   mpath = path;
   node = removenextnode(mpath);
 
