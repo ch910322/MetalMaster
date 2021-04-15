@@ -518,7 +518,9 @@ begin
   Boolean TrHs;
   record WebNGPageVc WPr;
   array string 255 arrDocs;
-
+  record ConfVc Confr;
+  record MailVc Mailr;
+  string 255 ckey;
 
   //sorting?
   BlockLoad(WebShopb);
@@ -533,7 +535,19 @@ begin
 
   BlockLoad(WSb);
   ReadFilters(vFilters);
-	
+  
+  Confr.AddrName = "Rekini";
+  if(readfirstkey("AddrName",Confr,1,true))then begin
+    logtext(0,Confr.AddrName);
+    ckey = "UserTime:" & Confr.SerNr;
+      TrHs = true;
+      while (LoopKey(ckey,Mailr,1,TrHs)) begin
+        arrDocs[arrDocs.length] = Mailr.Header;
+        logtext(0,Mailr.Header);
+      end;
+    
+  end;
+  
   ShowDocumentsCatalog(arrDocs,WSb);
 
   ShowWebAppPageEnd(WPr);
