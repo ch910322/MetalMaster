@@ -499,6 +499,8 @@ function boolean NodeIsApplication(record WebNGStructVc WSr)
 begin
   boolean res;
   
+  logtext(0,"NodeIsApplicationNodeIsApplicationNodeIsApplicationNodeIsApplicationNodeIsApplication");
+  
   res = false;
   if (WSr.Type==kStructTypeHALFunction or 
       WSr.Type==kStructTypeContentHandlerApp or
