@@ -481,6 +481,66 @@ begin
   return;
 end;
 
+
+procedure ShowDocumentsCatalog(array string arrDocs,record MMWebSetBlock WSb)
+begin
+  Integer i;
+  record INVc INr;
+  string 255 link,imglink,shorttext,tstr,base,lang,modal;
+  val price;
+  array string 255 aTypes,aColors;
+  
+  WebOutString("<div class='row product-catalog-list'>");
+  lang = CurrentWebLang;
+  for (i=0;i<arrDocs.length;i=i+1) begin
+      WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
+      WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
+      WebOutString("</div></div>");
+      WebOutString("</div></div>");
+      WebOutString("</div></div>");
+  end;
+
+  WebOutString("</div>");
+
+  return;
+end;
+
+global
+procedure MM_ShowDocumentsCatalog(record WebNGStructVc WSr,string mpath)
+begin
+  vector string 255 vFilters;
+  record MMWebSetBlock WSb;
+  record WebNGShopBlock WebShopb;
+  Boolean TrHs;
+  record WebNGPageVc WPr;
+  array string 255 arrDocs;
+
+
+  //sorting?
+  BlockLoad(WebShopb);
+  if (nonblank(WebShopb.ShopCatalogTemplPage)) then begin
+    WPr.Code = WebShopb.ShopCatalogTemplPage;
+  end else begin
+    WPr.Code = WSr.WebPage;
+  end;
+  if (ReadFirstMain(WPr,1,true)) then begin end;
+
+  ShowWebAppPageStart(WPr,"");
+
+  BlockLoad(WSb);
+  ReadFilters(vFilters);
+	
+  ShowDocumentsCatalog(arrDocs,WSb);
+
+  ShowWebAppPageEnd(WPr);
+
+  return;
+end;
+
 function string 255 GetVarTypeName(string code,string lang)
 begin
   Integer i,rwcnt;
