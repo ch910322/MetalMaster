@@ -903,20 +903,20 @@ begin
   Attachr.SerNr = StringToLongint(WebGetArg("sernr"))/2;
   attachketkey = StringToLongint(WebGetArg("key"));
   if(attachketkey==CalcPassword(Attachr.SerNr*2,Attachr.SerNr*2,0))then begin
-		if (readfirstmain(Attachr,1,true)) begin
-			for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
-				c = mid(Attachr.FileName,j,1);
-				if (c==".") then begin
-					j = -1;
-				end else begin
-					ext = c & ext;
-				end;
-			end;
-			SetContentTypeForExtension(ext);
-			WebSetContentDisposition("inline; filename=" & Attachr.FileName);
-			WebOutAttachment(Attachr.SerNr);
-		end;
-	end;
+    if (readfirstmain(Attachr,1,true)) begin
+      for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
+        c = mid(Attachr.FileName,j,1);
+        if (c==".") then begin
+          j = -1;
+        end else begin
+          ext = c & ext;
+        end;
+      end;
+      SetContentTypeForExtension(ext);
+      WebSetContentDisposition("inline; filename=" & Attachr.FileName);
+      WebOutAttachment(Attachr.SerNr);
+    end;
+  end;
   ResetCompanyBasedOnCountry(oldcomp);
 
   return;
@@ -1649,35 +1649,30 @@ begin
   integer filenr;
   record RLinkVc RLr;
   vector string 255 vDescription,vAttachKey;
-  
-  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
-  
+    
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
-      TrHs = true;
-      while (LoopKey(ckey,Mailr,1,TrHs)) begin
-        filenr = 1;
-        while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
-          if (right(Attach2r.FileName,4)==".pdf") then begin
-            arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
-            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
-            logtext(0,"PDF Mailr.Header " & Mailr.Header);
-            vDescription[Attach2r.SerNr*2] = Mailr.Header;
-            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
-          end;
-          if (right(Attach2r.FileName,5)==".docx") then begin
-            arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
-            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
-            vDescription[Attach2r.SerNr*2] = Mailr.Header;
-            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
-            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
-          end;
-          filenr = filenr + 1;
+    TrHs = true;
+    while (LoopKey(ckey,Mailr,1,TrHs)) begin
+      filenr = 1;
+      while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
+        if (right(Attach2r.FileName,4)==".pdf") then begin
+          arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
+          arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
+          vDescription[Attach2r.SerNr*2] = Mailr.Header;
+          vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
         end;
+        if (right(Attach2r.FileName,5)==".docx") then begin
+          arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
+          arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
+          vDescription[Attach2r.SerNr*2] = Mailr.Header;
+          vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+        end;
+        filenr = filenr + 1;
       end;
-    
+    end;
   end;
   
   ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsDocx,arrDocsDocxSerNr,vDescription,vAttachKey);
