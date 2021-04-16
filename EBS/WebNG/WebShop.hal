@@ -888,6 +888,36 @@ begin
   return;
 end;
 
+global webpublic
+procedure WebDownloadAllDoc()
+begin
+  record INDocVc IDr;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  Integer j;
+  string 255 c,ext;
+  Integer oldcomp;
+  
+  oldcomp = SetCompanyBasedOnCountry;
+  Attachr.SerNr = StringToLongint(WebGetArg("sernr"));
+	if (readfirstmain(Attachr,1,true)) begin
+		for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
+			c = mid(Attachr.FileName,j,1);
+			if (c==".") then begin
+				j = -1;
+			end else begin
+				ext = c & ext;
+			end;
+		end;
+		SetContentTypeForExtension(ext);
+		WebSetContentDisposition("inline; filename=" & Attachr.FileName);
+		WebOutAttachment(Attachr.SerNr);
+	end;
+  ResetCompanyBasedOnCountry(oldcomp);
+
+  return;
+end;
+
 procedure ShowVidoes(record INVc INr)
 begin
   record INDocVc IDr;
@@ -1554,43 +1584,49 @@ begin
   return;
 end;
 
-procedure ShowDocumentsCatalog(array string arrDocsPdf,array longint arrDocsPdfSerNr,array string arrDocsDocx,array longint arrDocsDocxSerNr)
+procedure ShowDocumentsCatalog(array string arrDocsPdf,array longint arrDocsPdfSerNr,array string arrDocsDocx,array longint arrDocsDocxSerNr,vector string vDescription)
 begin
   Integer i;
   record INVc INr;
   string 255 link,imglink,shorttext,tstr,base,lang,modal;
   val price;
   array string 255 aTypes,aColors;
-  
-  WebOutString("<div class='row product-catalog-list'>");
-  lang = CurrentWebLang;
-  for (i=0;i<arrDocsPdf.length;i=i+1) begin
-      WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
-      WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
-      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
-      WebOutString("</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
-      WebOutString("</div>" & arrDocsPdf[i] & "</div>");
-      WebOutString("</div>22222222222222222222222222222222</div>");
-      WebOutString("</div></div>");
-  end;
-
+  WebOutString("<div class='Documets'>");
+  WebOutString("<div class='SearchBox'>");
+  WebOutString("<input  id='docSearchInput' type='text' placeholder='Write what you want to find'>");
+  WebOutString("<button id='docSearchBtn'style='outline: 0;'>");
+  WebOutString("<i class='far fa-search'></i>");
+  WebOutString("</button>");
   WebOutString("</div>");
-  WebOutString("<div class='row product-catalog-list'>");
+  WebOutString("<h2>PDF dokumenti</h2>");
+  WebOutString("<div class='row'>");
   lang = CurrentWebLang;
   for (i=0;i<arrDocsPdf.length;i=i+1) begin
-      WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
-      WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
-      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
-      WebOutString("</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
-      WebOutString("</div>" & arrDocsDocx[i] & "</div>");
-      WebOutString("</div>22222222222222222222222222222222</div>");
-      WebOutString("</div></div>");
+      WebOutString("<div id='" & arrDocsPdfSerNr[i] & "' name='" & arrDocsPdf[i] & "' class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
+      WebOutString("<div class='ListDoc'>");
+      WebOutString("<div class='IcoDoc FilePDF'> </div>");
+      WebOutString("<div class='BoxInfoDoc'>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsPdfSerNr[i] & "'>" & arrDocsPdf[i] & "</a>");
+      WebOutString("<div class='Info'>" & vDescription[arrDocsPdfSerNr[i]] & "</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
   end;
-
+  WebOutString("</div>");
+  WebOutString("<h2>DOC dokumenti</h2>");
+  WebOutString("<div class='row'>");
+  for (i=0;i<arrDocsDocx.length;i=i+1) begin
+      WebOutString("<div id='" & arrDocsDocxSerNr[i] & "' name='" & arrDocsDocx[i] & "' class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
+      WebOutString("<div class='ListDoc'>");
+      WebOutString("<div class='IcoDoc FileDOC'> </div>");
+      WebOutString("<div class='BoxInfoDoc'>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsDocxSerNr[i] & "'>" & arrDocsDocx[i] & "</a>");
+      WebOutString("<div class='Info'>" & vDescription[arrDocsDocxSerNr[i]] & "</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+  end;
+  WebOutString("</div>");
   WebOutString("</div>");
 
   return;
@@ -1608,6 +1644,7 @@ begin
   record Attach2Vc Attach2r;
   integer filenr;
   record RLinkVc RLr;
+  vector string 255 vDescription;
   
   logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
   
@@ -1622,10 +1659,14 @@ begin
           if (right(Attach2r.FileName,4)==".pdf") then begin
             arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
             arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr;
+            logtext(0,"PDF Mailr.Header " & Mailr.Header);
+            vDescription[Attach2r.SerNr] = Mailr.Header;
           end;
           if (right(Attach2r.FileName,5)==".docx") then begin
             arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
             arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr;
+            vDescription[Attach2r.SerNr] = Mailr.Header;
+            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
           end;
           filenr = filenr + 1;
         end;
@@ -1633,7 +1674,7 @@ begin
     
   end;
   
-  ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsPdf,arrDocsPdfSerNr);
+  ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsDocx,arrDocsDocxSerNr,vDescription);
 
   return;
 end;
