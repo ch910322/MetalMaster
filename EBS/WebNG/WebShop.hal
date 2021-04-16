@@ -1637,7 +1637,7 @@ begin
 end;
 
 global
-procedure CustDocuments(record WebNGElementVc WEr)
+updating procedure CustDocuments(record WebNGElementVc WEr)
 begin
   array string 255 arrDocsPdf,arrDocsDocx;
   array longint arrDocsPdfSerNr,arrDocsDocxSerNr;
@@ -1649,7 +1649,14 @@ begin
   integer filenr;
   record RLinkVc RLr;
   vector string 255 vDescription,vAttachKey;
-    
+  
+  Mailr.SerNr = -1;
+  if(readfirstmain(Mailr,1,true))then begin
+    if(Mailr.SerNr==-1)then begin
+      recorddelete(Mailr);
+    end;
+  end;
+  
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
