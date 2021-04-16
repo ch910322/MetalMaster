@@ -3,6 +3,7 @@ begin
 
   SetLangMode(LangLatvian,"LAT",2);
   
+  Setting("Number Series - Mails",MailSerTClass,modTC); 
   Setting("MM tīmekļa iestatījumi",MMWebSetTClass,modWebShopNG);
   Setting("MM artikulu variācijas",MMItemSetLClass,modWebShopNG);
   Setting("MM artikulu tipi",MMItemTypeLClass,modWebShopNG);
