@@ -1652,7 +1652,7 @@ begin
   
   logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
   
-  Confr.AddrName = "Rekini";
+  Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
