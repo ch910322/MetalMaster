@@ -897,21 +897,25 @@ begin
   Integer j;
   string 255 c,ext;
   Integer oldcomp;
+  longint attachketkey;
   
   oldcomp = SetCompanyBasedOnCountry;
-  Attachr.SerNr = StringToLongint(WebGetArg("sernr"));
-	if (readfirstmain(Attachr,1,true)) begin
-		for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
-			c = mid(Attachr.FileName,j,1);
-			if (c==".") then begin
-				j = -1;
-			end else begin
-				ext = c & ext;
+  Attachr.SerNr = StringToLongint(WebGetArg("sernr"))/2;
+  attachketkey = StringToLongint(WebGetArg("key"));
+  if(attachketkey==CalcPassword(Attachr.SerNr*2,Attachr.SerNr*2,0))then begin
+		if (readfirstmain(Attachr,1,true)) begin
+			for (j=len(Attachr.FileName)-1;j>=0;j=j-1) begin
+				c = mid(Attachr.FileName,j,1);
+				if (c==".") then begin
+					j = -1;
+				end else begin
+					ext = c & ext;
+				end;
 			end;
+			SetContentTypeForExtension(ext);
+			WebSetContentDisposition("inline; filename=" & Attachr.FileName);
+			WebOutAttachment(Attachr.SerNr);
 		end;
-		SetContentTypeForExtension(ext);
-		WebSetContentDisposition("inline; filename=" & Attachr.FileName);
-		WebOutAttachment(Attachr.SerNr);
 	end;
   ResetCompanyBasedOnCountry(oldcomp);
 
@@ -1584,7 +1588,7 @@ begin
   return;
 end;
 
-procedure ShowDocumentsCatalog(array string arrDocsPdf,array longint arrDocsPdfSerNr,array string arrDocsDocx,array longint arrDocsDocxSerNr,vector string vDescription)
+procedure ShowDocumentsCatalog(array string arrDocsPdf,array longint arrDocsPdfSerNr,array string arrDocsDocx,array longint arrDocsDocxSerNr,vector string vDescription,vector string vAttachKey)
 begin
   Integer i;
   record INVc INr;
@@ -1606,7 +1610,7 @@ begin
       WebOutString("<div class='ListDoc'>");
       WebOutString("<div class='IcoDoc FilePDF'> </div>");
       WebOutString("<div class='BoxInfoDoc'>");
-      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsPdfSerNr[i] & "'>" & arrDocsPdf[i] & "</a>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsPdfSerNr[i] & "&key=" & vAttachKey[arrDocsPdfSerNr[i]] & "'>" & arrDocsPdf[i] & "</a>");
       WebOutString("<div class='Info'>" & vDescription[arrDocsPdfSerNr[i]] & "</div>");
       WebOutString("</div>");
       WebOutString("</div>");
@@ -1620,7 +1624,7 @@ begin
       WebOutString("<div class='ListDoc'>");
       WebOutString("<div class='IcoDoc FileDOC'> </div>");
       WebOutString("<div class='BoxInfoDoc'>");
-      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsDocxSerNr[i] & "'>" & arrDocsDocx[i] & "</a>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsDocxSerNr[i] & "&key=" & vAttachKey[arrDocsDocxSerNr[i]] & "'>" & arrDocsDocx[i] & "</a>");
       WebOutString("<div class='Info'>" & vDescription[arrDocsDocxSerNr[i]] & "</div>");
       WebOutString("</div>");
       WebOutString("</div>");
@@ -1644,7 +1648,7 @@ begin
   record Attach2Vc Attach2r;
   integer filenr;
   record RLinkVc RLr;
-  vector string 255 vDescription;
+  vector string 255 vDescription,vAttachKey;
   
   logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
   
@@ -1658,14 +1662,16 @@ begin
         while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
           if (right(Attach2r.FileName,4)==".pdf") then begin
             arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
-            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr;
+            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
             logtext(0,"PDF Mailr.Header " & Mailr.Header);
-            vDescription[Attach2r.SerNr] = Mailr.Header;
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
           end;
           if (right(Attach2r.FileName,5)==".docx") then begin
             arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
-            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr;
-            vDescription[Attach2r.SerNr] = Mailr.Header;
+            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
             logtext(0,"DOCX Mailr.Header " & Mailr.Header);
           end;
           filenr = filenr + 1;
@@ -1674,7 +1680,7 @@ begin
     
   end;
   
-  ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsDocx,arrDocsDocxSerNr,vDescription);
+  ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsDocx,arrDocsDocxSerNr,vDescription,vAttachKey);
 
   return;
 end;
