@@ -166,12 +166,20 @@ begin
   MainKeyBegin(SerNr,0);
   KeySegment(SerNr);
   EndRecord;  
+  
+  RecordAddBegin(WebNGProductVc,"WebNGProductVc_MM");
+    RecordField(Classification,M4UStr,255,0);
+    RecordField(Price,M4Val,0,0);
+    RecordField(Unittext,M4Str,10,0);
+  EndRecordAdd;
+  
 
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
   SourceFile("halcust/EBS/Windows",3);
   SourceFile("halcust/EBS/RActions",3);
   SourceFile("halcust/EBS/Latvian",0);
+  SourceFile("halcust/EBS/English",0);
   SourceFile("halcust/EBS/WebNG",3);
   SourceFile("halcust/EBS/Level0/RActions",0);
   SourceFile("halcust/EBS/Level0/WebNG",0);

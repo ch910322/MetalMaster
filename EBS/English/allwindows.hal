@@ -1,0 +1,61 @@
+external inner function Boolean HasSIPServerConnection();
+external inner function Boolean StandardHansa();
+external inner function Boolean DisplayAdditionalFields();
+external inner function Boolean IsCloudControllerClient();
+external inner function Boolean HasSalesGroup();
+external inner function UUID GetServerUUIDRemote();
+external inner function Boolean HasAdvancedCRM();
+
+window WebNGProductDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,t,v,vs;
+  WindowBegin("Web Product",WebNGProductDClass,CGview,-);
+  SetWRect(20,80,700,505);
+//  Sizeable(-1,-1,0,0);
+  UseView(WebNGProductVc);
+  ActiveFieldOnNew("Code");
+  vs = 20;h = 110;h2 = 330; v = 6;
+  Tile(0,110,false,"",-);
+  EditField(h,v,120,"Code",Normal,Code,false,INSClass);
+  EditField(h2,v,150,"Category",Normal,ProductCategory,false,WebNGProductCatSClass);
+  CheckBox(-100,v,0,"Closed",Closed);
+  EditField(h,v+=vs,300,"Comment",Normal,Comment,false,0);
+  EditField(-80,v,40,"Default Language",Normal,DefLangCode,false,WebNGLanguageSClass);
+//  EditField(h,v+=vs,80,"Free Components",Normal,FreeComponents,true,0);
+//  EditField(h2,v,150,"Picking order",Normal,FreePickingOrder,false,SetSClass);
+  EditField(h,v+=vs,80,"More Info Link",Normal,MoreInfoLink,true,WebNGStructSClass);
+//  CheckBox(h,v+=vs,0,"Configurable",Configurable);
+//  CheckBox(h+120,v,0,"Allow rental",AllowRental);
+//  CheckBox(h+240,v,0,"Sold in whole units",SoldInWholeUnits);
+  EditField(h2,v,80,"Sorting",Normal,Sorting,false,0);
+  EditField(-80,v,40,"Limited Availability Break Qty",Normal,LimitedInStock,true,0);
+  EditField(h,v+=vs,150,"HTML Head",Normal,ElementCode,false,WebNGElementSClass);
+  EditField(h,v+=vs,150,"Classification",Normal,Classification,false,DISClass);
+  EditField(h+200,v,70,"Unit",Normal,Unittext,false,UnitSClass);
+  EditField(h,v+=vs,70,"Price",Normal,Price,false,0);
+  HalPushButton(-130,v,-30,v+20,"NewProductTranslationDsm","New Translation");
+  TileButton(1,"Components");
+  TileButton(2,"Translations");
+  Tile(1,210,false,"1",-);
+  MatrixBegin(4,v=6,-32,-10,-,99);
+  MatCol(t=1,24,"Type",0,SelectionType,false,SetSClass);
+  MatCol(t,100,"Code",0,ComponentCode,false,WebNGProductSClass);
+  MatCol(t,206,"Name",0,ComponentName,false,0);
+  MatCol(t,336,"Requirement",0,Requirement,false,SetSClass);
+  MatCol(t,416,"Def Qty",0,Qty,true,0);
+  MatCol(t,471,"Min Qty",0,QtyMin,true,0);
+  MatCol(t,526,"Max Qty",0,QtyMax,true,0);
+  MatText(t=3,24,"Component Group",true);
+  MatCol(t,150,"Requirement",0,Requirement,false,SetSClass);
+  MatCol(t,250,"Selection Type",0,SelectionType,false,SetSClass);
+  EndMatrix;
+  Tile(2,70,true,"2",-);
+  RecordList2(10,v=6,-30,-39,"WebNGTranslateVc");
+  RlColKey(4,4,"Language",LangCode,false,ProductLangCode);
+  RlColKey(90,90,"Changed",LastChanged,false,ProductLastChanged);
+  RlCol(180,180,"Sorting",Sorting,false);
+  RlColKey(270,270,"Comment",Comment,false,ProductComment);
+//  SpecialMenu("Enable Web Product on Amazon",'e',1,"WebNGProductToAmazonDsm");//not ready
+  EndWindow;
+end;
