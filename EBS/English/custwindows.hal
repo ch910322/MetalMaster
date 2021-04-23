@@ -1,0 +1,15 @@
+
+window MMWebProdSetTClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm,tilenr,h2,h3;
+  vs = 20; h2 = 350; h3 = 500;
+  WindowBegin("Web Product Settings",MMWebProdSetTClass,CGSbl,SRType);
+  SetBlid(MMWebProdSetBlock);
+  SetWRect(20,80,600,298);
+  Sizeable(-1,-1,0,0);
+  EditField(h=150,v=20,100,"Mat. Class. Type",Normal,MatClass,false,CTypeSClass);
+  EditField(h,v+=20,100,"Col. Class. Type ",Normal,ColClass,false,CTypeSClass);
+  EditField(h,v+=20,100,"Item Code",Normal,ItemCode,false,0);
+  EndWindow;
+end;

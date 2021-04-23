@@ -1,0 +1,7 @@
+event startup
+begin
+
+  Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
+
+  return;
+end;

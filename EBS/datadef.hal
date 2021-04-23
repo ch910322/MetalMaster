@@ -173,6 +173,11 @@ begin
     RecordField(Unittext,M4Str,10,0);
   EndRecordAdd;
   
+  BlockBegin(MMWebProdSetBlock,-,"");
+    RecordField(MatClass,M4UStr,20,0);
+    RecordField(ColClass,M4UStr,20,0);
+    RecordField(ItemCode,M4UStr,100,0);
+  EndBlock;
 
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
