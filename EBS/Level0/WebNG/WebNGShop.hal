@@ -274,8 +274,9 @@ begin
       //TempWelcomePage(WSr);
       RedirectToShopPage("catalog");
     case "catalog":
-      //ShopCatalogApp(WSr,mpath);
-      MM_ShowProductCatalog(WSr,mpath);
+      ShopCatalogApp(WSr,mpath);
+      //MM_ShowProductCatalog(WSr,mpath);
+      
 
     case "basket":
       //ShopBasketApp(WSr,mpath);
