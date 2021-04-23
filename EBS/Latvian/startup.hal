@@ -9,9 +9,9 @@ begin
   Setting("MM artikulu tipi",MMItemTypeLClass,modWebShopNG);
   Setting("MM artikulu krāsas",MMItemColorLClass,modWebShopNG);
   Setting("Artikulu dokumenti",INDocLClass,modWebShopNG);
-
+  
   Setting("Amati",MMUserTitleLClass,modSY);
-
+  Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
   Setting("Metalmaster deklarāciju klasifikācijas",MM_DeclarationClassLClass,modSO);
   Setting("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,modSO);
 
