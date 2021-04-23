@@ -22,6 +22,9 @@ external inner updating function Integer AddProductToBasket(string,val,Integer);
 external inner function boolean GetShoppingBasket(var record WebNGShopBasketVc,integer);
 external inner function string 255 GetLinkToCheckoutPage();
 external inner procedure CalcSum(val,val,val,val,var val,Integer);
+external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
+external inner procedure ShowProductShortDescription(record WebNGProductVc);
+
 
 function string 255 GetCTypeTranslation(string cls)
 begin
@@ -358,6 +361,83 @@ begin
   return;
 end;
 
+
+procedure ShowWebProductCatalog(array record WebNGProductVc arrWebNGProductr,string listview,record MMWebSetBlock WSb)
+begin
+  Integer i;
+  record WebNGProductVc WebNGProductr;
+  string 255 link,imglink,shorttext,tstr,base,lang,modal;
+  val price;
+  array string 255 aTypes,aColors;
+  
+  logtext(0,"ShowWebProductCatalog  1");
+  
+  WebOutString("<div class='row product-catalog-list hal36'>");
+  lang = CurrentWebLang;
+  for (i=0;i<arrWebNGProductr.length;i=i+1) begin
+    logtext(0,"ShowWebProductCatalog  2 " & i);
+    WebNGProductr = arrWebNGProductr[i];
+    logtext(0,"ShowWebProductCatalog  3 " & i);
+    base = GetLinkToShop;
+    logtext(0,"ShowWebProductCatalog  4 " & i);
+    imglink = base & "images/";
+    imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/0",true);
+    logtext(0,"ShowWebProductCatalog  5 " & i);
+    link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(WebNGProductr.Code),true);
+    logtext(0,"ShowWebProductCatalog  6 " & i);
+    price = WebNGProductr.Price;
+    shorttext = GetTranslatedNameProduct(WebNGProductr);
+    logtext(0,"ShowWebProductCatalog  7 " & i);
+    tstr = GetTranslatedNameProduct(WebNGProductr);//GetItemTitle(INr,lang);
+    //GetItemVars(INr,aTypes,aColors);
+
+    if (listview=="list") then begin
+      WebOutString("<div " /*& ShowItemClasses(INr,WSb)*/ & " class='col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'><div class='row'>");
+      WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
+      WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
+      //WebOutString("<div class='text'>" & shorttext & "</div>");
+      ShowProductShortDescription(WebNGProductr);
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
+      if (aTypes.length==0) then begin
+        WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
+        modal = "";
+      end else begin
+        modal = " data-toggle='modal'";
+      end;
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
+      WebOutString("</div></div>");
+      WebOutString("</div></div>");
+      WebOutString("</div></div>");
+      
+    end else begin
+      WebOutString("<div "/* & ShowItemClasses(INr,WSb)*/ & "  class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'>");
+      WebOutString("<div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div>");
+      WebOutString("<div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
+      //WebOutString("<div class='text'>" & shorttext & "</div>");
+      ShowProductShortDescription(WebNGProductr);
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
+      if (aTypes.length==0) then begin
+        WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
+        modal = "";
+      end else begin
+        modal = " data-toggle='modal'";
+      end;
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+      WebOutString("</div></div>");
+    end;
+  end;
+
+  WebOutString("</div>");
+
+  return;
+end;
+
 procedure ShowProductCatalog(array record INVc arrINr,string listview,record MMWebSetBlock WSb)
 begin
   Integer i;
@@ -433,8 +513,10 @@ begin
   record DIVc DIr;
   Boolean TrHs;
   array record INVc arrINr;
+  array record WebNGProductVc arrWebNGProductr;
   record INVc INr;
   record WebNGPageVc WPr;
+  record WebNGProductVc WebNGProductr;
 
 
   //sorting?
@@ -453,6 +535,10 @@ begin
 
   DIr.CType = WSb.WebShowClass;
   TrHs = true;
+  
+  while(loopmain(WebNGProductr,1,true))begin
+    arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
+  end;
   while (LoopKey("CType",DIr,1,TrHs)) begin
     if (DIr.CType!=WSb.WebShowClass) then begin
       TrHs = false;
@@ -474,8 +560,9 @@ begin
   //Show filters
   ShowFilterOptions(WSb,vFilters);
   //show items
+  
+  ShowWebProductCatalog(arrWebNGProductr,vFilters["DisplayOption"],WSb);
   ShowProductCatalog(arrINr,vFilters["DisplayOption"],WSb);
-
   ShowWebAppPageEnd(WPr);
 
   return;
@@ -1036,6 +1123,7 @@ begin
   integer aLen,i;
   integer oldcompany;
   boolean res;
+  record WebNGProductVc WebNGProductr;
   
   RollbackOneRequestURL;
   
@@ -1101,6 +1189,44 @@ begin
           if (ReadFirstMain(Attachr,1,true)) then begin
             foundf = true;
             SendAttachedFile(Attachr,downloadf);
+          end;
+        end;
+      end else begin//INr
+        LRetryWebFindImage:;
+        i = 1;
+        WebNGProductr.Code = productcode;
+        if(readfirstmain(WebNGProductr,1,true))then begin
+          while (ReadRecordLink(WebNGProductr,i,Attachr,RLr)) begin
+            addf = false;
+            if (thumbf) then begin
+              if (left(Attachr.FileName,5)=="thumb") then begin
+                addf = true;
+              end;
+            end else begin
+              addf= true;
+            end;
+          
+            if (FileNameIsImage(Attachr.FileName)==false) then begin
+              addf = false;
+            end;
+          
+            if (addf) then begin
+              AddToSortedArray(Attachr.FileName,Attachr.SerNr,aFiles,aAttachSerNr,aLen);
+            end;
+          
+            i = i+1;
+          end;
+          if (thumbf and aLen==0) then begin
+            thumbf = false;
+            goto LRetryWebFindImage;
+          end;
+          if (imgno==0 or imgno<=aLen) then begin
+          
+            Attachr.SerNr = StringToLongint(aAttachSerNr[imgno]);
+            if (ReadFirstMain(Attachr,1,true)) then begin
+              foundf = true;
+              SendAttachedFile(Attachr,downloadf);
+            end;
           end;
         end;
       end;
