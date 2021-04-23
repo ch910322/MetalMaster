@@ -362,6 +362,19 @@ begin
 end;
 
 
+function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,record MMWebSetBlock WSb)
+begin
+  string 255 res;
+
+  res = ShowClassTypeList(WSb.WebShowClass,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter2,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter3,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter4,WebNGProductr.Classification);
+  
+  ShowWebNGProductClasses = res;
+  return;
+end;
+
 procedure ShowWebProductCatalog(array record WebNGProductVc arrWebNGProductr,string listview,record MMWebSetBlock WSb)
 begin
   Integer i;
@@ -392,7 +405,7 @@ begin
     //GetItemVars(INr,aTypes,aColors);
 
     if (listview=="list") then begin
-      WebOutString("<div " /*& ShowItemClasses(INr,WSb)*/ & " class='col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'><div class='row'>");
+      WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & " class='col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'><div class='row'>");
       WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
       WebOutString("<div class='col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12'><div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
       //WebOutString("<div class='text'>" & shorttext & "</div>");
@@ -412,7 +425,7 @@ begin
       WebOutString("</div></div>");
       
     end else begin
-      WebOutString("<div "/* & ShowItemClasses(INr,WSb)*/ & "  class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'>");
+      WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & "  class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'>");
       WebOutString("<div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div>");
       WebOutString("<div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
       //WebOutString("<div class='text'>" & shorttext & "</div>");
@@ -537,7 +550,9 @@ begin
   TrHs = true;
   
   while(loopmain(WebNGProductr,1,true))begin
-    arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
+    if(setinset(vFilters["Option1"],WebNGProductr.Classification))then begin
+      arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
+    end;
   end;
   while (LoopKey("CType",DIr,1,TrHs)) begin
     if (DIr.CType!=WSb.WebShowClass) then begin
@@ -707,13 +722,6 @@ begin
     WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
     WebOutStringFormatNL("                          <div class='ColorProduct'>");
     WebOutStringFormatNL("                              <select name='color'>");
-  /*
-    WebOutStringFormatNL("                                  <option class='ColorItem Color-1'>Oranžs / RAL</option>");
-    WebOutStringFormatNL("                                  <option class='ColorItem Color-2'>Oranžs / RAL</option>");
-    WebOutStringFormatNL("                                  <option class='ColorItem Color-3'>Oranžs / RAL</option>");
-    WebOutStringFormatNL("                                  <option class='ColorItem Color-4'>Oranžs / RAL</option>");
-    WebOutStringFormatNL("                                  <option class='ColorItem Color-5'>Oranžs / RAL</option>");
-  */
     for (i=0;i<aColors.length;i=i+1) begin
       WebOutStringFormatNL("<option value='" & aColors[i] & "' class='ColorItem color-class-" & aColors[i] & "'>" & GetVarColorName(aColors[i],lang) & "</option>");
     end;
