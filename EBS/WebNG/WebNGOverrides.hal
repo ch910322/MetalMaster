@@ -9,7 +9,9 @@ external procedure ShowNewsLetterSignup(record WebNGElementVc);
 external procedure ShowEmployeesOnWeb(record WebNGElementVc);
 external procedure ShowContentListCust(record WebNGElementVc);
 external procedure CustShowBestOffers(record WebNGElementVc);
-external procedure CustDocuments(record WebNGElementVc);
+// external procedure CustDocuments(record WebNGElementVc);
+external procedure CustPDFDocuments(record WebNGElementVc);
+external procedure CustDOCDocuments(record WebNGElementVc);
 external procedure CustShowLanguageSelectElement();
 external updating procedure MM_ShopAddToBasket();
 external procedure CustShowBasketElement();
@@ -39,7 +41,9 @@ begin
     case 206:
       CustShowBestOffers(WEr);
     case 207:
-      CustDocuments(WEr);
+      CustPDFDocuments(WEr);
+    case 208:
+      CustDOCDocuments(WEr);
     otherwise
       res = false;
   end;

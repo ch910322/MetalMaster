@@ -366,7 +366,7 @@ begin
   val price;
   array string 255 aTypes,aColors;
   
-  WebOutString("<div class='row product-catalog-list'>");
+  WebOutString("<div class='row product-catalog-list hal36'>");
   lang = CurrentWebLang;
   for (i=0;i<arrINr.length;i=i+1) begin
     INr = arrINr[i];
@@ -1596,13 +1596,7 @@ begin
   val price;
   array string 255 aTypes,aColors;
   WebOutString("<div class='Documets'>");
-  WebOutString("<div class='SearchBox'>");
-  WebOutString("<input  id='docSearchInput' type='text' placeholder='Write what you want to find'>");
-  WebOutString("<button id='docSearchBtn'style='outline: 0;'>");
-  WebOutString("<i class='far fa-search'></i>");
-  WebOutString("</button>");
-  WebOutString("</div>");
-  WebOutString("<h2>PDF dokumenti</h2>");
+  WebOutString("<h2>PDF documents</h2>");
   WebOutString("<div class='row'>");
   lang = CurrentWebLang;
   for (i=0;i<arrDocsPdf.length;i=i+1) begin
@@ -1617,7 +1611,7 @@ begin
       WebOutString("</div>");
   end;
   WebOutString("</div>");
-  WebOutString("<h2>DOC dokumenti</h2>");
+  WebOutString("<h2>DOC documents</h2>");
   WebOutString("<div class='row'>");
   for (i=0;i<arrDocsDocx.length;i=i+1) begin
       WebOutString("<div id='" & arrDocsDocxSerNr[i] & "' name='" & arrDocsDocx[i] & "' class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
@@ -1636,8 +1630,60 @@ begin
   return;
 end;
 
+procedure ShowDocumentsCatalogPDF(array string arrDocsPdf,array longint arrDocsPdfSerNr,vector string vDescription,vector string vAttachKey)
+begin
+  Integer i;
+  record INVc INr;
+  string 255 link,imglink,shorttext,tstr,base,lang,modal;
+  val price;
+  array string 255 aTypes,aColors;
+
+  WebOutString("<div class='row'>");
+  lang = CurrentWebLang;
+  for (i=0;i<arrDocsPdf.length;i=i+1) begin
+      WebOutString("<div id='" & arrDocsPdfSerNr[i] & "' name='" & arrDocsPdf[i] & "' class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
+      WebOutString("<div class='ListDoc'>");
+      WebOutString("<div class='IcoDoc FilePDF'> </div>");
+      WebOutString("<div class='BoxInfoDoc'>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsPdfSerNr[i] & "&key=" & vAttachKey[arrDocsPdfSerNr[i]] & "'>" & arrDocsPdf[i] & "</a>");
+      WebOutString("<div class='Info'>" & vDescription[arrDocsPdfSerNr[i]] & "</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+  end;
+  WebOutString("</div>");
+
+  return;
+end;
+
+procedure ShowDocumentsCatalogDOC(array string arrDocsDocx,array longint arrDocsDocxSerNr,vector string vDescription,vector string vAttachKey)
+begin
+  Integer i;
+  record INVc INr;
+  string 255 link,imglink,shorttext,tstr,base,lang,modal;
+  val price;
+  array string 255 aTypes,aColors;
+
+  lang = CurrentWebLang;
+  WebOutString("<div class='row'>");
+  for (i=0;i<arrDocsDocx.length;i=i+1) begin
+      WebOutString("<div id='" & arrDocsDocxSerNr[i] & "' name='" & arrDocsDocx[i] & "' class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
+      WebOutString("<div class='ListDoc'>");
+      WebOutString("<div class='IcoDoc FileDOC'> </div>");
+      WebOutString("<div class='BoxInfoDoc'>");
+      WebOutString("<a href='WebDownloadAllDoc.hal?sernr=" & arrDocsDocxSerNr[i] & "&key=" & vAttachKey[arrDocsDocxSerNr[i]] & "'>" & arrDocsDocx[i] & "</a>");
+      WebOutString("<div class='Info'>" & vDescription[arrDocsDocxSerNr[i]] & "</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+      WebOutString("</div>");
+  end;
+  WebOutString("</div>");
+
+  return;
+end;
+
 global
-updating procedure CustDocuments(record WebNGElementVc WEr)
+procedure CustDocuments(record WebNGElementVc WEr)
 begin
   array string 255 arrDocsPdf,arrDocsDocx;
   array longint arrDocsPdfSerNr,arrDocsDocxSerNr;
@@ -1650,39 +1696,119 @@ begin
   record RLinkVc RLr;
   vector string 255 vDescription,vAttachKey;
   
-  Mailr.SerNr = -1;
-  if(readfirstmain(Mailr,1,true))then begin
-    if(Mailr.SerNr==-1)then begin
-      recorddelete(Mailr);
-    end;
-  end;
+  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
   
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
-    TrHs = true;
-    while (LoopKey(ckey,Mailr,1,TrHs)) begin
-      filenr = 1;
-      while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
-        if (right(Attach2r.FileName,4)==".pdf") then begin
-          arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
-          arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
-          vDescription[Attach2r.SerNr*2] = Mailr.Header;
-          vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+      TrHs = true;
+      while (LoopKey(ckey,Mailr,1,TrHs)) begin
+        filenr = 1;
+        while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
+          if (right(Attach2r.FileName,4)==".pdf") then begin
+            arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
+            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
+            logtext(0,"PDF Mailr.Header " & Mailr.Header);
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+          end;
+          if (right(Attach2r.FileName,5)==".docx") then begin
+            arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
+            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
+          end;
+          filenr = filenr + 1;
         end;
-        if (right(Attach2r.FileName,5)==".docx") then begin
-          arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
-          arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
-          vDescription[Attach2r.SerNr*2] = Mailr.Header;
-          vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
-        end;
-        filenr = filenr + 1;
       end;
-    end;
+    
   end;
   
   ShowDocumentsCatalog(arrDocsPdf,arrDocsPdfSerNr,arrDocsDocx,arrDocsDocxSerNr,vDescription,vAttachKey);
-
   return;
+end;
+
+global
+procedure CustPDFDocuments(record WebNGElementVc WEr)
+begin
+  array string 255 arrDocsPdf;
+  array longint arrDocsPdfSerNr;
+  boolean TrHs;
+  record ConfVc Confr;
+  record MailVc Mailr;
+  string 255 ckey;
+  record Attach2Vc Attach2r;
+  integer filenr;
+  record RLinkVc RLr;
+  vector string 255 vDescription,vAttachKey;
+  
+  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
+  
+  Confr.AddrName = "Documents";
+  if(readfirstkey("AddrName",Confr,1,true))then begin
+    logtext(0,Confr.AddrName);
+    ckey = "UserTime:" & Confr.SerNr;
+      TrHs = true;
+      while (LoopKey(ckey,Mailr,1,TrHs)) begin
+        filenr = 1;
+        while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
+          if (right(Attach2r.FileName,4)==".pdf") then begin
+            arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
+            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
+            logtext(0,"PDF Mailr.Header " & Mailr.Header);
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+          end;
+          filenr = filenr + 1;
+        end;
+      end;
+    
+  end;
+  
+  ShowDocumentsCatalogPDF(arrDocsPdf,arrDocsPdfSerNr,vDescription,vAttachKey);
+  return;
+end;
+
+
+global
+procedure CustDOCDocuments(record WebNGElementVc WEr)
+begin
+array string 255 arrDocsDocx;
+array longint arrDocsDocxSerNr;
+boolean TrHs;
+record ConfVc Confr;
+record MailVc Mailr;
+string 255 ckey;
+record Attach2Vc Attach2r;
+integer filenr;
+record RLinkVc RLr;
+vector string 255 vDescription,vAttachKey;
+
+logtext(0,"CustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocuments");
+
+Confr.AddrName = "Rekini";
+  if(readfirstkey("AddrName",Confr,1,true))then begin
+    logtext(0,Confr.AddrName);
+    ckey = "UserTime:" & Confr.SerNr;
+      TrHs = true;
+      while (LoopKey(ckey,Mailr,1,TrHs)) begin
+        filenr = 1;
+        while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
+          if (right(Attach2r.FileName,5)==".docx") then begin
+            arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
+            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
+            vDescription[Attach2r.SerNr*2] = Mailr.Header;
+            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
+          end;
+          filenr = filenr + 1;
+        end;
+      end;
+    
+  end;
+
+ShowDocumentsCatalogDOC(arrDocsDocx,arrDocsDocxSerNr,vDescription,vAttachKey);
+return;
 end;
