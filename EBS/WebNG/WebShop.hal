@@ -562,7 +562,7 @@ begin
   //show items
   
   ShowWebProductCatalog(arrWebNGProductr,vFilters["DisplayOption"],WSb);
-  ShowProductCatalog(arrINr,vFilters["DisplayOption"],WSb);
+  //ShowProductCatalog(arrINr,vFilters["DisplayOption"],WSb);
   ShowWebAppPageEnd(WPr);
 
   return;
