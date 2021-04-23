@@ -1788,7 +1788,7 @@ vector string 255 vDescription,vAttachKey;
 
 logtext(0,"CustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocuments");
 
-Confr.AddrName = "Rekini";
+Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
