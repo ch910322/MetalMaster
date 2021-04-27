@@ -24,6 +24,7 @@ external inner function string 255 GetLinkToCheckoutPage();
 external inner procedure CalcSum(val,val,val,val,var val,Integer);
 external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
 external inner procedure ShowProductShortDescription(record WebNGProductVc);
+external inner procedure ExtractObj(string,var Integer,var string);
 
 
 function string 255 GetCTypeTranslation(string cls)
@@ -325,6 +326,32 @@ begin
   return;
 end;
 
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials)
+begin
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt,pos;
+  string 100 tstr;
+  
+  pos = 0;
+  ExtractObj(WebNGProductr.Classification,pos,tstr);
+  while (nonblank(tstr)) begin
+    if(nonblank(tstr))then begin
+      if(nonblank(vColors[tstr]))then begin
+        aColors[aColors.length] = vColors[tstr];
+      end;
+      if(nonblank(vMateraials[tstr]))then begin
+        aTypes[aTypes.length] = vMateraials[tstr];
+      end;
+    end;
+    ExtractObj(WebNGProductr.Classification,pos,tstr);
+  end;
+  
+
+  return;
+end;
+
+
 function string 255 ShowClassTypeList(string type,string list)
 begin
   string 255 res;
@@ -382,27 +409,53 @@ begin
   string 255 link,imglink,shorttext,tstr,base,lang,modal;
   val price;
   array string 255 aTypes,aColors;
+  record MMWebProdSetBlock MMWPSb;
+  record DIVc DIr;
+  vector string 255 vColors,vMateraials;
+  boolean TrHs;
   
-  logtext(0,"ShowWebProductCatalog  1");
+  blockload(MMWPSb);
   
+  DIr.CType = MMWPSb.MatClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.MatClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vMateraials[DIr.Code] = DIr.Name;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  
+  DIr.CType = MMWPSb.ColClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.ColClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vColors[DIr.Code] = DIr.Name;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+    
   WebOutString("<div class='row product-catalog-list hal36'>");
   lang = CurrentWebLang;
   for (i=0;i<arrWebNGProductr.length;i=i+1) begin
-    logtext(0,"ShowWebProductCatalog  2 " & i);
     WebNGProductr = arrWebNGProductr[i];
-    logtext(0,"ShowWebProductCatalog  3 " & i);
     base = GetLinkToShop;
-    logtext(0,"ShowWebProductCatalog  4 " & i);
     imglink = base & "images/";
     imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/0",true);
-    logtext(0,"ShowWebProductCatalog  5 " & i);
     link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(WebNGProductr.Code),true);
-    logtext(0,"ShowWebProductCatalog  6 " & i);
     price = WebNGProductr.Price;
     shorttext = GetTranslatedNameProduct(WebNGProductr);
-    logtext(0,"ShowWebProductCatalog  7 " & i);
     tstr = GetTranslatedNameProduct(WebNGProductr);//GetItemTitle(INr,lang);
-    //GetItemVars(INr,aTypes,aColors);
+    cleararray(aTypes);
+    cleararray(aColors);
+    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+    logtext(0,"aColors " & aColors.length);
+    logtext(0,"aTypes " & aTypes.length);
 
     if (listview=="list") then begin
       WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & " class='col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'><div class='row'>");
@@ -1591,6 +1644,119 @@ end;
 
 global
 procedure ShowItemVarsAjax()
+begin
+  Integer i,num;
+  array string 255 aTypes,aColors;
+  //record INVc INr;  
+  record WebNGProductVc WebNGProductr;
+  string 255 lang;
+  Integer oldcomp;
+  record MMWebProdSetBlock MMWPSb;
+  record DIVc DIr;
+  vector string 255 vColors,vMateraials;
+  boolean TrHs;
+  record UnitVc Unitr;
+  
+  blockload(MMWPSb);
+  
+  DIr.CType = MMWPSb.MatClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.MatClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vMateraials[DIr.Code] = DIr.Code;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  
+  DIr.CType = MMWPSb.ColClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.ColClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vColors[DIr.Code] = DIr.Code;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  
+  oldcomp = SetCompanyBasedOnCountry;
+
+  lang = CurrentWebLang;
+  WebNGProductr.Code = UrlDecode(WebGetArg("item"));
+  if (ReadFirstMain(WebNGProductr,1,true)) then begin
+    Unitr.Code = WebNGProductr.Unittext;
+    readfirstmain(Unitr,1,true);
+    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+    if (aTypes.length>0) then begin
+      WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
+      if (aTypes.length>0) then begin
+        WebOutStringFormatNL("              <div class='ModProdLi'>");
+        WebOutStringFormatNL("                  <div class='row'>");
+        WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-4 col-md-12 col-12'>");
+        WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89009) & "</div>");
+        WebOutStringFormatNL("                      </div>");
+        WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
+        WebOutStringFormatNL("                          <select name='type'>");
+
+        for (i=0;i<aTypes.length;i=i+1) begin
+          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & "</option>");
+        end;
+        WebOutStringFormatNL("                          </select>");
+        WebOutStringFormatNL("                      </div>");
+        WebOutStringFormatNL("                  </div>");
+        WebOutStringFormatNL("              </div>");
+      end;
+      if (aColors.length>0) then begin
+        WebOutStringFormatNL("              <div class='ModProdLi'>");
+        WebOutStringFormatNL("                  <div class='row'>");
+        WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-4 col-md-12 col-12'>");
+        WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89010) & "</div>");
+        WebOutStringFormatNL("                      </div>");
+        WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
+        WebOutStringFormatNL("                          <div class='ColorProduct'>");
+        WebOutStringFormatNL("                              <select name='color'>");
+        for (i=0;i<aColors.length;i=i+1) begin
+          WebOutStringFormatNL("<option value='" & aColors[i] & "' class='ColorItem color-class-" & aColors[i] & "'>" & GetVarColorName(aColors[i],lang) & "</option>");
+        end;
+
+        WebOutStringFormatNL("                              </select>");
+        WebOutStringFormatNL("                          </div>");
+        WebOutStringFormatNL("                      </div>");
+        WebOutStringFormatNL("                  </div>");
+        WebOutStringFormatNL("              </div>");
+      end;
+      WebOutStringFormatNL("              <div class='ModProdLi'>");
+      WebOutStringFormatNL("                  <div class='row'>");
+      WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-4 col-md-12 col-12'>");
+      WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89011) & "</div>");
+      WebOutStringFormatNL("                      </div>");
+      WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
+      
+      if(blank(Unitr.Comment))then begin
+        Unitr.Comment = ToolWebNGTranslateText2(89012);
+      end;
+      WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & Unitr.Comment & "'>");
+      WebOutStringFormatNL("                      </div>");
+      WebOutStringFormatNL("                  </div>");
+      WebOutStringFormatNL("              </div> ");
+      WebOutStringFormatNL("              <div class='ModProdLi text-center'>");
+      WebOutStringFormatNL("                  <input type='button' class='btns-white-red' value='" & ToolWebNGTranslateText2(89007) & "'>");
+      WebOutStringFormatNL("              </div>");
+      WebOutStringFormatNL("          </form>  ");
+    end;
+  end;
+  OutputColorClasses;
+
+  ResetCompanyBasedOnCountry(oldcomp);
+  return;
+end;
+
+global
+procedure ShowItemVarsAjaxIN()
 begin
   Integer i,num;
   array string 255 aTypes,aColors;
