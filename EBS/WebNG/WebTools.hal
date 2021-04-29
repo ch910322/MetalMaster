@@ -44,6 +44,23 @@ begin
   return;
 end;
 
+function string 255 OutputBannerImageLink(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr)
+begin
+  string 255 res,base,large_image,link;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  Integer i;
+  
+  base = GetLinkToStruct(WCSr.HandlerAppNode,false);
+  i = 1;
+  while (ReadRecordLink(WCr,i,Attachr,RLr)) begin
+    res = base & WCr.SerNr & "/images?image=" & Attachr.FileName;
+    i = i + 1;
+  end;
+
+  OutputBannerImageLink = res;
+  return;
+end; 
 
 function string 255 OutputBannerImages(record WebNGContentStyleVc WCSr,record WebNGContentVc WCr)
 begin
@@ -207,6 +224,7 @@ begin
       end; 
       link = GetLinkToStruct(WCSr.HandlerAppNode,true) & WCr.SerNr;
       tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
+      tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
       tstr = StrReplace(tstr,"{Title}",WTr.Comment);
       tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
       tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
