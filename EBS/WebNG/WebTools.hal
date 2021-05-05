@@ -659,6 +659,94 @@ begin
   return;
 end;
 
+
+global webpublic
+procedure WebGetFilters()
+begin 
+  Integer i,num;
+  array string 255 aTypes,aColors;
+  //record INVc INr;  
+  record WebNGProductVc WebNGProductr;
+  string 255 lang;
+  Integer oldcomp;
+  record MMWebProdSetBlock MMWPSb;
+  record DIVc DIr;
+  vector string 255 vColors,vMateraials;
+  boolean TrHs;
+  record UnitVc Unitr;
+  record MMWebSetBlock WSb;
+  boolean needcome;
+  
+  oldcomp = SetCompanyBasedOnCountry;
+  
+  blockload(MMWPSb);
+  blockload(WSb);
+  
+  weboutstring("{");
+  
+  weboutstring("\"" & WSb.WebShowClass & "\":[");
+  needcome = false;
+  DIr.CType = WSb.WebShowClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=WSb.WebShowClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        if(needcome)then begin
+           weboutstring(",");
+        end;
+        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        needcome = true;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  weboutstring("],");
+  
+  weboutstring("\"" & WSb.Filter2 & "\":[");
+  DIr.CType = WSb.Filter2;
+  TrHs = true;
+  needcome = false;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=WSb.Filter2)then begin TrHs = false; end;
+      if(TrHs)then begin
+        if(needcome)then begin
+           weboutstring(",");
+        end;
+        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        needcome = true;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  weboutstring("],");
+  
+  weboutstring("\"" & WSb.Filter3 & "\":[");
+  DIr.CType = WSb.Filter3;
+  TrHs = true;
+  needcome = false;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=WSb.Filter3)then begin TrHs = false; end;
+      if(TrHs)then begin
+        if(needcome)then begin
+           weboutstring(",");
+        end;
+        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        needcome = true;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  weboutstring("]");
+  
+  weboutstring("}");
+  
+  ResetCompanyBasedOnCountry(oldcomp);
+  return;
+end;
+
 function string 255 GetEmplJobTitle(record UserVc Userr)
 begin
   string 255 res;
