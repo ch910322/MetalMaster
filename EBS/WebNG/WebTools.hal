@@ -695,7 +695,7 @@ begin
         if(needcome)then begin
            weboutstring(",");
         end;
-        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
         needcome = true;
       end;
     end;
@@ -714,7 +714,7 @@ begin
         if(needcome)then begin
            weboutstring(",");
         end;
-        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
         needcome = true;
       end;
     end;
@@ -733,7 +733,7 @@ begin
         if(needcome)then begin
            weboutstring(",");
         end;
-        weboutstring("\"" & DIr.Code & "\":\"" & DIr.Name & "\"");
+        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
         needcome = true;
       end;
     end;
