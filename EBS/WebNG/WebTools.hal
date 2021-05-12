@@ -901,8 +901,10 @@ begin
 
     while (LoopKey("ActCode",Userr,1,true)) begin
       if (blank(WEr.HALFunc) or Userr.Department==WEr.HALFunc) then begin
-        if (ReadRecordLink(Userr,1,Attachr,RLr)) then begin
-          aUser[aUser.length] = Userr;
+        if(blank(Userr.WebLangCodes) or setinset(CurrentWebLang,Userr.WebLangCodes))then begin
+          if (ReadRecordLink(Userr,1,Attachr,RLr)) then begin
+            aUser[aUser.length] = Userr;
+          end;
         end;
       end;
     end;

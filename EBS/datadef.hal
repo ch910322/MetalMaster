@@ -179,6 +179,10 @@ begin
     RecordField(ItemCode,M4UStr,100,0);
   EndBlock;
 
+  RecordAddBegin(UserVc,"UserVc_MM");
+    RecordField(WebLangCodes,M4UStr,255,0);
+  EndRecordAdd;
+
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
   SourceFile("halcust/EBS/Windows",3);

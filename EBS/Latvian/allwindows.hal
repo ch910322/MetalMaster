@@ -178,6 +178,7 @@ begin
   EditField(h3+260,v,-20,"Minimālā cenu lapa",Normal,MinPLCode,false,PLDefSClass);
 	EditField(h,v+=vs,65,"Noliktava",Normal,Location,false,LocationSClass);
 	EditField(h3,v,120,"Departaments",Normal,Department,false,MMUserTitleSClass);//CUST >> DepSClass
+	EditField(h3,v+=vs,120,"Web Languages",Normal,WebLangCodes,false,LangSClass);//CUST >> DepSClass
   EditField(h3+260,v,-20,"POS ID",Normal,POSOperatorID,false,0); 
 	EditField(h,v+=vs,65,"Servisa atrašanās",Normal,ServLocation,false,LocationSClass);
 	EditField(h3,v,120,"Tālrunis 1",Normal,Phone1,false,0);
