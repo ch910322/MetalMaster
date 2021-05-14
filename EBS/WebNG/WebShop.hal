@@ -1407,6 +1407,7 @@ begin
   Integer i,rwcnt;
   val totqty;
   Integer res;
+  record WebNGProductVc WebNGProductr;
   
   qty = WebGetArg("qty");
   product = WebGetArg("item");
@@ -1420,11 +1421,9 @@ begin
   end;
   
   foundf = true;
-  INr.Code = UrlDecode(product);
-  if (ReadFirstMain(INr,1,true)) then begin
-    if (INr.Terminated==1) then begin
-      foundf = false;
-    end;
+  WebNGProductr.Code = UrlDecode(product);
+  if (ReadFirstMain(WebNGProductr,1,true)) then begin
+    
   end;
   WebOutString(" ");
   if (foundf) then begin
@@ -1471,19 +1470,20 @@ begin
   return;
 end;
 
-procedure GetBasketItem(string product,var record INVc INr,var record INVc mainINr)
+procedure GetBasketItem(string product,var record WebNGProductVc WebNGProductr,var record INVc mainINr)
 begin
   record MMItemSetVc INVr;
   Boolean foundf;
   
-  INr.Code = product;
-  ReadFirstMain(INr,1,true);
-  if (LoopKey("RowItem:" & INr.Code,INVr,1,true)) then begin
+  WebNGProductr.Code = product;
+  ReadFirstMain(WebNGProductr,1,true);
+  if (LoopKey("RowItem:" & WebNGProductr.Code,INVr,1,true)) then begin
     mainINr.Code = INVr.ArtCode;
     foundf = ReadFirstMain(mainINr,1,true);
   end;
   if (!foundf) then begin
-    RecordCopy(mainINr,INr);
+    mainINr.Code = WebNGProductr.Code;
+    readfirstmain(mainINr,1,true);
   end;
 
   return;
@@ -1510,6 +1510,7 @@ begin
   record GeneralOptionBlock GenOptRec;
   record WebNGPageVc WPr;
   record WebNGShopBlock WSb;
+  record WebNGProductVc WebNGProductr;
 
   BlockLoad(WSb);
   if (nonblank(WSb.ShopBasketTemplPage)) then begin
@@ -1554,7 +1555,7 @@ begin
     WebOutString("            </div>");
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(WSBr,i,WSBrw);
-      GetBasketItem(WSBrw.Product,INr,mainINr);
+      GetBasketItem(WSBrw.Product,WebNGProductr,mainINr);
       imglink = base & "images/";
       imglink = FormatSimpleLink(imglink & URLEncodeCS(mainINr.Code),true);
       link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainINr.Code),true);
