@@ -1,0 +1,965 @@
+external inner function string 255 UrlEncodeCS(string);
+external inner function string 255 FormatSimpleLink(string,boolean);
+external inner function string 255 GetLinkToShop();
+external inner function string 255 ToolWebNGTranslateText2(Longint);
+external inner function string 10 CurrentWebLang();
+external inner function string 60 AddObjectToObjectList(string,string);
+external inner procedure ShowWebAppPageStart(record WebNGPageVc,string);
+external inner procedure ShowWebAppPageEnd(record WebNGPageVc);
+external inner procedure ShowErrorPage(string);
+external inner function string 255 ToolWebNGTranslateText(Integer);
+external inner procedure SendAttachedFile(record Attach2Vc,boolean);
+external inner function boolean FileNameIsImage(string);
+external inner procedure AddToSortedArray(string,string,var array string,var array string,var integer);
+external inner function boolean ShopSetCompany(string);
+external inner function string 10 ToolWebNGGetCountry();
+external inner function string 255 removenextnode(var string);
+external inner procedure RollbackOneRequestURL();
+external inner procedure SetContentTypeForExtension(string);
+external function Integer SetCompanyBasedOnCountry();
+external procedure ResetCompanyBasedOnCountry(Integer);
+external inner updating function Integer AddProductToBasket(string,val,Integer);
+external inner function boolean GetShoppingBasket(var record WebNGShopBasketVc,integer);
+external inner function string 255 GetLinkToCheckoutPage();
+external inner procedure CalcSum(val,val,val,val,var val,Integer);
+external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
+external inner procedure ShowProductShortDescription(record WebNGProductVc);
+external inner procedure ExtractObj(string,var Integer,var string);
+
+
+function string 255 GetCTypeTranslation(string cls)
+begin
+  Integer i,rwcnt;
+  row CTypeVc CTrw;
+  record CTypeVc CTr;
+  string 255 lang,res;
+
+  lang = CurrentWebLang;
+  CTr.Code = cls;
+  if (ReadFirstMain(CTr,1,true)) then begin
+    res = CTr.Comment;
+    rwcnt = MatRowCnt(CTr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(CTr,i,CTrw);
+      if (CTrw.LangCode==lang) then begin
+        res = CTrw.Text;
+        i = rwcnt;
+      end;
+    end;
+  end;
+
+  GetCTypeTranslation = res;
+  return;
+end;
+
+function string 255 GetDITranslation(record DIVc DIr)
+begin
+  Integer i,rwcnt;
+  row DIVc DIrw;
+  string 255 lang,res;
+
+  lang = CurrentWebLang;  
+  res = DIr.Name;
+  rwcnt = MatRowCnt(DIr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(DIr,i,DIrw);
+    if (DIrw.LangCode==lang) then begin
+      res = DIrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetDITranslation = res;
+  return;
+end;
+
+
+procedure ShowSingleFilter(string cls,string values,var vector string vOptions)
+begin
+  record DIVc DIr;
+  Boolean TrHs;
+  string 255 vals,tstr;
+  
+  if (nonblank(cls)) then begin
+    DIr.CType = cls;
+    TrHs = true;
+    while (LoopKey("CType",DIr,1,TrHs)) begin
+      if (DIr.CType!=cls) then begin
+        TrHs = false;
+      end else begin
+        tstr = GetDITranslation(DIr);;
+        if (SetInSet(DIr.Code,values)) then begin
+          vals = AddObjectToObjectList(vals,tstr);
+        end;
+        vOptions[DIr.Code] = tstr;
+      end;
+    end;
+
+    if (nonblank(values)) then begin
+      WebOutString("<li class='active' list-cls='" & cls & "'><a href='#'>" & vals);
+    end else begin
+      WebOutString("<li list-cls='" & cls & "'><a href='#'>" & GetCTypeTranslation(cls));
+    end;
+    WebOutString("</a></li>");
+  end;
+  return;
+end;
+
+function string 255 joinComa(array string options)
+begin
+  string 255 result_string;
+  Integer i;
+
+  for (i=0;i<options.length;i=i+1) begin
+    if (i==0) then begin
+      result_string = result_string & options[i];
+    end else begin
+      result_string = result_string & "," & options[i];
+    end;
+  end;
+  logtext(0, "result_string = " & result_string);
+  joinComa = result_string;
+  return;
+end;
+
+procedure DisplayOptions(string cls,vector string options,string vals, string listview)
+begin
+  array string 255 a_options;
+  Integer i; 
+
+  logtext(0, "vals_listview = " & listview);
+  GetVectorTags(options,a_options);
+  if (a_options.length>0) then begin
+    if (listview=="list") then begin
+      WebOutString("<div class='filter_list filter_list" & cls & "'><div class='filter_menu col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12' list-type='" & cls & "'><div class='ProductList-menu'><ul>");
+    end else begin
+      WebOutString("<div class='filter_list filter_list" & cls & "'><div class='filter_menu col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12' list-type='" & cls & "'><div class='ProductList-menu'><ul>");
+    end;
+    //WebOutString("<div class='filter_list filter_list" & cls & "'><div class='filter_menu col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12' list-type='" & cls & "'><div class='ProductList-menu'><ul>");
+    GetVectorTags(options,a_options);
+    for (i=0;i<a_options.length;i=i+1) begin
+      if (SetInSet(a_options[i],vals)) then begin
+        WebOutString("<li class='active' cls='" & UpperCase(a_options[i]) & "'><a onclick=onFilterClick('" & UpperCase(a_options[i]) & "') href='#'>");
+      end else begin
+      //'" & UpperCase(a_options[i]) & "' , '" & options[a_options[i]] & "'
+        WebOutString("<li cls='" & UpperCase(a_options[i]) & "'><a onclick=onFilterClick() href='#'>");
+      end;
+      WebOutString(options[a_options[i]] & "</a></li>")
+    end;
+
+    WebOutString("</ul></div></div></div>");
+  end;
+  return;
+end;
+
+procedure ShowFilterOptions(record MMWebSetBlock WSb,vector string vFilters)
+begin
+  vector string 255 vOptions1,vOptions2,vOptions3,vOptions4;
+  string 255 active1,active2,filter1,filter2,filter3;
+  array string 255 a_options1,a_options2,a_options3;
+  
+  WebOutString("<div class='filter'><div class='row'><div class='col-xl-10 col-lg-10 col-12'><ul class='filter-buttons'>");
+  ShowSingleFilter(WSb.WebShowClass,vFilters["Option1"],vOptions1);
+  ShowSingleFilter(WSb.Filter2,vFilters["Option2"],vOptions2);
+  ShowSingleFilter(WSb.Filter3,vFilters["Option3"],vOptions3);
+  ShowSingleFilter(WSb.Filter4,vFilters["Option4"],vOptions4);
+  WebOutString("</ul></div>");
+  
+  WebOutString("<div class='col-xl-2 col-lg-2 d-lg-block d-md-none d-none'><div class='GridProd text-right'>");
+ 
+  if (vFilters["DisplayOption"]=="list") then begin
+    active2 = "class='active'";
+  end else begin
+    active1 = "class='active'";
+  end;
+
+  WebOutString("<a " & active1 & " href='?view=gal' ><i class='fas fa-th'></i></a>");
+
+  WebOutString("<a " & active2 & " href='?view=list' > <i class='fas fa-th-list'></i></a>"); 
+
+  WebOutString("</div></div>");
+  
+  GetVectorTags(vOptions1,a_options1);
+  GetVectorTags(vOptions2,a_options2);
+  GetVectorTags(vOptions3,a_options3);
+
+  filter1=joinComa(a_options1);
+  filter2=joinComa(a_options2);
+  filter3=joinComa(a_options3);
+  
+  logtext(0, "filter1 = " & filter1);
+  logtext(0, "filter2 = " & filter2);
+  logtext(0, "filter3 = " & filter3);
+
+  logtext(0, "WSb.WebShowClass = " & WSb.WebShowClass);
+  logtext(0, "WSb.Filter2 = " & WSb.Filter2);
+  logtext(0, "WSb.Filter3 = " & WSb.Filter3);
+
+  WebOutString("<div class='filter_option' id='filterOption' list-" & WSb.WebShowClass & "='" & filter1 & "' list-" & WSb.Filter2 & "='" & filter2 & "' list-" & WSb.Filter3 & "='" & filter3 & "'>");
+  DisplayOptions(WSb.WebShowClass,vOptions1,vFilters["Option1"],vFilters["DisplayOption"]);
+  DisplayOptions(WSb.Filter2,vOptions2,vFilters["Option2"],vFilters["DisplayOption"]);
+  DisplayOptions(WSb.Filter3,vOptions3,vFilters["Option3"],vFilters["DisplayOption"]);
+  DisplayOptions(WSb.Filter4,vOptions4,vFilters["Option4"],vFilters["DisplayOption"]);
+  WebOutString("</div>")
+  WebOutString("</div></div>");
+  return;
+end;
+
+
+function Boolean CheckFilters(string code,string filter)
+begin
+  Boolean res;
+
+  res = false;
+  if (blank(filter) or SetInSet(code,filter)) then begin
+    res = true;
+  end;
+  
+  CheckFilters = res;
+  return;
+end;
+
+procedure ReadFilters(var vector string vFilters)
+begin
+  
+  vFilters["Option1"] = WebGetArg("v1");
+  vFilters["Option2"] = WebGetArg("v2");
+  vFilters["Option3"] = WebGetArg("v2");
+  vFilters["Option4"] = WebGetArg("v2");
+  vFilters["DisplayOption"] = WebGetArg("view");
+  if (blank(WebGetArg("view"))) then begin
+    vFilters["DisplayOption"] = GetSessionString("webshop_view");
+  end else begin
+    PutSessionString("webshop_view",vFilters["DisplayOption"]);
+  end;
+
+  return;
+end;
+
+function string 255 GetItemTitle(record INVc INr,string lang)
+begin
+  string 255 res;
+  row INVc INrw;
+  Integer i,rwcnt;
+  
+  res = INr.Name;
+  rwcnt = MatRowCnt(INr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(INr,i,INrw);
+    if (INrw.LangCode==lang) then begin
+      res = INrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetItemTitle = res;
+  return;
+end;
+
+function string 255 GetItemDescription(record INVc INr,string lang)
+begin
+  string 255 res;
+  record NotePadVc Noter;
+  record RLinkVc RLr;
+  Integer i;
+  Longint pos;
+
+  i = 1;
+  while (ReadRecordLink(INr,i,Noter,RLr)) begin
+    if (blank(Noter.LangCode) or Noter.LangCode==lang) then begin
+      pos = 0;
+      res = "";
+      while (pos<SizeTextCnt(Noter)) begin
+        res = res & StringFromText(Noter,pos,255);
+        pos = pos + 255;
+      end;
+      if (nonblank(Noter.LangCode)) then begin
+        goto LGetItemDescription;
+      end;
+    end;
+    i = i + 1;
+  end;  
+
+LGetItemDescription:;
+  GetItemDescription = res;
+  return;
+end;
+
+function string 255 GetWebItemDescription(record WebNGProductVc WebNGProductr,string lang)
+begin
+  string 255 res;
+  record NotePadVc Noter;
+  record RLinkVc RLr;
+  Integer i;
+  Longint pos;
+
+  i = 1;
+  while (ReadRecordLink(WebNGProductr,i,Noter,RLr)) begin
+    if (blank(Noter.LangCode) or Noter.LangCode==lang) then begin
+      pos = 0;
+      res = "";
+      while (pos<SizeTextCnt(Noter)) begin
+        res = res & StringFromText(Noter,pos,255);
+        pos = pos + 255;
+      end;
+      if (nonblank(Noter.LangCode)) then begin
+        goto LGetItemDescription;
+      end;
+    end;
+    i = i + 1;
+  end;  
+
+LGetItemDescription:;
+  GetWebItemDescription = res;
+  return;
+end;
+
+procedure AddToArray(string tstr,array string arr)
+begin
+  Integer i;
+
+  for (i=0;i<arr.length;i=i+1) begin
+    if (arr[i]==tstr) then begin
+      goto LAddToArray;
+    end;
+  end;
+  arr[arr.length] = tstr;
+LAddToArray:;
+  return;
+end;
+
+procedure OutputColorClasses()
+begin
+  record MMItemColorVc ICr;
+
+  WebOutString("<style>");
+  while (LoopMain(ICr,1,true)) begin
+    WebOutString(".ColorProduct .color-class-" & ICr.Code & ":before {color: " & ICr.ColorCode & ";}")
+  end;
+  WebOutString("</style>");
+  return;
+end;
+
+
+procedure GetItemVars(record INVc INr,var array string aTypes,var array string aColors)
+begin
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt;
+  
+  INVr.ArtCode = INr.Code;
+  if (ReadFirstMain(INVr,1,true)) then begin
+    rwcnt = MatRowCnt(INVr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(INVr,i,INVrw);
+      AddToArray(INVrw.Type,aTypes);
+      AddToArray(INVrw.Color,aColors);
+    end;
+  end;
+
+  return;
+end;
+
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials)
+begin
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt,pos;
+  string 100 tstr;
+  
+  pos = 0;
+  ExtractObj(WebNGProductr.Classification,pos,tstr);
+  while (nonblank(tstr)) begin
+    if(nonblank(tstr))then begin
+      if(nonblank(vColors[tstr]))then begin
+        aColors[aColors.length] = vColors[tstr];
+      end;
+      if(nonblank(vMateraials[tstr]))then begin
+        aTypes[aTypes.length] = vMateraials[tstr];
+      end;
+    end;
+    ExtractObj(WebNGProductr.Classification,pos,tstr);
+  end;
+  
+
+  return;
+end;
+
+
+function string 255 ShowClassTypeList(string type,string list)
+begin
+  string 255 res;
+  record DIVc DIr;
+  Longint pos;
+  string 255 tstr;
+
+  if (nonblank(type)) then begin
+    while (GetNextSubstring(list,pos,",",tstr)) begin
+      DIr.Code = tstr;
+      if (ReadFirstMain(DIr,1,true)) then begin
+        if (DIr.CType==type) then begin
+          res = AddObjectToObjectList(res,DIr.Code);
+        end;
+      end;
+    end;
+    res = "list-" & type & "='" & res & "'";
+  end;
+
+  ShowClassTypeList = res;
+  return;
+end;
+
+function string 255 ShowItemClasses(record INVc INr,record MMWebSetBlock WSb)
+begin
+  string 255 res;
+
+  res = ShowClassTypeList(WSb.WebShowClass,INr.DispGroups);
+  res = res & ShowClassTypeList(WSb.Filter2,INr.DispGroups);
+  res = res & ShowClassTypeList(WSb.Filter3,INr.DispGroups);
+  res = res & ShowClassTypeList(WSb.Filter4,INr.DispGroups);
+  
+  ShowItemClasses = res;
+  return;
+end;
+
+
+function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,record MMWebSetBlock WSb)
+begin
+  string 255 res;
+
+  res = ShowClassTypeList(WSb.WebShowClass,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter2,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter3,WebNGProductr.Classification);
+  res = res & ShowClassTypeList(WSb.Filter4,WebNGProductr.Classification);
+  
+  ShowWebNGProductClasses = res;
+  return;
+end;
+
+
+function boolean checkclassexists(string classtype, string classifications)
+begin
+  boolean res;  
+  record DIVc DIr;
+  string 100 tstr;
+  integer pos;
+  
+  pos = 0;
+  ExtractObj(classifications,pos,tstr);
+  while(nonblank(tstr))begin
+    if(nonblank(tstr))then begin
+      DIr.Code = tstr;
+      if(readfirstmain(DIr,1,true))then begin
+        if(DIr.CType==classtype)then begin
+          res = true;
+        end;
+      end;
+    end;
+    ExtractObj(classifications,pos,tstr);
+  end;
+  
+  checkclassexists = res;
+return;
+end;
+
+
+function string 255 GetVarTypeName(string code,string lang)
+begin
+  Integer i,rwcnt;
+  record MMItemTypeVc ITr;
+  row MMItemTypeVc ITrw;
+  string 255 res;
+
+  ITr.Code = code;
+  if (ReadFirstMain(ITr,1,true)) then begin
+    res = ITr.Name;
+    rwcnt = MatRowCnt(ITr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(ITr,i,ITrw);
+      if (ITrw.LangCode==lang) then begin
+        res = ITrw.Text;
+        i = rwcnt;
+      end;
+    end;
+  end;
+
+  GetVarTypeName = res;
+  return;
+end;
+
+function string 255 GetVarColorName(string code,string lang)
+begin
+  Integer i,rwcnt;
+  record MMItemColorVc ICr;
+  row MMItemColorVc ICrw;
+  string 255 res;
+
+  ICr.Code = code;
+  if (ReadFirstMain(ICr,1,true)) then begin
+    res = ICr.Name;
+    rwcnt = MatRowCnt(ICr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(ICr,i,ICrw);
+      if (ICrw.LangCode==lang) then begin
+        res = ICrw.Text;
+        i = rwcnt;
+      end;
+    end;
+  end;
+
+  GetVarColorName = res;
+  return;
+end;
+
+procedure ShowWebItemInfoPage(record WebNGProductVc WebNGProductr)
+begin
+  string 255 description,base,imglink,lang;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  Integer i,num;
+  array string 255 aTypes,aColors;
+  record MMWebProdSetBlock MMWPSb;
+  array string 255 thumb;
+  record DIVc DIr;
+  vector string 255 vColors,vMateraials;
+  boolean TrHs;
+  
+  blockload(MMWPSb);
+  
+  DIr.CType = MMWPSb.MatClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.MatClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vMateraials[DIr.Code] = DIr.Name;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  
+  DIr.CType = MMWPSb.ColClass;
+  TrHs = true;
+  if(nonblank(DIr.CType))then begin
+    while(loopkey("CType",DIr,1,TrHs))begin
+      if(DIr.CType!=MMWPSb.ColClass)then begin TrHs = false; end;
+      if(TrHs)then begin
+        vColors[DIr.Code] = DIr.Name;
+      end;
+    end;
+  end;
+  resetloop(DIr);
+  
+  lang = CurrentWebLang;
+  description = GetWebItemDescription(WebNGProductr,lang);
+  WebOutStringFormatNL("  <h1 class='Title'>" & GetTranslatedNameProduct(WebNGProductr) & "</h1>");
+  WebOutStringFormatNL("  <div class='row Margin40'>");
+  WebOutStringFormatNL("      <div class='col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12'>");
+  WebOutStringFormatNL("          <div id='ProdSlider' class='slider-pro'>");
+  WebOutStringFormatNL("              <div class='sp-slides'>");
+/*
+  WebOutStringFormatNL("                  <div class='sp-slide'>");
+  WebOutStringFormatNL("                      <img class='sp-image' src='img/blank.gif' ");
+  WebOutStringFormatNL("                          data-src='img/Slider/slide_medium.jpg'");
+  WebOutStringFormatNL("                          data-small='img/Slider/slide_small.jpg'");
+  WebOutStringFormatNL("                          data-medium='img/Slider/slide_medium.jpg'");
+  WebOutStringFormatNL("                          data-large='img/Slider/slide_large.jpg'");
+  WebOutStringFormatNL("                          data-retina='img/Slider/slide_large.jpg'>");
+  WebOutStringFormatNL("                  </div>");
+*/
+//INr
+  base = GetLinkToShop;
+  i = 1;
+  while (ReadRecordLink(WebNGProductr,i,Attachr,RLr)) begin
+    if (FileNameIsImage(Attachr.FileName)) then begin
+      imglink = base & "images/";
+      imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/" & num,true);
+
+      WebOutStringFormatNL("<div class='sp-slide'>");
+      WebOutStringFormatNL("<img class='sp-image' src='" & imglink & "' data-src='" & imglink & "'>");
+      WebOutStringFormatNL("</div>");
+      thumb[thumb.length] = imglink;
+      num = num + 1;
+    end;
+
+    i = i + 1;
+  end;
+  WebOutStringFormatNL(" </div>");
+  if (thumb.length>0) then begin
+    WebOutStringFormatNL("<div class='sp-thumbnails'>");
+    for (i=0;i<thumb.length;i=i+1) begin
+      WebOutStringFormatNL("   <img class='sp-thumbnail' src='" & thumb[i] & "'>");
+    end;
+  end;
+  WebOutStringFormatNL("              </div>");
+  WebOutStringFormatNL("          </div>");
+  WebOutStringFormatNL("      </div>");
+  WebOutStringFormatNL("      <div class='col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12'>");
+  WebOutStringFormatNL("          <div class='DescripProd'>");
+  WebOutStringFormatNL("              <p>" & description & "</p>");
+  WebOutStringFormatNL("          </div>");
+  WebOutStringFormatNL("          <div class='DetailsProd'>");
+  WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
+  cleararray(aTypes);
+  cleararray(aColors);
+  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+  if (aTypes.length>0) then begin
+    WebOutStringFormatNL("              <div class='ProdLi'>");
+    WebOutStringFormatNL("                  <div class='row'>");
+    WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89009) & "</div>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <select name='type'>");
+
+    for (i=0;i<aTypes.length;i=i+1) begin
+      WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & "</option>");
+    end;
+  /*
+    WebOutStringFormatNL("                              <option>Lorem ipsum 1</option>");
+    WebOutStringFormatNL("                              <option>Lorem ipsum 2</option>");
+    WebOutStringFormatNL("                              <option>Lorem ipsum 3</option>");
+  */
+    WebOutStringFormatNL("                          </select>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                  </div>");
+    WebOutStringFormatNL("              </div>");
+  end;
+  if (aColors.length>0) then begin
+    WebOutStringFormatNL("              <div class='ProdLi'>");
+    WebOutStringFormatNL("                  <div class='row'>");
+    WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89010) & "</div>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <div class='ColorProduct'>");
+    WebOutStringFormatNL("                              <select name='color'>");
+    for (i=0;i<aColors.length;i=i+1) begin
+      WebOutStringFormatNL("<option value='" & aColors[i] & "' class='ColorItem color-class-" & aColors[i] & "'>" & GetVarColorName(aColors[i],lang) & "</option>");
+    end;
+
+    WebOutStringFormatNL("                              </select>");
+    WebOutStringFormatNL("                          </div>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                  </div>");
+    WebOutStringFormatNL("              </div>");
+  end;
+  if (aTypes.length>0) then begin
+    WebOutStringFormatNL("              <div class='ProdLi'>");
+    WebOutStringFormatNL("                  <div class='row'>");
+    WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89011) & "</div>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
+    WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & ToolWebNGTranslateText2(89012) & "'>");
+    WebOutStringFormatNL("                      </div>");
+    WebOutStringFormatNL("                  </div>");
+    WebOutStringFormatNL("              </div> ");
+  end;
+  WebOutStringFormatNL("              <div class='ProdLi'>");
+  WebOutStringFormatNL("                  <div class='row no-gutters'>");
+  WebOutStringFormatNL("                      <div class='col-md-4 col-4'>");
+  WebOutStringFormatNL("                          <div class='Price'>&euro;" & WebNGProductr.Price & "</div>");//INr
+  WebOutStringFormatNL("                      </div>");
+  if (aTypes.length==0) then begin
+    WebOutStringFormatNL("                      <div class='col-md-4 col-4'> ");
+    WebOutStringFormatNL("                          <div class='number-plus-minus'>");
+    WebOutStringFormatNL("                              <input type='number' min='1' max='100' step='1' value='1' name='qty'>");
+    WebOutStringFormatNL("                          </div>");
+    WebOutStringFormatNL("                      </div>");
+  end;
+  WebOutStringFormatNL("                      <div class='col-md-4 col-4'>");
+  WebOutStringFormatNL("                          <a href='#' class='btns-red' data-toggle='modal' data-target='#ModalRecommended'>" & ToolWebNGTranslateText2(89007) & "</a>");
+  WebOutStringFormatNL("                      </div>");
+  WebOutStringFormatNL("                  </div>");
+  WebOutStringFormatNL("              </div>");
+  WebOutStringFormatNL("          </form>  ");
+  WebOutStringFormatNL("          </div>");
+  WebOutStringFormatNL("      </div>");
+  WebOutStringFormatNL("  </div>");
+
+  OutputColorClasses;
+
+  return;
+end;
+
+procedure ShowRecommendedList(record INVc INr)
+begin
+  record CrossINVc CINr;
+  string 255 base,link,imglink,tstr,description,lang;
+  Boolean TrHs;
+  record INVc tINr;
+  array record INVc aINr;
+  Integer i;
+  val price;
+  array string 255 aTypes,aColors;
+  
+  lang = CurrentWebLang;
+  base = GetLinkToShop;
+  CINr.ItemCode = INr.Code;
+  if (ReadFirstMain(CINr,1,true)) then begin
+    WebOutString("<div class='WeRecommend'>");
+    WebOutString("<h2 class='Title'>" & ToolWebNGTranslateText2(89013) & "</h2>");
+    WebOutString("<div class='row'>");
+    TrHs = true;
+    CINr.ItemCode = INr.Code;
+    ResetLoop(CINr);
+    while (LoopMain(CINr,1,TrHs)) begin
+      if (CINr.ItemCode!=INr.Code) then begin
+        TrHs = false;
+      end else begin
+        tINr.Code = CINr.CrossItemCode;
+        ReadFirstMain(tINr,1,true);
+        tstr = GetItemTitle(tINr,lang);
+        description = GetItemDescription(tINr,lang);
+        imglink = base & "images/";
+        imglink = FormatSimpleLink(imglink & URLEncodeCS(CINr.CrossItemCode),true);
+        link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(CINr.CrossItemCode),true);
+        ClearArray(aTypes);
+        ClearArray(aColors);
+        GetItemVars(tINr,aTypes,aColors);
+
+        WebOutString("<div class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'>");
+        WebOutString("    <div class='RecommendList'>");
+        WebOutString("        <div class='ProdImg'>");
+        WebOutString("            <a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a>");
+        WebOutString("        </div>");
+        WebOutString("        <div class='InfoRecom'>");
+        WebOutString("            <h3><a href='" & link & "'>" & tstr & "</a></h3>");
+        WebOutString("            <div class='text'>" & description & "</div>");
+        WebOutString("        </div>");
+        WebOutString("    </div>");
+        WebOutString("</div>");
+        aINr[aINr.length] = tINr;
+      end;
+    end;
+    WebOutString("</div></div>");
+
+
+  WebOutString("        <div class='modal ModalAddCart' id='ModalRecommended' tabindex='-1' role='dialog' data-backdrop='static' aria-hidden='true'>");
+  WebOutString("            <div class='modal-dialog modal-dialog-centered modal-xl' role='document'>");
+  WebOutString("                <div class='modal-content'>");
+  WebOutString("                    <div class='modal-header'>");
+  WebOutString("                        <button type='button' class='closes' data-dismiss='modal' aria-label='Close'>");
+  WebOutString("                            <i class='fal fa-times'></i>");
+  WebOutString("                        </button>");
+  WebOutString("                    </div>");
+  WebOutString("                    <div class='modal-body'>");
+  WebOutString("                        <h2 class='Title'>" & ToolWebNGTranslateText2(89024) & "</h2>");
+  WebOutString("                        <div id='ProdListSlide' class='ProductList owl-carousel'>");
+
+  for (i=0;i<aINr.length;i=i+1) begin
+    tINr = aINr[i];
+    tstr = GetItemTitle(tINr,lang);
+    description = GetItemDescription(tINr,lang);
+    imglink = base & "images/";
+    imglink = FormatSimpleLink(imglink & URLEncodeCS(tINr.Code),true);
+    price = tINr.InPrice;
+    link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(tINr.Code),true);
+    WebOutString("                            <div class='ProductList-item' itemcode='" & URLEncodeCS(tINr.Code) & "'>");
+    WebOutString("                                <div class='ProdImg'>");
+    WebOutString("                                    <a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a>");
+    WebOutString("                                </div>");
+    WebOutString("                                <div class='ProdInfo'>");
+    WebOutString("                                    <h2><a href='" & link & "'>" & tstr & "</a></h2>");
+    WebOutString("                                    <div class='text'>" & description & "</div>");
+    WebOutString("                                    <div class='row no-gutters'>");
+    WebOutString("                                        <div class='col-md-4 col-4'>");
+    WebOutString("                                            <div class='Price'>&euro;" & price & "</div>");
+    WebOutString("                                        </div>");
+    WebOutString("                                        <div class='col-md-4 col-4'>");
+    WebOutString("                                        <div class='number-plus-minus'>");
+    if (aTypes.length==0) then begin
+      WebOutString("                                            <input type='number' min='1' max='100' step='1' value='1'>");
+    end;
+    WebOutString("                                        </div>                                 ");
+    WebOutString("                                        </div>");
+    WebOutString("                                        <div class='col-md-4 col-4'>");
+    WebOutString("                                            <a href='#' class='btns-red' data-toggle='modal' data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a>");
+    WebOutString("                                        </div>");
+    WebOutString("                                    </div>");
+    WebOutString("                                </div>");
+    WebOutString("                            </div>");
+  end;
+  WebOutString("                        </div>");
+  WebOutString("                    </div>");
+  WebOutString("                </div>");
+  WebOutString("            </div>");
+  WebOutString("        </div>         ");
+
+    //Show modal window
+
+  end;
+
+  return;
+end;
+
+procedure GetDocTranslations(record INDocVc IDr,var string name,var string description,string lang)
+begin
+  Integer i,rwcnt;
+  row INDocVc IDrw;
+  string 255 res;
+
+  name = IDr.Name;
+  description = IDr.Description;
+  rwcnt = MatRowCnt(IDr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(IDr,i,IDrw);
+    if (IDrw.LangCode==lang) then begin
+      name = IDrw.RowName;
+      description = IDrw.RowDescription;
+      i = rwcnt;
+    end;
+  end;
+
+  return;
+end;
+
+procedure ShowDocuments(record INVc INr)
+begin
+  record INDocVc IDr;
+  Boolean TrHs,firstf;
+  string 255 name,description,link,lang,type;
+
+  lang = CurrentWebLang;
+  IDr.ArtCode = INr.Code;
+  TrHs = true;
+  while (LoopMain(IDr,1,TrHs)) begin
+    if (IDr.ArtCode!=INr.Code) then begin
+      TrHs = false;
+    end else begin
+      if (IDr.DocType!=3) then begin //skip for videos
+        switch (IDr.DocType) begin
+          case 1: type = "FilePDF";
+          case 2: type = "FileDOC";
+        end;
+        link = "/WebDownloadItemDoc.hal?sernr=" & IDr.SerNr;
+        GetDocTranslations(IDr,name,description,lang);
+
+        if (firstf==false) then begin
+          WebOutString("<div class='Documets'>");
+          WebOutString("  <h2>" & ToolWebNGTranslateText2(89008) & "</h2>");
+          WebOutString("  <div class='row'>");
+          firstf = true;
+        end;
+
+        WebOutString("<div class='col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12'>");
+        WebOutString("    <div class='ListDoc'>");
+        WebOutString("        <div class='IcoDoc " & type & "'></div>");
+        WebOutString("        <div class='BoxInfoDoc'>");
+        WebOutString("            <a href='" & link & "' target='blank'>" & name & "</a>");
+        WebOutString("            <div class='Info'>" & description & "</div>");
+        WebOutString("        </div>");
+        WebOutString("    </div>");
+        WebOutString("</div>");
+
+      end;
+    end;
+  end;
+  if (firstf) then begin
+    WebOutString("</div></div>");
+  end;
+
+  return;
+end;
+
+
+
+procedure ShowVidoes(record INVc INr)
+begin
+  record INDocVc IDr;
+  Boolean TrHs,firstf;
+  string 255 name,description,link,lang,type;
+  
+
+  lang = CurrentWebLang;
+  IDr.ArtCode = INr.Code;
+  TrHs = true;
+  while (LoopMain(IDr,1,TrHs)) begin
+    if (IDr.ArtCode!=INr.Code) then begin
+      TrHs = false;
+    end else begin
+      if (IDr.DocType==3) then begin //skip for videos
+        GetDocTranslations(IDr,name,description,lang);
+        if (firstf==false) then begin
+          WebOutString("  <div class='VideoInstruction'> ");
+          WebOutString("    <div class='VideoListWrapp'>");
+          WebOutString("        <div class='VideoList'>");
+          firstf = true;
+        end;
+        WebOutString("    <div class='row'>");
+        WebOutString("        <div class='col-xl-5 col-lg-5 col-md-12 col-sm-12 col-12'>");
+        WebOutString("            <div class='ImgVideo'>");
+        WebOutString("<iframe width='100%' height='260' src='https://www.youtube.com/embed/" & IDr.VideoID & "' frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>");
+        WebOutString("            </div>");
+        WebOutString("       </div>");
+        WebOutString("        <div class='col-xl-7 col-lg-7 col-md-12 col-sm-12 col-12'>");
+        WebOutString("            <div class='Info'>");
+        WebOutString("                <h2>" & name & "</h2>");
+        WebOutString("                <div class='text'>" & description & "</div>");
+//TODO::
+/*
+        WebOutString("                <div class='text2'>Preces no video</div>");
+        WebOutString("                <div class='boxBNS'>");
+        WebOutString("                    <a href='#' class='btns-white-red'>Prece 1</a>");
+        WebOutString("                    <a href='#' class='btns-white-red'>Prece 2</a>");
+        WebOutString("                    <a href='#' class='btns-white-red'>Prece 3</a>");
+        WebOutString("                </div>");
+*/
+        WebOutString("            </div>");
+        WebOutString("        </div>");                  
+        WebOutString("    </div>");
+      end;
+    end;
+  end;
+  if (firstf) then begin
+    WebOutString("</div></div></div>");
+  end;
+  return;
+end;
+
+global
+procedure MM_ShopWebProductInfoApp(record WebNGStructVc WSr,string path)
+begin
+  record WebNGPageVc WPr;
+  //record INVc INr;
+  record WebNGProductVc WebNGProductr;
+  string 255 mpath,node;
+  Boolean foundf;
+
+  mpath = path;
+  node = removenextnode(mpath);
+  
+  if (nonblank(node)) then begin    
+    foundf = true;
+    WebNGProductr.Code = urldecode(node);
+    if (ReadFirstMain(WebNGProductr,1,true)) then begin
+
+    end;
+    
+    if (foundf) then begin
+      WPr.Code = WSr.WebPage;
+      if (nonblank(WPr.Code)) then begin
+        if (ReadFirstMain(WPr,1,true)) then begin end;
+      end;
+      WPr.Code = WSr.WebPage;
+      if (ReadFirstMain(WPr,1,true)) then begin end;
+
+      ShowWebAppPageStart(WPr,"");
+
+
+      ShowWebItemInfoPage(WebNGProductr);
+
+      //ShowDocuments(INr);
+
+      //ShowVidoes(INr);
+
+      //ShowRecommendedList(INr);
+
+      ShowWebAppPageEnd(WPr);
+
+    end;
+  end;
+
+  return;
+end;

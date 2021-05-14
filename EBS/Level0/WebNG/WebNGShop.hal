@@ -39,6 +39,7 @@ external procedure ShopManageFavouriteItem(string);
 external outer procedure MM_ShowProductCatalog(record WebNGStructVc,string);
 external outer procedure MM_ProductImageDownloadApp(string);
 external outer procedure MM_ShopProductInfoApp(record WebNGStructVc,string);
+external outer procedure MM_ShopWebProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopBasketApp(record WebNGStructVc,string);
 external outer procedure MM_ShowDeliveryOptions(record WebNGStructVc,string);
 //CUST-END
@@ -282,7 +283,8 @@ begin
       MM_ShopBasketApp(WSr,mpath);
     case "productinfo":
       //ShopProductInfoApp(WSr,mpath);
-      MM_ShopProductInfoApp(WSr,mpath);
+      //MM_ShopProductInfoApp(WSr,mpath);
+      MM_ShopWebProductInfoApp(WSr,mpath);
     case "manage":
       ShopManageFavouriteItem(mpath);
     case "configureproduct":
