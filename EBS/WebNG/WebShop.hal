@@ -1470,7 +1470,7 @@ begin
   return;
 end;
 
-procedure GetBasketItem(string product,var record WebNGProductVc WebNGProductr,var record INVc mainINr)
+procedure GetBasketItem(string product,var record WebNGProductVc WebNGProductr,var record WebNGProductVc mainWebNGProductr)
 begin
   record MMItemSetVc INVr;
   Boolean foundf;
@@ -1478,12 +1478,11 @@ begin
   WebNGProductr.Code = product;
   ReadFirstMain(WebNGProductr,1,true);
   if (LoopKey("RowItem:" & WebNGProductr.Code,INVr,1,true)) then begin
-    mainINr.Code = INVr.ArtCode;
-    foundf = ReadFirstMain(mainINr,1,true);
+    mainWebNGProductr.Code = INVr.ArtCode;
+    foundf = ReadFirstMain(mainWebNGProductr,1,true);
   end;
   if (!foundf) then begin
-    mainINr.Code = WebNGProductr.Code;
-    readfirstmain(mainINr,1,true);
+    recordcopy(mainWebNGProductr,WebNGProductr);
   end;
 
   return;
@@ -1510,7 +1509,7 @@ begin
   record GeneralOptionBlock GenOptRec;
   record WebNGPageVc WPr;
   record WebNGShopBlock WSb;
-  record WebNGProductVc WebNGProductr;
+  record WebNGProductVc WebNGProductr,mainWebNGProductr;
 
   BlockLoad(WSb);
   if (nonblank(WSb.ShopBasketTemplPage)) then begin
@@ -1555,11 +1554,11 @@ begin
     WebOutString("            </div>");
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(WSBr,i,WSBrw);
-      GetBasketItem(WSBrw.Product,WebNGProductr,mainINr);
+      GetBasketItem(WSBrw.Product,WebNGProductr,mainWebNGProductr);
       imglink = base & "images/";
-      imglink = FormatSimpleLink(imglink & URLEncodeCS(mainINr.Code),true);
-      link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainINr.Code),true);
-      title = GetItemTitle(mainINr,lang);
+      imglink = FormatSimpleLink(imglink & URLEncodeCS(mainWebNGProductr.Code),true);
+      link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainWebNGProductr.Code),true);
+      title = GetTranslatedNameProduct(mainWebNGProductr);
       CalcSum(WSBrw.Qty,WSBrw.Price,0,WSBrw.Discount,rowsum,GenOptRec.UseDiscount);
 
       WebOutString("            <div class='ListCartInner'>");
