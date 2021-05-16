@@ -1470,19 +1470,32 @@ begin
   return;
 end;
 
-procedure GetBasketItem(string product,var record WebNGProductVc WebNGProductr,var record WebNGProductVc mainWebNGProductr)
+procedure GetBasketItem(string product,var record WebNGProductVc WebNGProductr,var record WebNGProductVc mainWebNGProductr,var string material,var string color)
 begin
   record MMItemSetVc INVr;
   Boolean foundf;
+  row MMItemSetVc INVrw;
+  integer i,rwcnt;
   
   WebNGProductr.Code = product;
-  ReadFirstMain(WebNGProductr,1,true);
-  if (LoopKey("RowItem:" & WebNGProductr.Code,INVr,1,true)) then begin
+  if (LoopKey("RowItem:" & product,INVr,1,true)) then begin
     mainWebNGProductr.Code = INVr.ArtCode;
     foundf = ReadFirstMain(mainWebNGProductr,1,true);
+    if(foundf)then begin
+      rwcnt = matrowcnt(INVr);
+      for(i=0;i<rwcnt;i=i+1)begin
+        matrowget(INVr,i,INVrw);
+        if(INVrw.Item==product)then begin
+          material = GetVarTypeName(INVrw.Type,CurrentWebLang);
+          color = GetVarColorName(INVrw.Color,CurrentWebLang);
+        end;
+      end;
+    end;
   end;
   if (!foundf) then begin
-    recordcopy(mainWebNGProductr,WebNGProductr);
+    mainWebNGProductr.Code = product;
+    readfirstmain(mainWebNGProductr,1,true);
+    //recordcopy(mainWebNGProductr,WebNGProductr);
   end;
 
   return;
@@ -1503,14 +1516,16 @@ begin
   record WebNGShopBasketVc WSBr;
   row WebNGShopBasketVc WSBrw;
   Integer i,rwcnt;
-  string 255 imglink,title,lang,base,currency,link;
+  string 255 imglink,title,lang,base,currency,link,material,color;
   record INVc INr,mainINr;
   val shippingcost,rowsum;
   record GeneralOptionBlock GenOptRec;
   record WebNGPageVc WPr;
   record WebNGShopBlock WSb;
   record WebNGProductVc WebNGProductr,mainWebNGProductr;
-
+  
+  logtext(0,"MM_ShopBasketApp");
+  
   BlockLoad(WSb);
   if (nonblank(WSb.ShopBasketTemplPage)) then begin
     WPr.Code = WSb.ShopBasketTemplPage;
@@ -1530,6 +1545,7 @@ begin
   if (GetShoppingBasket(WSBr,0)) then begin
     rwcnt = MatRowCnt(WSBr);
   end;
+  logtext(0,"MM_ShopBasketApp rwcnt " & rwcnt);
   if (rwcnt>0) then begin
     WebOutString("    <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
     WebOutString("        <div class='boxCartList'>");
@@ -1554,11 +1570,17 @@ begin
     WebOutString("            </div>");
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(WSBr,i,WSBrw);
-      GetBasketItem(WSBrw.Product,WebNGProductr,mainWebNGProductr);
+      logtext(0,"WSBrw.Product " & WSBrw.Product);
+      GetBasketItem(WSBrw.Product,WebNGProductr,mainWebNGProductr,material,color);
+      logtext(0,"WebNGProductr code " & WebNGProductr.Code);
+      logtext(0,"mainWebNGProductr code " & mainWebNGProductr.Code);
       imglink = base & "images/";
       imglink = FormatSimpleLink(imglink & URLEncodeCS(mainWebNGProductr.Code),true);
       link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainWebNGProductr.Code),true);
-      title = GetTranslatedNameProduct(mainWebNGProductr);
+      
+      logtext(0,"material " & material);
+      logtext(0,"color " & color);
+      title = GetTranslatedNameProduct(mainWebNGProductr) & " " & material & " " & color;
       CalcSum(WSBrw.Qty,WSBrw.Price,0,WSBrw.Discount,rowsum,GenOptRec.UseDiscount);
 
       WebOutString("            <div class='ListCartInner'>");

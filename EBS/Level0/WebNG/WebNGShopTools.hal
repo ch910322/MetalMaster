@@ -1,0 +1,33 @@
+
+//rede CUST
+global
+function val ShopGetItemPrice(string itemcode,val qty,var val outreb,var string outvatcode,var string outcurrency,integer calllevel)
+begin
+  record WebNGProductVc WPr;
+  row WebNGProductVc WPrw;
+  record CUVc CUr;
+  record INVc INr;
+  val price,cost,tax2prc,tmpprice,tmpoutreb;
+  string 255 curitemname,salesacc,tax2code,tmpoutvatcode,tmpoutcurrency,taxtemplatecode;
+  boolean calcprice,dummyf;
+  val fr,to1,to2,br1,br2;
+  integer i,cnt;
+  Time blankt;
+  date blankd;
+  Integer inclvat;
+  string 20 tstr;
+  record WebNGProductVc WebNGProductr;// Edit ************************** BPI Ukraine - KramarAlexandr - 07, 16 05 2021 y. at 2:00:56 PM
+  record MMItemSetVc INVr;
+  boolean foundf;
+  integer rwcnt;
+  
+  if (LoopKey("RowItem:" & itemcode,INVr,1,true)) then begin
+    WebNGProductr.Code = INVr.ArtCode;
+    foundf = ReadFirstMain(WebNGProductr,1,true);
+    price = WebNGProductr.Price;
+  end;
+
+
+  ShopGetItemPrice = price;
+  return;
+end;
