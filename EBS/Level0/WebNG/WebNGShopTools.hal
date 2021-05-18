@@ -1,6 +1,6 @@
 
 //rede CUST
-global
+/*global
 function val ShopGetItemPrice(string itemcode,val qty,var val outreb,var string outvatcode,var string outcurrency,integer calllevel)
 begin
   record WebNGProductVc WPr;
@@ -30,4 +30,4 @@ begin
 
   ShopGetItemPrice = price;
   return;
-end;
+end;*/

@@ -2080,9 +2080,7 @@ begin
   integer filenr;
   record RLinkVc RLr;
   vector string 255 vDescription,vAttachKey;
-  
-  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
-  
+    
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
@@ -2094,7 +2092,6 @@ begin
           if (right(Attach2r.FileName,4)==".pdf") then begin
             arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
             arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
-            logtext(0,"PDF Mailr.Header " & Mailr.Header);
             vDescription[Attach2r.SerNr*2] = Mailr.Header;
             vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
           end;
@@ -2103,7 +2100,6 @@ begin
             arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
             vDescription[Attach2r.SerNr*2] = Mailr.Header;
             vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
-            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
           end;
           filenr = filenr + 1;
         end;
@@ -2120,17 +2116,24 @@ procedure CustPDFDocuments(record WebNGElementVc WEr)
 begin
   array string 255 arrDocsPdf;
   array longint arrDocsPdfSerNr;
-  boolean TrHs;
+  boolean TrHs,checklang;
   record ConfVc Confr;
   record MailVc Mailr;
-  string 255 ckey;
+  string 255 ckey,lang,tstr;
   record Attach2Vc Attach2r;
-  integer filenr;
+  integer filenr,i;
   record RLinkVc RLr;
   vector string 255 vDescription,vAttachKey;
-  
-  logtext(0,"CustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocumentsCustDocuments");
-  
+  record WebNGLanguageVc WebNGLanguager;
+  vector boolean vweblang;
+  array string 100 weblang;
+
+  lang = CurrentWebLang;
+
+  while(loopmain(WebNGLanguager,1,true))begin
+    weblang[weblang.length] = WebNGLanguager.Code;
+  end;
+    
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
     logtext(0,Confr.AddrName);
@@ -2140,11 +2143,22 @@ begin
         filenr = 1;
         while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
           if (right(Attach2r.FileName,4)==".pdf") then begin
-            arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
-            arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
-            logtext(0,"PDF Mailr.Header " & Mailr.Header);
-            vDescription[Attach2r.SerNr*2] = Mailr.Header;
-            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+            checklang = true;
+            for(i=0;i<weblang.length;i=i+1)begin
+              tstr = weblang[i];
+              if((left(Attach2r.FileName,len(tstr)) & "_")==tstr & "_")then begin
+                if(lang!=tstr)then begin
+                  checklang = false;
+                end;
+              end;
+            end;
+            
+            if(checklang)then begin
+              arrDocsPdf[arrDocsPdf.length] = Attach2r.FileName;
+              arrDocsPdfSerNr[arrDocsPdfSerNr.length] = Attach2r.SerNr*2;
+              vDescription[Attach2r.SerNr*2] = Mailr.Header;
+              vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+            end;
           end;
           filenr = filenr + 1;
         end;
@@ -2162,16 +2176,23 @@ procedure CustDOCDocuments(record WebNGElementVc WEr)
 begin
 array string 255 arrDocsDocx;
 array longint arrDocsDocxSerNr;
-boolean TrHs;
+boolean TrHs,checklang;
 record ConfVc Confr;
 record MailVc Mailr;
-string 255 ckey;
+string 255 ckey,lang,tstr;
 record Attach2Vc Attach2r;
-integer filenr;
+integer filenr,i;
 record RLinkVc RLr;
 vector string 255 vDescription,vAttachKey;
+record WebNGLanguageVc WebNGLanguager;
+vector boolean vweblang;
+array string 100 weblang;
 
-logtext(0,"CustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocumentsCustDOCDocuments");
+lang = CurrentWebLang;
+
+while(loopmain(WebNGLanguager,1,true))begin
+  weblang[weblang.length] = WebNGLanguager.Code;
+end;
 
 Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
@@ -2182,11 +2203,23 @@ Confr.AddrName = "Documents";
         filenr = 1;
         while (ReadRecordLink(Mailr,filenr,Attach2r,RLr)) begin
           if (right(Attach2r.FileName,5)==".docx") then begin
-            arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
-            arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
-            vDescription[Attach2r.SerNr*2] = Mailr.Header;
-            vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
-            logtext(0,"DOCX Mailr.Header " & Mailr.Header);
+            checklang = true;
+            for(i=0;i<weblang.length;i=i+1)begin
+              tstr = weblang[i];
+              logtext(0,Attach2r.FileName);
+              if((left(Attach2r.FileName,len(tstr)) & "_")==tstr & "_")then begin
+                if(lang!=tstr)then begin
+                  checklang = false;
+                end;
+              end;
+            end;
+            
+            if(checklang)then begin
+              arrDocsDocx[arrDocsDocx.length] = Attach2r.FileName;
+              arrDocsDocxSerNr[arrDocsDocxSerNr.length] = Attach2r.SerNr*2;
+              vDescription[Attach2r.SerNr*2] = Mailr.Header;
+              vAttachKey[Attach2r.SerNr*2] = CalcPassword(Attach2r.SerNr*2,Attach2r.SerNr*2,0);
+            end;
           end;
           filenr = filenr + 1;
         end;
