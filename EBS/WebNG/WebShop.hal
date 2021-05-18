@@ -1454,7 +1454,7 @@ begin
   record WebNGShopBasketVc WSBr;
   row WebNGShopBasketVc WSBrw;
   Integer i,rwcnt;
-  val totqty;
+  Integer totqty;
   string 255 link;
   
   if (GetShoppingBasket(WSBr,0)) then begin
@@ -1466,7 +1466,7 @@ begin
   end;
 
   link = FormatSimpleLink(GetLinkToShop & "basket",true);;
-  WebOutString("<a href=""" & link & """>" & totqty & "</a>");
+  WebOutString("<a href=""" & link & """> <span class='CartNumb'> " & totqty & " </span></a>");
   return;
 end;
 
