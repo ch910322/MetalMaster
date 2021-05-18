@@ -360,25 +360,26 @@ begin
   return;
 end;
 
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials)
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials,var vector val prices)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
   Integer i,rwcnt,pos;
   string 100 tstr;
+  record INVc INr;
   
-  pos = 0;
-  ExtractObj(WebNGProductr.Classification,pos,tstr);
-  while (nonblank(tstr)) begin
-    if(nonblank(tstr))then begin
-      if(nonblank(vColors[tstr]))then begin
-        aColors[aColors.length] = vColors[tstr];
-      end;
-      if(nonblank(vMateraials[tstr]))then begin
-        aTypes[aTypes.length] = vMateraials[tstr];
+  INVr.ArtCode = WebNGProductr.Code;
+  if (ReadFirstMain(INVr,1,true)) then begin
+    rwcnt = MatRowCnt(INVr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(INVr,i,INVrw);
+      AddToArray(INVrw.Type,aTypes);
+      AddToArray(INVrw.Color,aColors);
+      INr.Code = INVrw.Item;
+      if(readfirstmain(INr,1,true))then begin
+        prices[INVrw.Type & ";;;" & INVrw.Color] = INr.InPrice;
       end;
     end;
-    ExtractObj(WebNGProductr.Classification,pos,tstr);
   end;
   
 
@@ -523,6 +524,7 @@ begin
   record DIVc DIr;
   vector string 255 vColors,vMateraials;
   boolean TrHs;
+  vector val vprices;
   
   blockload(MMWPSb);
   
@@ -602,7 +604,7 @@ begin
   WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
   cleararray(aTypes);
   cleararray(aColors);
-  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
   if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
     WebOutStringFormatNL("                  <div class='row'>");

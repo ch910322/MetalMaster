@@ -754,6 +754,7 @@ begin
   row MMUserTitleVc UTrw;
   Integer i,rwcnt;
   string 255 lang;
+  
 
   lang = CurrentWebLang;
   UTr.Code = Userr.Job;
@@ -768,7 +769,9 @@ begin
       end;
     end;
   end;
-
+  
+  logtext(0,Userr.Job & " GetEmplJobTitle " & Userr.Code & "  " & Userr.Name & " -> " & res);
+  
   GetEmplJobTitle = res;
   return;
 end;
