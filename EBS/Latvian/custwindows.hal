@@ -59,7 +59,7 @@ begin
   EditField(h,v=6,150,"Kods",Normal,Code,false,);
   EditField(h,v+=vs,-40,"Nosaukums",Normal,Comment,false,0);
   MatrixBegin(10,v+=vs+40,-40,-20,-,99);
-  MatCol(1,24,"Valoda",0,LangCode,false,0);
+  MatCol(1,24,"Valoda",0,LangCode,false,WebNGLanguageSClass);
   MatCol(1,74,"Nosaukums",0,RowComment,false,0);
   EndMatrix;
   EndWindow;
