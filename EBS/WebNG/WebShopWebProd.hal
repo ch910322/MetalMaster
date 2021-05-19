@@ -25,7 +25,8 @@ external inner procedure CalcSum(val,val,val,val,var val,Integer);
 external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
 external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
-
+external function string 255 getWebProductFilters(record WebNGProductVc);
+external procedure ShowSingleFilter(string,string,var vector string);
 
 function string 255 GetCTypeTranslation(string cls)
 begin
@@ -70,38 +71,6 @@ begin
   end;
 
   GetDITranslation = res;
-  return;
-end;
-
-
-procedure ShowSingleFilter(string cls,string values,var vector string vOptions)
-begin
-  record DIVc DIr;
-  Boolean TrHs;
-  string 255 vals,tstr;
-  
-  if (nonblank(cls)) then begin
-    DIr.CType = cls;
-    TrHs = true;
-    while (LoopKey("CType",DIr,1,TrHs)) begin
-      if (DIr.CType!=cls) then begin
-        TrHs = false;
-      end else begin
-        tstr = GetDITranslation(DIr);;
-        if (SetInSet(DIr.Code,values)) then begin
-          vals = AddObjectToObjectList(vals,tstr);
-        end;
-        vOptions[DIr.Code] = tstr;
-      end;
-    end;
-
-    if (nonblank(values)) then begin
-      WebOutString("<li class='active' list-cls='" & cls & "'><a href='#'>" & vals);
-    end else begin
-      WebOutString("<li list-cls='" & cls & "'><a href='#'>" & GetCTypeTranslation(cls));
-    end;
-    WebOutString("</a></li>");
-  end;
   return;
 end;
 
@@ -159,10 +128,10 @@ begin
   array string 255 a_options1,a_options2,a_options3;
   
   WebOutString("<div class='filter'><div class='row'><div class='col-xl-10 col-lg-10 col-12'><ul class='filter-buttons'>");
-  ShowSingleFilter(WSb.WebShowClass,vFilters["Option1"],vOptions1);
-  ShowSingleFilter(WSb.Filter2,vFilters["Option2"],vOptions2);
-  ShowSingleFilter(WSb.Filter3,vFilters["Option3"],vOptions3);
-  ShowSingleFilter(WSb.Filter4,vFilters["Option4"],vOptions4);
+  ShowSingleFilter("FilterType",vFilters["Option1"],vOptions1);
+  ShowSingleFilter("FilterMaterial",vFilters["Option2"],vOptions2);
+  ShowSingleFilter("FilterColor",vFilters["Option3"],vOptions3);
+  //ShowSingleFilter(WSb.Filter4,vFilters["Option4"],vOptions4);
   WebOutString("</ul></div>");
   
   WebOutString("<div class='col-xl-2 col-lg-2 d-lg-block d-md-none d-none'><div class='GridProd text-right'>");
@@ -187,19 +156,12 @@ begin
   filter2=joinComa(a_options2);
   filter3=joinComa(a_options3);
   
-  logtext(0, "filter1 = " & filter1);
-  logtext(0, "filter2 = " & filter2);
-  logtext(0, "filter3 = " & filter3);
-
-  logtext(0, "WSb.WebShowClass = " & WSb.WebShowClass);
-  logtext(0, "WSb.Filter2 = " & WSb.Filter2);
-  logtext(0, "WSb.Filter3 = " & WSb.Filter3);
 
   WebOutString("<div class='filter_option' id='filterOption' list-" & WSb.WebShowClass & "='" & filter1 & "' list-" & WSb.Filter2 & "='" & filter2 & "' list-" & WSb.Filter3 & "='" & filter3 & "'>");
-  DisplayOptions(WSb.WebShowClass,vOptions1,vFilters["Option1"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter2,vOptions2,vFilters["Option2"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter3,vOptions3,vFilters["Option3"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter4,vOptions4,vFilters["Option4"],vFilters["DisplayOption"]);
+  DisplayOptions("FilterType",vOptions1,vFilters["Option1"],vFilters["DisplayOption"]);
+  DisplayOptions("FilterMaterial",vOptions2,vFilters["Option2"],vFilters["DisplayOption"]);
+  DisplayOptions("FilterColor",vOptions3,vFilters["Option3"],vFilters["DisplayOption"]);
+  //DisplayOptions(WSb.Filter4,vOptions4,vFilters["Option4"],vFilters["DisplayOption"]);
   WebOutString("</div>")
   WebOutString("</div></div>");
   return;
@@ -360,25 +322,26 @@ begin
   return;
 end;
 
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials)
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials,var vector val prices)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
   Integer i,rwcnt,pos;
   string 100 tstr;
+  record INVc INr;
   
-  pos = 0;
-  ExtractObj(WebNGProductr.Classification,pos,tstr);
-  while (nonblank(tstr)) begin
-    if(nonblank(tstr))then begin
-      if(nonblank(vColors[tstr]))then begin
-        aColors[aColors.length] = vColors[tstr];
-      end;
-      if(nonblank(vMateraials[tstr]))then begin
-        aTypes[aTypes.length] = vMateraials[tstr];
+  INVr.ArtCode = WebNGProductr.Code;
+  if (ReadFirstMain(INVr,1,true)) then begin
+    rwcnt = MatRowCnt(INVr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(INVr,i,INVrw);
+      AddToArray(INVrw.Type,aTypes);
+      AddToArray(INVrw.Color,aColors);
+      INr.Code = INVrw.Item;
+      if(readfirstmain(INr,1,true))then begin
+        prices[INVrw.Type & ";;;" & INVrw.Color] = INr.InPrice;
       end;
     end;
-    ExtractObj(WebNGProductr.Classification,pos,tstr);
   end;
   
 
@@ -427,10 +390,10 @@ function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,
 begin
   string 255 res;
 
-  res = ShowClassTypeList(WSb.WebShowClass,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter2,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter3,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter4,WebNGProductr.Classification);
+  res = ShowClassTypeList(WSb.WebShowClass,getWebProductFilters(WebNGProductr));
+  res = res & ShowClassTypeList(WSb.Filter2,getWebProductFilters(WebNGProductr));
+  res = res & ShowClassTypeList(WSb.Filter3,getWebProductFilters(WebNGProductr));
+  //res = res & ShowClassTypeList(WSb.Filter4,WebNGProductr.Classification);
   
   ShowWebNGProductClasses = res;
   return;
@@ -523,6 +486,7 @@ begin
   record DIVc DIr;
   vector string 255 vColors,vMateraials;
   boolean TrHs;
+  vector val vprices;
   
   blockload(MMWPSb);
   
@@ -602,7 +566,7 @@ begin
   WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
   cleararray(aTypes);
   cleararray(aColors);
-  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
   if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
     WebOutStringFormatNL("                  <div class='row'>");

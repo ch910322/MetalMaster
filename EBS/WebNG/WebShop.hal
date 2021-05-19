@@ -27,13 +27,108 @@ external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
 
 
-function string 255 GetCTypeTranslation(string cls)
+global function string 255 getWebProductFilters(record WebNGProductVc WebNGProductr)
+begin
+  string 255 res,tstr;
+  integer pos;
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt;
+    
+    if(nonblank(WebNGProductr.ProductCategory))then begin
+      pos = 0;
+      ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      while(nonblank(tstr))begin
+        if(nonblank(tstr))then begin
+          res = AddObjectToObjectList(res,"CAT_" & tstr);
+        end;
+        ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      end;
+      
+      INVr.ArtCode = WebNGProductr.Code;
+      if (ReadFirstMain(INVr,1,true)) then begin
+        rwcnt = MatRowCnt(INVr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(INVr,i,INVrw);
+          if(nonblank(INVrw.Type))then begin
+            res = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+          end;
+          if(nonblank(INVrw.Color))then begin
+            res = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+          end;
+        end;
+      end;
+      
+    end;
+    
+  
+  getWebProductFilters = res;
+return;
+end;
+
+global function string 255 getWebProductFilterslist(record WebNGProductVc WebNGProductr)
+begin
+  string 255 res,tstr,res1,res2,res3;
+  integer pos;
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt;
+    
+    if(nonblank(WebNGProductr.ProductCategory))then begin
+      pos = 0;
+      ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      while(nonblank(tstr))begin
+        if(nonblank(tstr))then begin
+          res1 = AddObjectToObjectList(res,"CAT_" & tstr);
+        end;
+        ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      end;
+      res1 = "list-" & "FilterType" & "='" & res1 & "'";
+            
+      INVr.ArtCode = WebNGProductr.Code;
+      if (ReadFirstMain(INVr,1,true)) then begin
+        rwcnt = MatRowCnt(INVr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(INVr,i,INVrw);
+          if(nonblank(INVrw.Type))then begin
+            res2 = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+          end;
+          if(nonblank(INVrw.Color))then begin
+            res3 = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+          end;
+        end;
+      end;
+      res2 = "list-" & "FilterMaterial" & "='" & res2 & "'";
+      res3 = "list-" & "FilterColor" & "='" & res3 & "'";
+      
+    end;
+    
+    res = res1 & res2 & res3;
+  
+  getWebProductFilterslist = res;
+return;
+end;
+
+
+function string 255 GetCTypeTranslation(string tmpcls)
 begin
   Integer i,rwcnt;
   row CTypeVc CTrw;
   record CTypeVc CTr;
-  string 255 lang,res;
-
+  string 255 lang,res,cls;
+  record MMWebSetBlock WSb;
+  
+  blockload(WSb);
+  
+  cls = tmpcls;
+  
+  logtext(0,"GetCTypeTranslation " & cls);
+  switch(cls)begin
+    case "FilterType":cls = WSb.WebShowClass;
+    case "FilterMaterial":cls = WSb.Filter2;
+    case "FilterColor":cls = WSb.Filter3;
+  end;
+  
   lang = CurrentWebLang;
   CTr.Code = cls;
   if (ReadFirstMain(CTr,1,true)) then begin
@@ -73,12 +168,133 @@ begin
   return;
 end;
 
+global
+function string 255 GetWebNGProductCatTranslation(record WebNGProductCatVc WebNGProductCatr)
+begin
+  Integer i,rwcnt;
+  row WebNGProductCatVc WebNGProductCatrw;
+  string 255 lang,res;
 
+  lang = CurrentWebLang;  
+  res = WebNGProductCatr.Comment;
+  rwcnt = MatRowCnt(WebNGProductCatr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(WebNGProductCatr,i,WebNGProductCatrw);
+    if (WebNGProductCatrw.LangCode==lang) then begin
+      res = WebNGProductCatrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetWebNGProductCatTranslation = res;
+  return;
+end;
+
+global
+function string 255 GetWebMMItemTypeVcTranslation(record MMItemTypeVc MMItemTyper)
+begin
+  Integer i,rwcnt;
+  row MMItemTypeVc MMItemTyperw;
+  string 255 lang,res;
+
+  lang = CurrentWebLang;  
+  res = MMItemTyper.Name;
+  rwcnt = MatRowCnt(MMItemTyper);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(MMItemTyper,i,MMItemTyperw);
+    if (MMItemTyperw.LangCode==lang) then begin
+      res = MMItemTyperw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetWebMMItemTypeVcTranslation = res;
+  return;
+end;
+
+global
+function string 255 GetWebMMItemColorVcTranslation(record MMItemColorVc MMItemColorr)
+begin
+  Integer i,rwcnt;
+  row MMItemColorVc MMItemColorrw;
+  string 255 lang,res;
+
+  lang = CurrentWebLang;  
+  res = MMItemColorr.Name;
+  rwcnt = MatRowCnt(MMItemColorr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(MMItemColorr,i,MMItemColorrw);
+    if (MMItemColorrw.LangCode==lang) then begin
+      res = MMItemColorrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetWebMMItemColorVcTranslation = res;
+  return;
+end;
+
+
+global
 procedure ShowSingleFilter(string cls,string values,var vector string vOptions)
 begin
   record DIVc DIr;
   Boolean TrHs;
   string 255 vals,tstr;
+  record WebNGProductCatVc WebNGProductCatr;
+  record MMItemTypeVc MMItemTyper;
+  record MMItemColorVc MMItemColorr;
+  
+  if(cls=="FilterType")then begin
+    while(loopmain(WebNGProductCatr,1,true))begin
+      tstr = GetWebNGProductCatTranslation(WebNGProductCatr);
+      if (SetInSet("CAT_" & WebNGProductCatr.Code,values)) then begin
+        vals = AddObjectToObjectList(vals,tstr);
+      end;
+      vOptions["CAT_" & WebNGProductCatr.Code] = tstr;
+    end;
+    if (nonblank(values)) then begin
+      WebOutString("<li class='active' list-cls='" & cls & "'><a href='#'>" & vals);
+    end else begin
+      WebOutString("<li list-cls='" & cls & "'><a href='#'>" & GetCTypeTranslation(cls));
+    end;
+    WebOutString("</a></li>");
+    goto lShowSingleFilter;
+  end;
+  
+  if(cls=="FilterMaterial")then begin
+     while(loopmain(MMItemTyper,1,true))begin
+      tstr = GetWebMMItemTypeVcTranslation(MMItemTyper);
+      if (SetInSet("TYPE_" & MMItemTyper.Code,values)) then begin
+        vals = AddObjectToObjectList(vals,tstr);
+      end;
+      vOptions["TYPE_" & MMItemTyper.Code] = tstr;
+    end;
+    if (nonblank(values)) then begin
+      WebOutString("<li class='active' list-cls='" & cls & "'><a href='#'>" & vals);
+    end else begin
+      WebOutString("<li list-cls='" & cls & "'><a href='#'>" & GetCTypeTranslation(cls));
+    end;
+    WebOutString("</a></li>");
+    goto lShowSingleFilter;
+  end;
+  
+  if(cls=="FilterColor")then begin
+    while(loopmain(MMItemColorr,1,true))begin
+      tstr = GetWebMMItemColorVcTranslation(MMItemColorr);
+      if (SetInSet("COLOR_" & MMItemColorr.Code,values)) then begin
+        vals = AddObjectToObjectList(vals,tstr);
+      end;
+      vOptions["COLOR_" & MMItemColorr.Code] = tstr;
+    end;
+    if (nonblank(values)) then begin
+      WebOutString("<li class='active' list-cls='" & cls & "'><a href='#'>" & vals);
+    end else begin
+      WebOutString("<li list-cls='" & cls & "'><a href='#'>" & GetCTypeTranslation(cls));
+    end;
+    WebOutString("</a></li>");
+    goto lShowSingleFilter;
+  end;
   
   if (nonblank(cls)) then begin
     DIr.CType = cls;
@@ -87,7 +303,7 @@ begin
       if (DIr.CType!=cls) then begin
         TrHs = false;
       end else begin
-        tstr = GetDITranslation(DIr);;
+        tstr = GetDITranslation(DIr);
         if (SetInSet(DIr.Code,values)) then begin
           vals = AddObjectToObjectList(vals,tstr);
         end;
@@ -102,6 +318,9 @@ begin
     end;
     WebOutString("</a></li>");
   end;
+  
+lShowSingleFilter:;
+  
   return;
 end;
 
@@ -127,7 +346,6 @@ begin
   array string 255 a_options;
   Integer i; 
 
-  logtext(0, "vals_listview = " & listview);
   GetVectorTags(options,a_options);
   if (a_options.length>0) then begin
     if (listview=="list") then begin
@@ -135,7 +353,7 @@ begin
     end else begin
       WebOutString("<div class='filter_list filter_list" & cls & "'><div class='filter_menu col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12' list-type='" & cls & "'><div class='ProductList-menu'><ul>");
     end;
-    //WebOutString("<div class='filter_list filter_list" & cls & "'><div class='filter_menu col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12' list-type='" & cls & "'><div class='ProductList-menu'><ul>");
+
     GetVectorTags(options,a_options);
     for (i=0;i<a_options.length;i=i+1) begin
       if (SetInSet(a_options[i],vals)) then begin
@@ -159,10 +377,10 @@ begin
   array string 255 a_options1,a_options2,a_options3;
   
   WebOutString("<div class='filter'><div class='row'><div class='col-xl-10 col-lg-10 col-12'><ul class='filter-buttons'>");
-  ShowSingleFilter(WSb.WebShowClass,vFilters["Option1"],vOptions1);
-  ShowSingleFilter(WSb.Filter2,vFilters["Option2"],vOptions2);
-  ShowSingleFilter(WSb.Filter3,vFilters["Option3"],vOptions3);
-  ShowSingleFilter(WSb.Filter4,vFilters["Option4"],vOptions4);
+  ShowSingleFilter("FilterType",vFilters["Option1"],vOptions1);
+  ShowSingleFilter("FilterMaterial",vFilters["Option2"],vOptions2);
+  ShowSingleFilter("FilterColor",vFilters["Option3"],vOptions3);
+  //ShowSingleFilter(WSb.Filter4,vFilters["Option4"],vOptions4);
   WebOutString("</ul></div>");
   
   WebOutString("<div class='col-xl-2 col-lg-2 d-lg-block d-md-none d-none'><div class='GridProd text-right'>");
@@ -187,19 +405,11 @@ begin
   filter2=joinComa(a_options2);
   filter3=joinComa(a_options3);
   
-  logtext(0, "filter1 = " & filter1);
-  logtext(0, "filter2 = " & filter2);
-  logtext(0, "filter3 = " & filter3);
-
-  logtext(0, "WSb.WebShowClass = " & WSb.WebShowClass);
-  logtext(0, "WSb.Filter2 = " & WSb.Filter2);
-  logtext(0, "WSb.Filter3 = " & WSb.Filter3);
-
-  WebOutString("<div class='filter_option' id='filterOption' list-" & WSb.WebShowClass & "='" & filter1 & "' list-" & WSb.Filter2 & "='" & filter2 & "' list-" & WSb.Filter3 & "='" & filter3 & "'>");
-  DisplayOptions(WSb.WebShowClass,vOptions1,vFilters["Option1"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter2,vOptions2,vFilters["Option2"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter3,vOptions3,vFilters["Option3"],vFilters["DisplayOption"]);
-  DisplayOptions(WSb.Filter4,vOptions4,vFilters["Option4"],vFilters["DisplayOption"]);
+  WebOutString("<div class='filter_option' id='filterOption' list-" & "FilterType" & "='" & filter1 & "' list-" & "FilterMaterial" & "='" & filter2 & "' list-" & "FilterColor" & "='" & filter3 & "'>");
+  DisplayOptions("FilterType",vOptions1,vFilters["Option1"],vFilters["DisplayOption"]);
+  DisplayOptions("FilterMaterial",vOptions2,vFilters["Option2"],vFilters["DisplayOption"]);
+  DisplayOptions("FilterColor",vOptions3,vFilters["Option3"],vFilters["DisplayOption"]);
+  //DisplayOptions(WSb.Filter4,vOptions4,vFilters["Option4"],vFilters["DisplayOption"]);
   WebOutString("</div>")
   WebOutString("</div></div>");
   return;
@@ -360,25 +570,26 @@ begin
   return;
 end;
 
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials)
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials, var vector val prices)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
   Integer i,rwcnt,pos;
   string 100 tstr;
+  record INVc INr;
   
-  pos = 0;
-  ExtractObj(WebNGProductr.Classification,pos,tstr);
-  while (nonblank(tstr)) begin
-    if(nonblank(tstr))then begin
-      if(nonblank(vColors[tstr]))then begin
-        aColors[aColors.length] = vColors[tstr];
-      end;
-      if(nonblank(vMateraials[tstr]))then begin
-        aTypes[aTypes.length] = vMateraials[tstr];
+  INVr.ArtCode = WebNGProductr.Code;
+  if (ReadFirstMain(INVr,1,true)) then begin
+    rwcnt = MatRowCnt(INVr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(INVr,i,INVrw);
+      AddToArray(INVrw.Type,aTypes);
+      AddToArray(INVrw.Color,aColors);
+      INr.Code = INVrw.Item;
+      if(readfirstmain(INr,1,true))then begin
+        prices[INVrw.Type & ";;;" & INVrw.Color] = INr.InPrice;
       end;
     end;
-    ExtractObj(WebNGProductr.Classification,pos,tstr);
   end;
   
 
@@ -392,7 +603,22 @@ begin
   record DIVc DIr;
   Longint pos;
   string 255 tstr;
-
+  
+  if(type=="FilterType")then begin
+  
+    goto lShowClassTypeList;
+  end;
+  
+  if(type=="FilterMaterial")then begin
+  
+    goto lShowClassTypeList;
+  end;
+  
+  if(type=="FilterColor")then begin
+  
+    goto lShowClassTypeList;
+  end;
+  
   if (nonblank(type)) then begin
     while (GetNextSubstring(list,pos,",",tstr)) begin
       DIr.Code = tstr;
@@ -404,7 +630,8 @@ begin
     end;
     res = "list-" & type & "='" & res & "'";
   end;
-
+  
+lShowClassTypeList:;
   ShowClassTypeList = res;
   return;
 end;
@@ -426,12 +653,15 @@ end;
 function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,record MMWebSetBlock WSb)
 begin
   string 255 res;
-
-  res = ShowClassTypeList(WSb.WebShowClass,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter2,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter3,WebNGProductr.Classification);
-  res = res & ShowClassTypeList(WSb.Filter4,WebNGProductr.Classification);
   
+  
+  //res = ShowClassTypeList("FilterType",getWebProductFilters(WebNGProductr));
+  //res = res & ShowClassTypeList("FilterMaterial",getWebProductFilters(WebNGProductr));
+  //res = res & ShowClassTypeList("FilterColor",getWebProductFilters(WebNGProductr));
+  //res = res & ShowClassTypeList(WSb.Filter4,getWebProductFilters(WebNGProductr.Classification);
+  
+  res = getWebProductFilterslist(WebNGProductr);
+  logtext(0,"res  " & res);
   ShowWebNGProductClasses = res;
   return;
 end;
@@ -447,6 +677,7 @@ begin
   record DIVc DIr;
   vector string 255 vColors,vMateraials;
   boolean TrHs;
+  vector val vprices;
   
   blockload(MMWPSb);
   
@@ -489,7 +720,7 @@ begin
     logtext(0,"aTypes " & aTypes.length);
     cleararray(aTypes);
     cleararray(aColors);
-    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
     logtext(0,"aColors " & aColors.length);
     logtext(0,"aTypes " & aTypes.length);
     logtext(0,"listview = " & listview);
@@ -665,11 +896,11 @@ begin
   TrHs = true;
   
   while(loopmain(WebNGProductr,1,true))begin
-    if(setinset(vFilters["Option1"],WebNGProductr.Classification) and checkclassexists(WSb.WebShowClass,WebNGProductr.Classification))then begin
+    if(setinset(vFilters["Option1"],getWebProductFilters(WebNGProductr)))then begin
       arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
     end;
   end;
-  while (LoopKey("CType",DIr,1,TrHs)) begin
+  /*while (LoopKey("CType",DIr,1,TrHs)) begin
     if (DIr.CType!=WSb.WebShowClass) then begin
       TrHs = false;
     end else begin
@@ -683,16 +914,14 @@ begin
         end;
       end;
     end;
-  end;
+  end;*/
 
   //sort list
 
   //Show filters
   ShowFilterOptions(WSb,vFilters);
   //show items
-  logtext("0", " vFilters[DisplayOption] = " & vFilters["DisplayOption"]);
   ShowWebProductCatalog(arrWebNGProductr,vFilters["DisplayOption"],WSb);
-  logtext(0,"4444221 " & vFilters["DisplayOption"]);
   //ShowProductCatalog(arrINr,vFilters["DisplayOption"],WSb);
   ShowWebAppPageEnd(WPr);
 
@@ -1741,6 +1970,7 @@ begin
   vector string 255 vColors,vMateraials;
   boolean TrHs;
   record UnitVc Unitr;
+  vector val vprices;
   
   blockload(MMWPSb);
   
@@ -1775,7 +2005,7 @@ begin
   if (ReadFirstMain(WebNGProductr,1,true)) then begin
     Unitr.Code = WebNGProductr.Unittext;
     readfirstmain(Unitr,1,true);
-    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials);
+    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
     if (aTypes.length>0) then begin
       WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
       if (aTypes.length>0) then begin
