@@ -168,14 +168,27 @@ end;
 procedure ShowLoginStateElement(record WebNGElementVc WEr)
 begin
   record WebNGStructVc WSr;
+  record CUVc CUr;
   string 255 tstr;
 
   if (LoginState==true) then begin
-    WebOutTagOpen("<a href=""" & FormatLink("/WebUpdatingAction.hal","?action=logout&path=" & ConvertXml(WebGetArg("path")),true,true) & """>");
-    WebOutStringFormat(ToolWebNGTranslateText(20026)); //Logout
-    WebOutTagClose("</a>");  
-  end else begin  
-    tstr = "<a href=""";
+    WebOutString("<div id='loggedIn' style='cursor: pointer'>");
+    WebOutString("<i class='fas fa-user' ></i>");
+    WebOutTagOpen("<a href='#'></a>");
+    // href=""" & FormatLink("/WebUpdatingAction.hal","?action=logout&path=" & ConvertXml(WebGetArg("path")),true,true) & """></a>
+    // WebOutStringFormat(ToolWebNGTranslateText(20026)); //Logout
+    // http://localhost:81/dologin&company=3&login=1005&passwd=123
+    CUr.Code = CurrentCust;
+    logtext(0, "before if =  " & CurrentCust);
+    if (ReadFirstMain(CUr,1,true)) then begin
+      logtext(0, "in if! ");
+      WebOutString(CUr.Name);
+    end;
+    WebOutTagClose("</a>");
+    WebOutString("</div>");
+  end else begin
+
+    tstr = "<i class='fas fa-user' ></i> <a  id='notLoggedIn' style='cursor: pointer;' href='#' onclick='console.log(123123123123)' data-toggle='modal' data-target='#ModalLogin' ";
     if (WEr.LinkToStruct!=-1) then begin
       tstr = tstr & FormatSimpleLink(GetLinkToStruct(WEr.LinkToStruct,true),true);
     end else begin
@@ -190,7 +203,6 @@ begin
     WebOutTagOpen(tstr);
 
     WebOutStringFormat(ToolWebNGTranslateText(20049)); //Login
-
     WebOutTagClose("</a>");
   end;
   return;

@@ -530,7 +530,7 @@ begin
         modal = " data-toggle='modal'";
       end;
       WebOutString("</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><a href='#' onclick='showModal(1,[1,2],{3:2})' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
       WebOutString("</div>");
       WebOutString("</div>");
       WebOutString("</div></div>");
@@ -1649,7 +1649,7 @@ begin
     WebOutString("            </div>");
     WebOutString("        </div>");
     WebOutString("        <div class='BoxCartBTN'>");
-    WebOutString("            <input type='submit' class='btns-red' value='" & ToolWebNGTranslateText2(89018) & "'>");//CHECKOUT
+    WebOutString("            <input type='submit' class='btns-red' id='checkoutBtn' value='" & ToolWebNGTranslateText2(89018) & "'>"); // CHECKOUT
     WebOutString("        </div>                        ");
     WebOutString("    </div>");
   end else begin
