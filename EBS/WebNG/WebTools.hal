@@ -13,6 +13,10 @@ external inner procedure AddToSortedArray(string,string,var array string,var arr
 external inner function string 255 GetNextValue(var string);
 external inner function string 255 FormatLink(string,string,boolean,boolean);
 
+external function string 255 GetWebNGProductCatTranslation(record WebNGProductCatVc);
+external function string 255 GetWebMMItemTypeVcTranslation(record MMItemTypeVc);
+external function string 255 GetWebMMItemColorVcTranslation(record MMItemColorVc);
+
 global
 function Integer SetCompanyBasedOnCountry()
 begin
@@ -676,6 +680,9 @@ begin
   record UnitVc Unitr;
   record MMWebSetBlock WSb;
   boolean needcome;
+  record WebNGProductCatVc WebNGProductCatr;
+  record MMItemTypeVc MMItemTyper;
+  record MMItemColorVc MMItemColorr;
   
   oldcomp = SetCompanyBasedOnCountry;
   
@@ -684,61 +691,37 @@ begin
   
   weboutstring("{");
   
-  weboutstring("\"" & WSb.WebShowClass & "\":[");
+  weboutstring("\"" & "FilterType" & "\":[");
   needcome = false;
-  DIr.CType = WSb.WebShowClass;
-  TrHs = true;
-  if(nonblank(DIr.CType))then begin
-    while(loopkey("CType",DIr,1,TrHs))begin
-      if(DIr.CType!=WSb.WebShowClass)then begin TrHs = false; end;
-      if(TrHs)then begin
-        if(needcome)then begin
-           weboutstring(",");
-        end;
-        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
-        needcome = true;
-      end;
+  while(loopmain(WebNGProductCatr,1,true))begin
+    if(needcome)then begin
+       weboutstring(",");
     end;
+    weboutstring("{\"" & "TYPE_" & WebNGProductCatr.Code & "\":\"" & GetWebNGProductCatTranslation(WebNGProductCatr) & "\"}");
+    needcome = true;
   end;
-  resetloop(DIr);
   weboutstring("],");
   
-  weboutstring("\"" & WSb.Filter2 & "\":[");
-  DIr.CType = WSb.Filter2;
-  TrHs = true;
+  weboutstring("\"" & "FilterMaterial" & "\":[");
   needcome = false;
-  if(nonblank(DIr.CType))then begin
-    while(loopkey("CType",DIr,1,TrHs))begin
-      if(DIr.CType!=WSb.Filter2)then begin TrHs = false; end;
-      if(TrHs)then begin
-        if(needcome)then begin
-           weboutstring(",");
-        end;
-        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
-        needcome = true;
-      end;
+  while(loopmain(MMItemTyper,1,true))begin
+    if(needcome)then begin
+       weboutstring(",");
     end;
+    weboutstring("{\"" & "TYPE_" & MMItemTyper.Code & "\":\"" & GetWebNGProductCatTranslation(MMItemTyper) & "\"}");
+    needcome = true;
   end;
-  resetloop(DIr);
   weboutstring("],");
   
-  weboutstring("\"" & WSb.Filter3 & "\":[");
-  DIr.CType = WSb.Filter3;
-  TrHs = true;
+  weboutstring("\"" & "FilterColor" & "\":[");
   needcome = false;
-  if(nonblank(DIr.CType))then begin
-    while(loopkey("CType",DIr,1,TrHs))begin
-      if(DIr.CType!=WSb.Filter3)then begin TrHs = false; end;
-      if(TrHs)then begin
-        if(needcome)then begin
-           weboutstring(",");
-        end;
-        weboutstring("{\"" & DIr.Code & "\":\"" & DIr.Name & "\"}");
-        needcome = true;
-      end;
+  while(loopmain(MMItemColorr,1,true))begin
+    if(needcome)then begin
+       weboutstring(",");
     end;
+    weboutstring("{\"" & "TYPE_" & MMItemColorr.Code & "\":\"" & GetWebMMItemColorVcTranslation(MMItemColorr) & "\"}");
+    needcome = true;
   end;
-  resetloop(DIr);
   weboutstring("]");
   
   weboutstring("}");
