@@ -27,6 +27,46 @@ external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
 
 
+global function string 255 getWebProductFilters(record WebNGProductVc WebNGProductr)
+begin
+  string 255 res,tstr;
+  integer pos;
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  Integer i,rwcnt;
+    
+    if(nonblank(WebNGProductr.ProductCategory))then begin
+      pos = 0;
+      ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      while(nonblank(tstr))begin
+        if(nonblank(tstr))then begin
+          res = AddObjectToObjectList(res,"CAT_" & tstr);
+        end;
+        ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
+      end;
+      
+      INVr.ArtCode = WebNGProductr.Code;
+      if (ReadFirstMain(INVr,1,true)) then begin
+        rwcnt = MatRowCnt(INVr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(INVr,i,INVrw);
+          if(nonblank(INVrw.Type))then begin
+            res = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+          end;
+          if(nonblank(INVrw.Color))then begin
+            res = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+          end;
+        end;
+      end;
+      
+    end;
+    
+  
+  getWebProductFilters = res;
+return;
+end;
+
+
 function string 255 GetCTypeTranslation(string cls)
 begin
   Integer i,rwcnt;
