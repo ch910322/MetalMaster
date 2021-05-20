@@ -27,6 +27,9 @@ external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
 external function string 255 getWebProductFilters(record WebNGProductVc);
 external procedure ShowSingleFilter(string,string,var vector string);
+external function string 255 GetVarTypeName(string,string);
+external function string 255 GetVarColorName(string,string);
+external procedure GetProductVars(record WebNGProductVc,var array string,var array string);
 
 function string 255 GetCTypeTranslation(string cls)
 begin
@@ -322,32 +325,6 @@ begin
   return;
 end;
 
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials,var vector val prices)
-begin
-  record MMItemSetVc INVr;
-  row MMItemSetVc INVrw;
-  Integer i,rwcnt,pos;
-  string 100 tstr;
-  record INVc INr;
-  
-  INVr.ArtCode = WebNGProductr.Code;
-  if (ReadFirstMain(INVr,1,true)) then begin
-    rwcnt = MatRowCnt(INVr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(INVr,i,INVrw);
-      AddToArray(INVrw.Type,aTypes);
-      AddToArray(INVrw.Color,aColors);
-      INr.Code = INVrw.Item;
-      if(readfirstmain(INr,1,true))then begin
-        prices[INVrw.Type & ";;;" & INVrw.Color] = INr.InPrice;
-      end;
-    end;
-  end;
-  
-
-  return;
-end;
-
 
 function string 255 ShowClassTypeList(string type,string list)
 begin
@@ -399,7 +376,6 @@ begin
   return;
 end;
 
-
 function boolean checkclassexists(string classtype, string classifications)
 begin
   boolean res;  
@@ -425,55 +401,6 @@ begin
 return;
 end;
 
-
-function string 255 GetVarTypeName(string code,string lang)
-begin
-  Integer i,rwcnt;
-  record MMItemTypeVc ITr;
-  row MMItemTypeVc ITrw;
-  string 255 res;
-
-  ITr.Code = code;
-  if (ReadFirstMain(ITr,1,true)) then begin
-    res = ITr.Name;
-    rwcnt = MatRowCnt(ITr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(ITr,i,ITrw);
-      if (ITrw.LangCode==lang) then begin
-        res = ITrw.Text;
-        i = rwcnt;
-      end;
-    end;
-  end;
-
-  GetVarTypeName = res;
-  return;
-end;
-
-function string 255 GetVarColorName(string code,string lang)
-begin
-  Integer i,rwcnt;
-  record MMItemColorVc ICr;
-  row MMItemColorVc ICrw;
-  string 255 res;
-
-  ICr.Code = code;
-  if (ReadFirstMain(ICr,1,true)) then begin
-    res = ICr.Name;
-    rwcnt = MatRowCnt(ICr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(ICr,i,ICrw);
-      if (ICrw.LangCode==lang) then begin
-        res = ICrw.Text;
-        i = rwcnt;
-      end;
-    end;
-  end;
-
-  GetVarColorName = res;
-  return;
-end;
-
 procedure ShowWebItemInfoPage(record WebNGProductVc WebNGProductr)
 begin
   string 255 description,base,imglink,lang;
@@ -481,39 +408,10 @@ begin
   record RLinkVc RLr;
   Integer i,num;
   array string 255 aTypes,aColors;
-  record MMWebProdSetBlock MMWPSb;
   array string 255 thumb;
   record DIVc DIr;
-  vector string 255 vColors,vMateraials;
   boolean TrHs;
-  vector val vprices;
-  
-  blockload(MMWPSb);
-  
-  DIr.CType = MMWPSb.MatClass;
-  TrHs = true;
-  if(nonblank(DIr.CType))then begin
-    while(loopkey("CType",DIr,1,TrHs))begin
-      if(DIr.CType!=MMWPSb.MatClass)then begin TrHs = false; end;
-      if(TrHs)then begin
-        vMateraials[DIr.Code] = DIr.Name;
-      end;
-    end;
-  end;
-  resetloop(DIr);
-  
-  DIr.CType = MMWPSb.ColClass;
-  TrHs = true;
-  if(nonblank(DIr.CType))then begin
-    while(loopkey("CType",DIr,1,TrHs))begin
-      if(DIr.CType!=MMWPSb.ColClass)then begin TrHs = false; end;
-      if(TrHs)then begin
-        vColors[DIr.Code] = DIr.Name;
-      end;
-    end;
-  end;
-  resetloop(DIr);
-  
+    
   lang = CurrentWebLang;
   description = GetWebItemDescription(WebNGProductr,lang);
   WebOutStringFormatNL("  <h1 class='Title'>" & GetTranslatedNameProduct(WebNGProductr) & "</h1>");
@@ -566,7 +464,7 @@ begin
   WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
   cleararray(aTypes);
   cleararray(aColors);
-  GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
+  GetProductVars(WebNGProductr,aTypes,aColors);
   if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
     WebOutStringFormatNL("                  <div class='row'>");
@@ -925,5 +823,46 @@ begin
     end;
   end;
 
+  return;
+end;
+
+global webpublic
+procedure WebProductPrices()
+begin 
+  Integer i,rwcnt;
+  record WebNGProductVc WebNGProductr;
+  string 255 lang;
+  Integer oldcomp;
+  boolean needcome;
+  record WebNGProductCatVc WebNGProductCatr;
+  record MMItemTypeVc MMItemTyper;
+  record MMItemColorVc MMItemColorr;
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  record INVc INr;
+  
+  oldcomp = SetCompanyBasedOnCountry;
+  
+  weboutstring("{");
+  
+  weboutstring("\"" & "prices" & "\":[");
+  WebNGProductr.Code = webgetarg("prod");
+  if(readfirstmain(WebNGProductr,1,true))then begin
+    INVr.ArtCode = WebNGProductr.Code;
+    if (ReadFirstMain(INVr,1,true)) then begin
+      rwcnt = MatRowCnt(INVr);
+      for (i=0;i<rwcnt;i=i+1) begin
+        MatRowGet(INVr,i,INVrw);
+        INr.Code = INVrw.Item;
+        if(readfirstmain(INr,1,true))then begin
+        weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+        end;
+      end;
+    end;
+    
+  end;
+  weboutstring("]}");
+  
+  ResetCompanyBasedOnCountry(oldcomp);
   return;
 end;

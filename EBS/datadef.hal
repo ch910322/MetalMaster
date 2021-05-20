@@ -171,6 +171,7 @@ begin
     RecordField(Classification,M4UStr,255,0);
     RecordField(Price,M4Val,0,0);
     RecordField(Unittext,M4Str,10,0);
+    RecordField(PriceTextCalculation,M4Str,100,0);
   EndRecordAdd;
   
   BlockBegin(MMWebProdSetBlock,-,"");

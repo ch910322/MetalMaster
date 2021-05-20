@@ -570,7 +570,8 @@ begin
   return;
 end;
 
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,vector string vColors,vector string vMateraials, var vector val prices)
+global
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
@@ -585,10 +586,6 @@ begin
       MatRowGet(INVr,i,INVrw);
       AddToArray(INVrw.Type,aTypes);
       AddToArray(INVrw.Color,aColors);
-      INr.Code = INVrw.Item;
-      if(readfirstmain(INr,1,true))then begin
-        prices[INVrw.Type & ";;;" & INVrw.Color] = INr.InPrice;
-      end;
     end;
   end;
   
@@ -671,7 +668,7 @@ begin
   Integer i,y;
   record WebNGProductVc WebNGProductr;
   string 255 link,imglink,shorttext,tstr,base,lang,modal;
-  val price;
+  string 100 price;
   array string 255 aTypes,aColors;
   record MMWebProdSetBlock MMWPSb;
   record DIVc DIr;
@@ -714,13 +711,13 @@ begin
     imglink = base & "images/";
     imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/0",true);
     link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(WebNGProductr.Code),true);
-    price = WebNGProductr.Price;
+    price = WebNGProductr.PriceTextCalculation;
     shorttext = GetTranslatedNameProduct(WebNGProductr);
     tstr = GetTranslatedNameProduct(WebNGProductr);//GetItemTitle(INr,lang);
     logtext(0,"aTypes " & aTypes.length);
     cleararray(aTypes);
     cleararray(aColors);
-    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
+    GetProductVars(WebNGProductr,aTypes,aColors);
     logtext(0,"aColors " & aColors.length);
     logtext(0,"aTypes " & aTypes.length);
     logtext(0,"listview = " & listview);
@@ -876,7 +873,15 @@ begin
   record INVc INr;
   record WebNGPageVc WPr;
   record WebNGProductVc WebNGProductr;
-
+  vector val vItemPrice;
+  record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  integer rwcnt,i;
+  val minprice,maxprice;
+  
+  while(loopmain(INr,1,true))begin
+    vItemPrice[INr.Code] = INr.UPrice1;
+  end;
 
   //sorting?
   BlockLoad(WebShopb);
@@ -897,6 +902,30 @@ begin
   
   while(loopmain(WebNGProductr,1,true))begin
     if(setinset(vFilters["Option1"],getWebProductFilters(WebNGProductr)))then begin
+      minprice = 99999999;
+      maxprice = blankval;
+      INVr.ArtCode = WebNGProductr.Code;
+      if(ReadFirstMain(INVr,1,true))then begin
+        rwcnt = MatRowCnt(INVr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(INVr,i,INVrw);
+          if(vItemPrice[INVrw.Item]!=0)then begin
+            if(minprice>vItemPrice[INVrw.Item])then begin
+              minprice = vItemPrice[INVrw.Item];
+            end;
+            if(maxprice<vItemPrice[INVrw.Item])then begin
+              maxprice = vItemPrice[INVrw.Item];
+            end;
+          end;
+        end;
+        if(minprice==maxprice)then begin
+          WebNGProductr.PriceTextCalculation = ValToString(maxprice,M4Val,"",".",0);
+        end else begin
+          WebNGProductr.PriceTextCalculation = ValToString(minprice,M4Val,"",".",0) & " - " & ValToString(maxprice,M4Val,"",".",0);
+        end;
+      end else begin
+        WebNGProductr.PriceTextCalculation = WebNGProductr.Price;
+      end;
       arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
     end;
   end;
@@ -928,6 +957,7 @@ begin
   return;
 end;
 
+global
 function string 255 GetVarTypeName(string code,string lang)
 begin
   Integer i,rwcnt;
@@ -952,6 +982,7 @@ begin
   return;
 end;
 
+global
 function string 255 GetVarColorName(string code,string lang)
 begin
   Integer i,rwcnt;
@@ -2005,7 +2036,7 @@ begin
   if (ReadFirstMain(WebNGProductr,1,true)) then begin
     Unitr.Code = WebNGProductr.Unittext;
     readfirstmain(Unitr,1,true);
-    GetProductVars(WebNGProductr,aTypes,aColors,vColors,vMateraials,vprices);
+    GetProductVars(WebNGProductr,aTypes,aColors);
     if (aTypes.length>0) then begin
       WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
       if (aTypes.length>0) then begin
