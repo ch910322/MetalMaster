@@ -697,7 +697,7 @@ begin
     if(needcome)then begin
        weboutstring(",");
     end;
-    weboutstring("{\"" & "TYPE_" & WebNGProductCatr.Code & "\":\"" & GetWebNGProductCatTranslation(WebNGProductCatr) & "\"}");
+    weboutstring("{\"" & "CAT_" & WebNGProductCatr.Code & "\":\"" & GetWebNGProductCatTranslation(WebNGProductCatr) & "\"}");
     needcome = true;
   end;
   weboutstring("],");
@@ -719,7 +719,7 @@ begin
     if(needcome)then begin
        weboutstring(",");
     end;
-    weboutstring("{\"" & "TYPE_" & MMItemColorr.Code & "\":\"" & GetWebMMItemColorVcTranslation(MMItemColorr) & "\"}");
+    weboutstring("{\"" & "COLOR_" & MMItemColorr.Code & "\":\"" & GetWebMMItemColorVcTranslation(MMItemColorr) & "\"}");
     needcome = true;
   end;
   weboutstring("]");
