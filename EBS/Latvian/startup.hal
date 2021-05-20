@@ -15,7 +15,9 @@ begin
   Setting("Metalmaster deklarāciju klasifikācijas",MM_DeclarationClassLClass,modSO);
   Setting("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,modSO);
   
+
   Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
+  Setting("MM Country Prices List",WebNGCountryPricesLClass,modWebShopNG);
   
 
   
