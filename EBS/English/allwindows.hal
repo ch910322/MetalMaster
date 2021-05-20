@@ -59,3 +59,32 @@ begin
 //  SpecialMenu("Enable Web Product on Amazon",'e',1,"WebNGProductToAmazonDsm");//not ready
   EndWindow;
 end;
+
+window WebNGCountryPricesDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,h3,v,vs;
+  WindowBegin("Country Price List",WebNGCountryPricesDClass,CGview,-);
+  SetWRect(64,80,450,180);
+  UseView(WebNGCountryPricesVc);
+  v = 30; vs = 20; h = 80; h2 = 340; h3 = 350;
+  EditField(h,v, 240,"Country",Normal,Country,false,WebNGCountrySClass);
+  EditField(h,v+=vs,100,"Price List",Normal,PriceList,false,PLDefSClass);
+  EndWindow;
+end;
+
+window WebNGCountryPricesLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Country Price List",WebNGCountryPricesLClass,CGmlist,-);
+  SpawnClass(WebNGCountryPricesDClass);
+  SetWRect(64,80,409,298);
+  Sizeable(-1,-1,0,0);
+  UseView(WebNGCountryPricesVc);
+  RecordList(4,17,-21,-39);
+ 
+  RlColKey(4,2, "Country",Country,false,Country);
+  RlCol(230,230, "Price List",PriceList,false);
+  SearchField("Search");
+  EndWindow;
+end;

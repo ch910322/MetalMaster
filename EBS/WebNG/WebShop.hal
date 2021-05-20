@@ -878,9 +878,35 @@ begin
   row MMItemSetVc INVrw;
   integer rwcnt,i;
   val minprice,maxprice;
+  string 10 country;
+  record WebNGCountryPricesVc WebNGCountryPricer;
+  record PLVc PLr;
   
-  while(loopmain(INr,1,true))begin
-    vItemPrice[INr.Code] = INr.UPrice1;
+  
+  country = ToolWebNGGetCountry;
+  if(country!="global")then begin
+    WebNGCountryPricer.Country = country;
+    if(readfirstmain(WebNGCountryPricer,1,true))then begin
+      if(nonblank(WebNGCountryPricer.PriceList))then begin
+        PLr.PLCode = WebNGCountryPricer.PriceList;
+        TrHs = true;
+        while(loopmain(PLr,1,TrHs))begin
+          if(PLr.PLCode==WebNGCountryPricer.PriceList)then begin TrHs = false; end;
+          
+          if(TrHs)then begin
+            vItemPrice[PLr.ArtCode] = PLr.ExVatPrice;
+          end;
+        end;
+      end;
+    end else begin
+      while(loopmain(INr,1,true))begin
+        vItemPrice[INr.Code] = INr.UPrice1;
+      end;
+    end;
+  end else begin
+    while(loopmain(INr,1,true))begin
+      vItemPrice[INr.Code] = INr.UPrice1;
+    end;
   end;
 
   //sorting?

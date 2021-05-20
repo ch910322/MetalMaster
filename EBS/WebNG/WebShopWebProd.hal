@@ -840,9 +840,12 @@ begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
   record INVc INr;
+  record WebNGCountryPricesVc WebNGCountryPricer;
+  record PLVc PLr;
+  string 20 country;
   
   oldcomp = SetCompanyBasedOnCountry;
-  
+  country = ToolWebNGGetCountry;
   weboutstring("{");
   
   weboutstring("\"" & "prices" & "\":[");
@@ -853,13 +856,36 @@ begin
       rwcnt = MatRowCnt(INVr);
       for (i=0;i<rwcnt;i=i+1) begin
         MatRowGet(INVr,i,INVrw);
-        INr.Code = INVrw.Item;
-        if(readfirstmain(INr,1,true))then begin
-        if(needcome)then begin
-          weboutstring(",");
-        end;
-        weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
-        needcome = true;
+        
+        if(country!="global")then begin
+          WebNGCountryPricer.Country = country;
+          if(readfirstmain(WebNGCountryPricer,1,true))then begin
+            PLr.PLCode = WebNGCountryPricer.PriceList;
+            PLr.ArtCode = INVrw.Item;
+            if(readfirstmain(PLr,2,true))then begin
+              if(needcome)then begin
+                weboutstring(",");
+              end;
+              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+            end;
+          end else begin
+            INr.Code = INVrw.Item;
+            if(readfirstmain(INr,1,true))then begin
+              if(needcome)then begin
+                weboutstring(",");
+              end;
+              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+            end;
+          end;
+        end else begin
+          INr.Code = INVrw.Item;
+          if(readfirstmain(INr,1,true))then begin
+            if(needcome)then begin
+              weboutstring(",");
+            end;
+            weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+          end;
+          needcome = true;
         end;
       end;
     end;

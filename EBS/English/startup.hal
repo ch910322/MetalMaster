@@ -2,6 +2,7 @@ event startup
 begin
 
   Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
-
+  Setting("MMCountry Prices List",WebNGCountryPricesLClass,modWebShopNG);
+  
   return;
 end;
