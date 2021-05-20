@@ -855,7 +855,11 @@ begin
         MatRowGet(INVr,i,INVrw);
         INr.Code = INVrw.Item;
         if(readfirstmain(INr,1,true))then begin
+        if(needcome)then begin
+          weboutstring(",");
+        end;
         weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+        needcome = true;
         end;
       end;
     end;
