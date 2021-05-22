@@ -1010,3 +1010,12 @@ begin
   
   return;
 end;
+
+global webpublic procedure WebFinishOrder()
+begin
+  
+  
+  weboutstring("Ok");
+  
+  return;
+end;
