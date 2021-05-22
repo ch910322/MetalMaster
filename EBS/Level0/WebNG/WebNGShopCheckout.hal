@@ -1096,7 +1096,6 @@ begin
       end;
       if(storef)then begin
         passw = WebGetArg("Password");
-        logtext(0,"passw " & passw);
         storef = WebStoreCust(CUr,passw);
         if(storef)then begin
           weboutstring("Ok");
