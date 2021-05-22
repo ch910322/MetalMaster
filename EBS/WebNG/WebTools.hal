@@ -992,3 +992,21 @@ begin
   
   return;
 end;
+
+global webpublic procedure WebUpdateCustomerData()
+begin
+  
+  weboutstring("Ok");
+  
+  return;
+end;
+
+global webpublic procedure WebDeliveryMode()
+begin
+  
+  webgetarg("deliverytype");
+  
+  weboutstring("Ok");
+  
+  return;
+end;
