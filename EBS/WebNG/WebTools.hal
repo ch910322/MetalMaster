@@ -976,3 +976,19 @@ begin
   
   return;
 end;
+
+global webpublic procedure WebCuMainMenu()
+begin
+  
+  weboutstring("Ok");
+  
+  return;
+end;
+
+global webpublic procedure WebUnknownLogin()
+begin
+  
+  weboutstring("Error");
+  
+  return;
+end;
