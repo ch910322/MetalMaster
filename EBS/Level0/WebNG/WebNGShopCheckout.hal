@@ -1,7 +1,5 @@
-external function Boolean HasStandardWebshop();
 //tools
 external procedure ShowInputWithLabel2(string,string,string,string,string,boolean,boolean,integer);
-external procedure ShowInputWithLabel3(string,string,string,string,string,boolean,boolean,integer,Boolean);
 external function string 255 removenextnode(var string);
 external function string 255 FormatLink(string,string,boolean,boolean);
 external function string 255 FormatSimpleLink(string,boolean);
@@ -10,7 +8,6 @@ external function boolean LoginState();
 external function string 255 CurrentWebLang();
 external function string 255 ConvertXml(string);
 external procedure WebOutSubmit(string,string,string,string);
-external function Boolean ShowDeliveryOptions();
 //pages
 external procedure ShowErrorPage(string);
 external procedure ShowWebAppPageStart(record WebNGPageVc,string);
@@ -29,7 +26,6 @@ external procedure ShowShoppingBasket(string,boolean);
 external procedure SumUpShopBasket(var record WebNGShopBasketVc);
 external function boolean PayMethodSupported(string,var string,var string);
 external procedure WebCheckOutDeliveryModes();
-external procedure WebCheckOutDeliveryOptions();
 //webng
 external procedure RedirectToRequestedPage();
 external procedure RedirectToLoginPage();
@@ -53,8 +49,6 @@ external procedure ShowWebElement(string);
 //deladdr
 external procedure ShowDelAddrEdit(string,string,Boolean);
 external function Boolean CheckoutQtyFail();
-external function Boolean WebGuestCheckout();
-external function string 255 GetTranslatedNameDelAddrField(record DelAddrFieldVc);
 
 global
 function string 255 GetLinkToCheckoutPage()
@@ -88,7 +82,6 @@ begin
   PutSessionString("updcu_phone","");
   PutSessionString("updcu_fax","");
   PutSessionString("updcu_comment","");
-  PutSessionString("updcu_deliveryoption","");
   PutSessionString("updcu_errorflags","");
   PutSessionString("updcu_errormsg","");
 
@@ -96,27 +89,25 @@ begin
 end;
 
 procedure GetCurrentCustomerDetails(var string companyname,var string personname,var string address1,var string address2,var string address3,var string address4,
-                                    var string address5,var string country,var string email,var string orgnr,var string phone,var string fax,var string comment,
-                                    var string deliveryoption)
+                                    var string address5,var string country,var string email,var string orgnr,var string phone,var string fax,var string comment)
 begin
   record CUVc CUr;
   
   CUr.Code = CurrentCust;
   if (ReadFirstMain(CUr,1,true)) then begin
-    companyname     = CUr.Name;
-    personname      = CUr.Person;
-    address1        = CUr.InvAddr0;
-    address2        = CUr.InvAddr1;
-    address3        = CUr.InvAddr2;
-    address4        = CUr.InvAddr3;
-    address5        = CUr.InvAddr4;
+    companyname = CUr.Name;
+    personname  = CUr.Person;
+    address1    = CUr.InvAddr0;
+    address2    = CUr.InvAddr1;
+    address3    = CUr.InvAddr2;
+    address4    = CUr.InvAddr3;
+    address5    = CUr.InvAddr4;
     GetCountryName(CUr.CountryCode,CurrentWebLang,country);
-    email           = CUr.eMail;
-    orgnr           = CUr.VATNr;
-    phone           = CUr.Phone;
-    fax             = CUr.Fax;
-    comment         = CUr.Comment;
-    deliveryoption  = CUr.DeliveryOption;
+    email       = CUr.eMail;
+    orgnr       = CUr.VATNr;
+    phone       = CUr.Phone;
+    fax         = CUr.Fax;
+    comment     = CUr.Comment;
   end;
   
   return;
@@ -344,7 +335,6 @@ begin
   string 255 fax;
   string 255 passwd;
   string 255 comment;
-  string 255 deliveryoption;
   integer hmcompany;
   record NotepadVc Noter;
   integer errorflags,errormsg;
@@ -353,21 +343,20 @@ begin
   boolean firstline;
   
   if (nonblank(GetSessionString("updcu_busy"))) then begin
-    companyname     = GetSessionString("updcu_companyname");
-    personname      = GetSessionString("updcu_personname");
-    address1        = GetSessionString("updcu_address1");
-    address2        = GetSessionString("updcu_address2");
-    address3        = GetSessionString("updcu_address3");
-    address4        = GetSessionString("updcu_address4");
-    address5        = GetSessionString("updcu_address5");
-    email           = GetSessionString("updcu_email");
-    orgnr           = GetSessionString("updcu_orgnr");
-    phone           = GetSessionString("updcu_phone");
-    fax             = GetSessionString("updcu_fax");
-    comment         = GetSessionString("updcu_comment");
-    deliveryoption  = GetSessionString("updcu_deliveryoption");
+    companyname = GetSessionString("updcu_companyname");
+    personname  = GetSessionString("updcu_personname");
+    address1    = GetSessionString("updcu_address1");
+    address2    = GetSessionString("updcu_address2");
+    address3    = GetSessionString("updcu_address3");
+    address4    = GetSessionString("updcu_address4");
+    address5    = GetSessionString("updcu_address5");
+    email       = GetSessionString("updcu_email");
+    orgnr       = GetSessionString("updcu_orgnr");
+    phone       = GetSessionString("updcu_phone");
+    fax         = GetSessionString("updcu_fax");
+    comment     = GetSessionString("updcu_comment");
   end else begin
-    GetCurrentCustomerDetails(companyname,personname,address1,address2,address3,address4,address5,country,email,orgnr,phone,fax,comment,deliveryoption);
+    GetCurrentCustomerDetails(companyname,personname,address1,address2,address3,address4,address5,country,email,orgnr,phone,fax,comment);
   end;
 
   errorflags  = StringToInt(GetSessionString("updcu_errorflags"));
@@ -444,8 +433,7 @@ begin
 end;
 
 updating procedure UpdateCustomer(string custcode,string companyname,string personname,string address1,string address2,string address3,
-                                  string address4,string address5,string email,string orgnr,string phone,string fax,string comment,string deliveryoption,
-                                  var integer errormsg)
+                                  string address4,string address5,string email,string orgnr,string phone,string fax,string comment,var integer errormsg)
 begin
   record CUVc oldCUr,CUr;
   boolean storef;
@@ -502,10 +490,6 @@ begin
       CUr.Comment = comment;
       storef = true;
     end;
-    if (CUr.DeliveryOption!=StringToInt(deliveryoption)) then begin
-      CUr.DeliveryOption = StringToInt(deliveryoption);
-      storef = true;
-    end;
     
     if (storef) then begin
       if (RecordUpdate(oldCUr,CUr,false)) then begin end;
@@ -531,7 +515,6 @@ begin
   string 255 phone;
   string 255 fax;
   string 255 comment;
-  string 255 deliveryoption;
   string 255 tstr;
   integer errormsg;
   string 255 custcode;
@@ -540,19 +523,18 @@ begin
     RedirectToRequestedPage;
   end else begin
     //read from webargs
-    companyname     = WebGetArg("companyname");
-    personname      = WebGetArg("personname");
-    address1        = WebGetArg("address1");
-    address2        = WebGetArg("address2");
-    address3        = WebGetArg("address3");
-    address4        = WebGetArg("address4");
-    address5        = WebGetArg("address5");
-    email           = WebGetArg("email");
-    orgnr           = WebGetArg("orgnr");
-    phone           = WebGetArg("phone");
-    fax             = WebGetArg("fax");
-    comment         = WebGetArg("comment");
-    deliveryoption  = WebGetArg("deliveryoptions");
+    companyname = WebGetArg("companyname");
+    personname  = WebGetArg("personname");
+    address1    = WebGetArg("address1");
+    address2    = WebGetArg("address2");
+    address3    = WebGetArg("address3");
+    address4    = WebGetArg("address4");
+    address5    = WebGetArg("address5");
+    email       = WebGetArg("email");
+    orgnr       = WebGetArg("orgnr");
+    phone       = WebGetArg("phone");
+    fax         = WebGetArg("fax");
+    comment     = WebGetArg("comment");
     
     //validate
     errorflags = 0;
@@ -573,7 +555,7 @@ begin
     end;
 
     if (errorflags==0) then begin
-      UpdateCustomer(CurrentCust,companyname,personname,address1,address2,address3,address4,address5,email,orgnr,phone,fax,comment,deliveryoption,errormsg);
+      UpdateCustomer(CurrentCust,companyname,personname,address1,address2,address3,address4,address5,email,orgnr,phone,fax,comment,errormsg);
     end;
 
     if (errorflags==0 and errormsg==0) then begin
@@ -593,7 +575,6 @@ begin
       PutSessionString("updcu_phone",phone);
       PutSessionString("updcu_fax",fax);
       PutSessionString("updcu_comment",comment);
-      PutSessionString("updcu_deliveryoption",deliveryoption);
       PutSessionString("updcu_busy","true");
       RedirectToRequestedPage;
     end;
@@ -799,7 +780,7 @@ begin
   string 255 tstr,paydeal,infoelement;
   record IVVc IVr;
   val freight;
-
+  
   PayMethodSupported("invoice",paydeal,infoelement);
   BuildWebNGInvoiceFromBasket(IVr,WSBr,paydeal,false,"",freight);
   sumofrows = 0;
@@ -878,24 +859,12 @@ begin
   return;
 end;
 
-global
 procedure OutChecked(var Boolean firstf)
 begin
   if (firstf) then begin
     WebOutStringFormat(" checked");
     firstf = false;
   end;
-  return;
-end;
-
-function Boolean GetDelAddrFieldForLabel(Integer FieldType,var record DelAddrFieldVc DelAddrFieldr)
-begin
-  Boolean res;
-
-  DelAddrFieldr.FieldType = FieldType;
-  res = ReadFirstKey("FieldType",DelAddrFieldr,1,true);
-
-  GetDelAddrFieldForLabel = res;
   return;
 end;
 
@@ -917,11 +886,9 @@ begin
   string 255 phone;
   string 255 fax;
   string 255 comment;
-  string 255 deliveryoption;
   record WebNGShopBasketVc WSBr;
   boolean firstpaymethodf;
   string 20 paydeal,infoelement;
-  record DelAddrFieldVc DelAddrFieldr;
 
   WPr.Code = WSr.WebPage;
   if (nonblank(WPr.Code)) then begin
@@ -945,7 +912,7 @@ begin
   WebOutStringFormat("<br>");
 
   WebOutTagOpen("<div class=""checkout_invoice_address"">");
-  GetCurrentCustomerDetails(companyname,personname,address1,address2,address3,address4,address5,country,email,orgnr,phone,fax,comment,deliveryoption);
+  GetCurrentCustomerDetails(companyname,personname,address1,address2,address3,address4,address5,country,email,orgnr,phone,fax,comment);
   WebOutStringFormat("<span style=""font-weight: bold"">" & ToolWebNGTranslateText(25321) & "</span>"); //Invoice to:
   WebOutStringFormat("(<a href=""" & FormatSimpleLink(GetLinkToShop & "checkout/verifydetails",true)& """>");
   WebOutStringFormat(ToolWebNGTranslateText(25528)); //Edit
@@ -974,41 +941,13 @@ begin
     WebOutTagClose("</div>");
   end;
   WebCheckOutDeliveryModes;
+  WebOutTagOpen("<div class=""checkout_select_paymethod"">");
+
+  WebOutStringFormat("<span style=""font-weight: bold"">" & ToolWebNGTranslateText(25322) & "</span>" & "<br>"); //Please select your method of payment:
 
   WebOutTagOpen("<form method=""GET"" action=""/WebUpdatingAction.hal"">");
   WebOutStringFormatNL("<input type=""hidden"" name=""action"" value=""pay"">");
   WebOutStringFormatNL("<input type=""hidden"" name=""appid"" value=""1"">");
-  if (HasStandardWebshop and BuildProductCode=="StandardPOS" and ShowDeliveryOptions) then begin
-    WebCheckoutDeliveryOptions;
-  end;
-
-  if (!LoginState and WebGuestCheckout) then begin
-    WebOutTagOpen("<div class=""guest_order_details"">");
-    if (GetDelAddrFieldForLabel(kDelAddrFieldTypeGuestAddr0,DelAddrFieldr)) then begin
-      ShowInputWithLabel3(GetTranslatedNameDelAddrField(DelAddrFieldr),"text","cu_details","cu_addr0","",DelAddrFieldr.Required,false,60,true);
-    end;
-    if (GetDelAddrFieldForLabel(kDelAddrFieldTypeGuestAddr1,DelAddrFieldr)) then begin
-      WebOutTagOpen("<br>");
-      ShowInputWithLabel3(GetTranslatedNameDelAddrField(DelAddrFieldr),"text","cu_details","cu_addr2","",DelAddrFieldr.Required,false,60,true);
-    end;
-    if (GetDelAddrFieldForLabel(kDelAddrFieldTypeGuestAddr2,DelAddrFieldr)) then begin
-      WebOutTagOpen("<br>");
-      ShowInputWithLabel3(GetTranslatedNameDelAddrField(DelAddrFieldr),"text","cu_details","cu_addr3","",DelAddrFieldr.Required,false,60,true);
-    end;
-    if (GetDelAddrFieldForLabel(kDelAddrFieldTypeGuestAddr3,DelAddrFieldr)) then begin
-      WebOutTagOpen("<br>");
-      ShowInputWithLabel3(GetTranslatedNameDelAddrField(DelAddrFieldr),"text","cu_details","cu_addr4","",DelAddrFieldr.Required,false,60,true);
-    end;
-    if (GetDelAddrFieldForLabel(kDelAddrFieldTypeGuestDetails,DelAddrFieldr)) then begin
-      WebOutTagOpen("<br>");
-      ShowInputWithLabel3(GetTranslatedNameDelAddrField(DelAddrFieldr),"text","cu_details","cu_attn","",DelAddrFieldr.Required,false,60,true);
-    end;
-    WebOutTagClose("</div>");
-  end;
-
-  WebOutTagOpen("<div class=""checkout_select_paymethod"">");
-
-  WebOutStringFormat("<span style=""font-weight: bold"">" & ToolWebNGTranslateText(25322) & "</span>" & "<br>"); //Please select your method of payment:
 
   firstpaymethodf = true;
   if (PayMethodSupported("creditcard",paydeal,infoelement)) then begin
@@ -1071,22 +1010,10 @@ begin
     end;
     WebOutStringFormatNL("<br>");
   end;
-  if (PayMethodSupported("paymark",paydeal,infoelement)) then begin
-    WebOutStringFormat("<input type=""radio"" id=""paymethod_pm"" name=""paymethod"" value=""paymark""");
-    if (firstpaymethodf) then begin
-      WebOutStringFormat(" checked");
-      firstpaymethodf = false;
-    end;
-    WebOutStringFormatNL("><label for=""paymethod_pm"">" & ToolWebNGTranslateText(25543) & "</label>"); //Paymark
-    if (nonblank(infoelement)) then begin
-      ShowWebElement(infoelement);
-    end;
-    WebOutStringFormatNL("<br>");
-  end;
   ShowInputWithLabel2(ToolWebNGTranslateText(30080),"text","poentryfield","customerordnum","",false,false,60);  //"Your Purchase Order No."
   WebOutStringFormatNL("<br>");
 
-  WebOutSubmit("","button","s1",ToolWebNGTranslateText(25542)); //Buy
+  WebOutSubmit("","button","s1",ToolWebNGTranslateText(25516)); //Pay
   
   WebOutTagClose("</form>");
 
@@ -1103,16 +1030,12 @@ procedure ShopCheckoutApp(record WebNGStructVc WSr,string path)
 begin
   string 255 node,mpath;
   string 255 paytype;
-
-  LogText(0,"0.ShopCheckoutApp");
-
-  /*
+  
   if (LoginState==false) then begin
     RedirectToLoginPage;
     goto LShopCheckoutApp;
   end;
-  */
-  
+
 //  if (WebSecureMode==false) then begin
 //    RedirectToSecureModePage; //TODO: fix this up so it redirects properly and goes back to normal mode after payment
 //  end;
@@ -1120,8 +1043,6 @@ begin
   mpath = path;
   node = removenextnode(mpath);
   
-  LogText(1,"0.ShopCheckoutApp " & node);
-
   switch (node) begin
     case "verifydetails":
       ShopCheckoutVerifyCustDetails(WSr);
@@ -1133,11 +1054,7 @@ begin
       if (CheckoutQtyFail) then begin
         RedirectToShopPage("basket");          
       end else begin
-        if (!LoginState and !WebGuestCheckout) then begin
-          RedirectToLoginPage;
-        end else begin
-          RedirectToShopPage("checkout/confirm");
-        end;
+        RedirectToShopPage("checkout/confirm");    
       end;
   end;
   
