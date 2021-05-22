@@ -1061,3 +1061,52 @@ begin
 LShopCheckoutApp:;
   return;
 end;
+
+
+global webpublic updating procedure WebHBSStoreCustMM()
+begin 
+  record CUVc CUr;
+  record CUVc tempCUr;
+  Boolean storef;
+  string 255 passw,name,mail;
+  Integer oldcomp,newcomp;
+  Boolean res,res1;
+  
+  oldcomp = CurrentCompany;
+  newcomp = StringToInt(WebGetArg("company"));
+  if ((newcomp>0) and (oldcomp!=newcomp)) then begin
+    res1 = SetCompany(newcomp,false);
+  end;  
+  storef = true;
+  
+  CUr.eMail = WebGetArg("E-mail");
+  if(nonblank(CUr.eMail))then begin
+    if(ReadFirstKey("eMail",CUr,1,true)==false)then begin
+      RecordNew(CUr);
+      CUr.Name = WebGetArg("Username");
+      CUr.eMail = WebGetArg("E-mail");
+      CUr.AllowLogin = 1;
+      CUr.CustCat = "WWW";
+      passw = WebGetArg("Password");
+      if (GetNextCustNr(passw)) then begin end;
+      CUr.Code = passw;
+      RecordCopy(tempCUr,CUr);
+      if (ReadFirstMain(tempCUr,1,true)) then begin
+        storef = false;
+      end;
+      if(storef)then begin
+        storef = WebStoreCust(CUr,passw);
+        if(storef)then begin
+          weboutstring("Ok");
+        end else begin
+          weboutstring("Error");
+        end;
+      end;
+    end;
+  end;
+  
+ 
+  ResetCompany(oldcomp);
+
+return;
+end;
