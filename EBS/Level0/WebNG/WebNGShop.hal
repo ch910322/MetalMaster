@@ -58,6 +58,7 @@ begin
   return;
 end;
 
+global
 procedure RedirectToShopStartPage()
 begin
   RedirectToShopPage("");
