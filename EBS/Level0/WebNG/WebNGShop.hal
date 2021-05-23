@@ -43,6 +43,7 @@ external outer procedure MM_ShopWebProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopBasketApp(record WebNGStructVc,string);
 external outer procedure MM_ShowDeliveryOptions(record WebNGStructVc,string);
 external outer updating procedure MM_Orderdone(record WebNGStructVc,string);
+external outer procedure MM_ShowOrders(record WebNGStructVc,Boolean);
 
 //CUST-END
 
@@ -272,13 +273,11 @@ begin
   if (usenextnode) then begin
     node = removenextnode(mpath);
   end;
-
   switch (node) begin
     case "":
       //TempWelcomePage(WSr);
       RedirectToShopPage("catalog");
     case "catalog":
-      logtext(0,"catalogcatalogcatalogcatalogcatalogcatalog");
       //ShopCatalogApp(WSr,mpath);
       MM_ShowProductCatalog(WSr,mpath);
     case "basket":
@@ -288,6 +287,8 @@ begin
       //ShopProductInfoApp(WSr,mpath);
       //MM_ShopProductInfoApp(WSr,mpath);
       MM_ShopWebProductInfoApp(WSr,mpath);
+    case "orders":
+      MM_ShowOrders(WSr,true);
     case "manage":
       ShopManageFavouriteItem(mpath);
     case "configureproduct":
