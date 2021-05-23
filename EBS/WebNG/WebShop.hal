@@ -714,13 +714,9 @@ begin
     price = WebNGProductr.PriceTextCalculation;
     shorttext = GetTranslatedNameProduct(WebNGProductr);
     tstr = GetTranslatedNameProduct(WebNGProductr);//GetItemTitle(INr,lang);
-    logtext(0,"aTypes " & aTypes.length);
     cleararray(aTypes);
     cleararray(aColors);
     GetProductVars(WebNGProductr,aTypes,aColors);
-    logtext(0,"aColors " & aColors.length);
-    logtext(0,"aTypes " & aTypes.length);
-    logtext(0,"listview = " & listview);
     if (listview=="list") then begin
       WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & " class='productItem col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'  ><div class='row'>");
       WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
@@ -2115,7 +2111,7 @@ begin
       if(blank(Unitr.Comment))then begin
         Unitr.Comment = ToolWebNGTranslateText2(89012);
       end;
-      WebOutStringFormatNL("                          <input type='text' readonly name='qty' value='" & Unitr.Comment & "' placeholder='" & Unitr.Comment & "'>");
+      WebOutStringFormatNL("                          <input type='text' readonly name='unit' value='" & Unitr.Comment & "' placeholder='" & Unitr.Comment & "'>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                  </div>");
       WebOutStringFormatNL("              </div> ");

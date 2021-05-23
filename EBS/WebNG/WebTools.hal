@@ -16,6 +16,7 @@ external inner function string 255 FormatLink(string,string,boolean,boolean);
 external function string 255 GetWebNGProductCatTranslation(record WebNGProductCatVc);
 external function string 255 GetWebMMItemTypeVcTranslation(record MMItemTypeVc);
 external function string 255 GetWebMMItemColorVcTranslation(record MMItemColorVc);
+external inner function boolean GetShoppingBasket(var record WebNGShopBasketVc,integer);
 
 global
 function Integer SetCompanyBasedOnCountry()
@@ -995,6 +996,9 @@ end;
 
 global webpublic procedure WebUpdateCustomerData()
 begin
+  record WebNGShopBasketVc WSBr;
+  GetShoppingBasket(WSBr,0);
+  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   
   weboutstring("Ok");
   
@@ -1003,9 +1007,11 @@ end;
 
 global webpublic procedure WebDeliveryMode()
 begin
+  record WebNGShopBasketVc WSBr;
+  GetShoppingBasket(WSBr,0);
   
   webgetarg("deliverytype");
-  
+  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   weboutstring("Ok");
   
   return;
@@ -1013,7 +1019,9 @@ end;
 
 global webpublic procedure WebFinishOrder()
 begin
-  
+  record WebNGShopBasketVc WSBr;
+  GetShoppingBasket(WSBr,0);
+  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   
   weboutstring("Ok");
   
