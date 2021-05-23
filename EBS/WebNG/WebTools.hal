@@ -27,6 +27,28 @@ external inner updating procedure SendWebshopMail(Integer,Longint);
 external inner updating procedure ClearShopBasket(integer);
 external inner procedure RedirectToPaymentCompletedPage(record WebNGPaySessionVc);
 
+global function string 255 NormalizeStrToJson (string Str)
+begin
+	integer strln,i;
+	string 255 NormStr;
+	
+
+	NormStr = "";
+	strln = len(Str);
+	for (i=0;i<strln;i=i+1)begin
+		if(mid(Str,i,1)==chr(34))then begin
+			NormStr = NormStr & chr(92) & mid(Str,i,1);
+		end else begin
+			NormStr = NormStr & mid(Str,i,1);
+		end;
+	end;
+	
+	
+	NormalizeStrToJson = NormStr;
+	
+	return;
+end;
+
 global
 function Integer SetCompanyBasedOnCountry()
 begin
@@ -1003,13 +1025,78 @@ begin
   return;
 end;
 
-global webpublic procedure WebUpdateCustomerData()
+global webpublic updating procedure WebRequisitesSave()
 begin
   record WebNGShopBasketVc WSBr;
+  record CUVc CUr;
+  
   GetShoppingBasket(WSBr,0);
   logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   
+  CUr.Code = CurrentCust;
+  if (ReadFirstMain(CUr,1,true)) then begin
+    logtext(0,"webgetarg(\"mode\") " & webgetarg("mode"));
+    if(webgetarg("mode")=="2")then begin
+      if(nonblank(webgetarg("fiz_sia")))then begin
+        CUr.Name = webgetarg("fiz_sia");
+        CUr.InvAddr3 = webgetarg("fiz_accNumber");
+        CUr.InvAddr2 = webgetarg("fiz_bankCode");
+        CUr.Phone = webgetarg("fiz_phone");
+        recordstore(Cur,true);
+      end;
+    end;
+    if(webgetarg("mode")=="1")then begin
+      logtext(0,"jur_sia " & webgetarg("jur_sia"));
+      if(nonblank(webgetarg("jur_sia")))then begin
+        CUr.Name = webgetarg("jur_sia");
+        CUr.RegNr1 = webgetarg("jur_regNr");
+        CUr.InvAddr0 = webgetarg("jur_address");
+        CUr.InvAddr3 = webgetarg("jur_accNumber");
+        CUr.InvAddr2 = webgetarg("jur_bankCode");
+        CUr.Person = webgetarg("jur_contactPersonSIA");
+        //CUr. = webgetarg("reqjur_source");
+        CUr.Phone = webgetarg("jur_phone");
+        //CUr. = webgetarg("reqjur_email");
+ 
+      
+      
+        recordstore(Cur,true);
+      end;
+    end;
+    //webgetarg("reqfiz_email");
+    
+  end;
+  
   weboutstring("Ok");
+  
+  return;
+end;
+
+
+global webpublic updating procedure WebGetRequisitesSave()
+begin
+  record WebNGShopBasketVc WSBr;
+  record CUVc CUr;
+  
+  weboutstring("{");
+  CUr.Code = CurrentCust;
+  if (ReadFirstMain(CUr,1,true)) then begin
+    weboutstring("\"fiz_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+    weboutstring("\"fiz_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
+    weboutstring("\"fiz_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
+    weboutstring("\"fiz_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+    weboutstring("\"fiz_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
+    weboutstring("\"jur_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+    weboutstring("\"jur_regNr\":\"" & NormalizeStrToJson(CUr.RegNr1) & "\",");
+    weboutstring("\"jur_address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\",");
+    weboutstring("\"jur_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
+    weboutstring("\"jur_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
+    weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
+    weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+    weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\"");
+    weboutstring("}");
+  end;
+  
   
   return;
 end;
@@ -1025,7 +1112,6 @@ begin
   deltype = webgetarg("mode");
   
   blockload(MMWebDMb);
-  logtext(0,deltype);
   if(deltype=="2")then begin
     WSBr.DelMode = MMWebDMb.Delivery;
     PutSessionString("delmodecode",WSBr.DelMode);
