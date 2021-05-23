@@ -1163,7 +1163,7 @@ begin
     WebOutStringFormatNL("                      </div>");
   end;
   WebOutStringFormatNL("                      <div class='col-md-4 col-4'>");
-  WebOutStringFormatNL("                          <a href='#' class='btns-red' data-toggle='modal' data-target='#ModalRecommended'>" & ToolWebNGTranslateText2(89007) & "</a>");
+  WebOutStringFormatNL("                          <a href='#' class='btns-red' data-toggle='modal' data-target='#ModalRecommended'><span class='CartNumb'> " & ToolWebNGTranslateText2(89007) & "</span></a>");
   WebOutStringFormatNL("                      </div>");
   WebOutStringFormatNL("                  </div>");
   WebOutStringFormatNL("              </div>");
@@ -2115,7 +2115,7 @@ begin
       if(blank(Unitr.Comment))then begin
         Unitr.Comment = ToolWebNGTranslateText2(89012);
       end;
-      WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & Unitr.Comment & "'>");
+      WebOutStringFormatNL("                          <input type='text' readonly name='qty' value='" & Unitr.Comment & "' placeholder='" & Unitr.Comment & "'>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                  </div>");
       WebOutStringFormatNL("              </div> ");
