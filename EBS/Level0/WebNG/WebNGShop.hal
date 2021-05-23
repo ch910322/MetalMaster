@@ -42,6 +42,8 @@ external outer procedure MM_ShopProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopWebProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopBasketApp(record WebNGStructVc,string);
 external outer procedure MM_ShowDeliveryOptions(record WebNGStructVc,string);
+external outer updating procedure MM_Orderdone(record WebNGStructVc,string);
+
 //CUST-END
 
 global
@@ -225,7 +227,7 @@ begin
 end;
 
 global
-procedure ShopApp2(record WebNGStructVc WSr,string path,Boolean simplef)
+updating procedure ShopApp2(record WebNGStructVc WSr,string path,Boolean simplef)
 begin
   string 255 node,mpath;
   boolean usenextnode;
@@ -312,6 +314,8 @@ begin
 //CUST-BEGIN
     case "delivery":
       MM_ShowDeliveryOptions(WSr,mpath);
+    case "orderdone":
+      MM_Orderdone(WSr,mpath);
 //CUST-END
     otherwise
       RedirectToShopStartPage;
@@ -326,7 +330,7 @@ LShopApp:
 end;
 
 global
-procedure ShopApp(record WebNGStructVc WSr,string path)
+updating procedure ShopApp(record WebNGStructVc WSr,string path)
 begin
   ShopApp2(WSr,path,false);
 end;

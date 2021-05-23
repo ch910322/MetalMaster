@@ -69,7 +69,7 @@ external procedure ShowRedirectHtml(string,boolean);
 external function string 255 GetLinkToMyAccount();
 external procedure ShowRedirectHtml(string,boolean);
 //CUST-BEGIN
-external procedure MM_ShopPaymentCompleted(record WebNGStructVc,string);
+external outer procedure MM_ShopPaymentCompleted(record WebNGStructVc,string);
 //CUST-END
 
 global

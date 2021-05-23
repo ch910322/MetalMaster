@@ -3,6 +3,8 @@ begin
 
   Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
   Setting("MM Country Prices List",WebNGCountryPricesLClass,modWebShopNG);
+  Setting("MM Delivery Mode",MMWebDelModeTClass,modWebShopNG);
+  
   
   return;
 end;

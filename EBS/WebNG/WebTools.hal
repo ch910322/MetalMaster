@@ -17,6 +17,15 @@ external function string 255 GetWebNGProductCatTranslation(record WebNGProductCa
 external function string 255 GetWebMMItemTypeVcTranslation(record MMItemTypeVc);
 external function string 255 GetWebMMItemColorVcTranslation(record MMItemColorVc);
 external inner function boolean GetShoppingBasket(var record WebNGShopBasketVc,integer);
+external inner procedure RedirectToShopPage(string);
+external inner updating procedure ShopHandleOrderPayment(string);
+external inner updating function Boolean ShopUpdateExistingOrder(record WebNGShopBasketVc);
+external inner function Boolean BuildWebNGOrder(var record ORVc,integer,string,boolean,string,string);
+external inner procedure WebNGInsertCustOrderNr_ORVc(var record ORVc);
+external inner procedure WebNGInsertCustOrderNr_IVVc(var record IVVc);
+external inner updating procedure SendWebshopMail(Integer,Longint);
+external inner updating procedure ClearShopBasket(integer);
+external inner procedure RedirectToPaymentCompletedPage(record WebNGPaySessionVc);
 
 global
 function Integer SetCompanyBasedOnCountry()
@@ -1005,25 +1014,147 @@ begin
   return;
 end;
 
-global webpublic procedure WebDeliveryMode()
+global webpublic updating procedure WebDeliveryMode()
 begin
   record WebNGShopBasketVc WSBr;
+  record MMWebDelModeBlock MMWebDMb;
+  string 100 deltype;
+  
   GetShoppingBasket(WSBr,0);
   
-  webgetarg("deliverytype");
+  deltype = webgetarg("mode");
+  
+  blockload(MMWebDMb);
+  logtext(0,deltype);
+  if(deltype=="2")then begin
+    WSBr.DelMode = MMWebDMb.Delivery;
+    PutSessionString("delmodecode",WSBr.DelMode);
+    recordstore(WSBr,true);
+  end;
+  if(deltype=="1")then begin
+    WSBr.DelMode = MMWebDMb.SelfPick;
+    PutSessionString("delmodecode",WSBr.DelMode);
+    recordstore(WSBr,true);
+  end;
+  
+  
   logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   weboutstring("Ok");
   
   return;
 end;
 
-global webpublic procedure WebFinishOrder()
+global webpublic updating procedure WebFinishOrder()
 begin
+  record WebNGPaySessionVc WPSr;
+  record WebNGPaySessionVc oldWPSr;
+  record ORVc ORr,oldORr;
+  boolean orderokf;
+  string 255 paydeal,infoelement;
+  Longint recsernr;
+  record WebNGShopCompBlock WSCb;
   record WebNGShopBasketVc WSBr;
-  GetShoppingBasket(WSBr,0);
-  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
+  
+  
+  if (GetShoppingBasket(WSBr,0)) then begin
+    logtext(0,"GetShoppingBasket");
+    if (WSBr.OrderNr>-1) then begin
+      logtext(0,"1");
+      orderokf = ShopUpdateExistingOrder(WSBr);
+      recsernr = WSBr.OrderNr;
+    end else begin
+      logtext(0,"2");
+      if (BuildWebNGOrder(ORr,0,paydeal,false,"",WPSr.DelAddrCode)) then begin
+        logtext(0,"BuildWebNGOrder");
+        WebNGInsertCustOrderNr_ORVc(ORr);
+        if (ORr.SerNr<0) then begin
+          ORr.SerNr = NextSerNr("ORVc",ORr.OrdDate,-1,false,"");
+        end;
+        logtext(0,"ORr.SerNr " & ORr.SerNr);
+        recsernr = ORr.SerNr;
+        if (ORr.SerNr>0) then begin
+          if (RecordInsert(ORr,true)) then begin
+            orderokf = true;
+            SendWebshopMail(kWebshopMailOrder,ORr.SerNr);
+            if (WSCb.DontOKOrders==0) then begin
+              RecordCopy(oldORr,ORr);
+              ORr.OKFlag = 1;
+              RecordUpdate(oldORr,ORr,true);
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+  
+  if (orderokf) then begin
+    ClearShopBasket(0);
+    RecordCopy(oldWPSr,WPSr);
+    WPSr.Completed = 1;
+    WPSr.CompletedDate = CurrentDate;
+    WPSr.RecordNr = recsernr;
+    if (RecordUpdate(oldWPSr,WPSr,false)) then begin end;
+
+    //RedirectToPaymentCompletedPage(WPSr);
+  end;
   
   weboutstring("Ok");
   
   return;
+end;
+
+
+global updating procedure MM_Orderdone(record WebNGStructVc WSr,string path)
+begin
+  record WebNGPaySessionVc WPSr;
+  record WebNGPaySessionVc oldWPSr;
+  record ORVc ORr,oldORr;
+  boolean orderokf;
+  string 255 paydeal,infoelement;
+  Longint recsernr;
+  record WebNGShopCompBlock WSCb;
+  record WebNGShopBasketVc WSBr;
+  
+  
+  if (GetShoppingBasket(WSBr,0)) then begin
+    logtext(0,"GetShoppingBasket");
+    if (WSBr.OrderNr>-1) then begin
+      logtext(0,"1");
+      orderokf = ShopUpdateExistingOrder(WSBr);
+      recsernr = WSBr.OrderNr;
+    end else begin
+      logtext(0,"2");
+      if (BuildWebNGOrder(ORr,0,paydeal,false,"",WPSr.DelAddrCode)) then begin
+        logtext(0,"BuildWebNGOrder");
+        WebNGInsertCustOrderNr_ORVc(ORr);
+        if (ORr.SerNr<0) then begin
+          ORr.SerNr = NextSerNr("ORVc",ORr.OrdDate,-1,false,"");
+        end;
+        logtext(0,"ORr.SerNr " & ORr.SerNr);
+        recsernr = ORr.SerNr;
+        if (ORr.SerNr>0) then begin
+          if (RecordInsert(ORr,true)) then begin
+            orderokf = true;
+            SendWebshopMail(kWebshopMailOrder,ORr.SerNr);
+            if (WSCb.DontOKOrders==0) then begin
+              RecordCopy(oldORr,ORr);
+              ORr.OKFlag = 1;
+              RecordUpdate(oldORr,ORr,true);
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+  
+  if (orderokf) then begin
+    ClearShopBasket(0);
+    RecordCopy(oldWPSr,WPSr);
+    WPSr.Completed = 1;
+    WPSr.CompletedDate = CurrentDate;
+    WPSr.RecordNr = recsernr;
+    if (RecordUpdate(oldWPSr,WPSr,false)) then begin end;
+  end;
+
+return;
 end;

@@ -190,6 +190,11 @@ begin
   MainKeyBegin(Country,0);
   KeySegment(Country);
   EndRecord;
+  
+  BlockBegin(MMWebDelModeBlock,-,"");
+    RecordField(Delivery,M4Code,20,0);
+    RecordField(SelfPick,M4Code,20,0);
+  EndBlock;
 
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);

@@ -2112,6 +2112,7 @@ begin
         Unitr.Comment = ToolWebNGTranslateText2(89012);
       end;
       WebOutStringFormatNL("                          <input type='text' readonly name='unit' value='" & Unitr.Comment & "' placeholder='" & Unitr.Comment & "'>");
+      WebOutStringFormatNL("                          <input style='display:none' type='text' readonly name='qty' value='" & 1 & "' placeholder='" & 1 & "'>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                  </div>");
       WebOutStringFormatNL("              </div> ");
