@@ -30,6 +30,7 @@ external procedure ShowSingleFilter(string,string,var vector string);
 external function string 255 GetVarTypeName(string,string);
 external function string 255 GetVarColorName(string,string);
 external procedure GetProductVars(record WebNGProductVc,var array string,var array string);
+external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
 
 function string 255 GetCTypeTranslation(string cls)
 begin
@@ -842,7 +843,8 @@ begin
   record INVc INr;
   record WebNGCountryPricesVc WebNGCountryPricer;
   record PLVc PLr;
-  string 20 country;
+  string 20 country,curncy,vatcode;
+  val reb;
   
   oldcomp = SetCompanyBasedOnCountry;
   country = ToolWebNGGetCountry;
@@ -866,7 +868,9 @@ begin
               if(needcome)then begin
                 weboutstring(",");
               end;
-              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+              reb = blankval;
+              curncy = "EUR";
+              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
             end;
           end else begin
             INr.Code = INVrw.Item;
@@ -874,7 +878,9 @@ begin
               if(needcome)then begin
                 weboutstring(",");
               end;
-              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+              reb = blankval;
+              curncy = "EUR";
+              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
             end;
           end;
         end else begin
@@ -883,7 +889,9 @@ begin
             if(needcome)then begin
               weboutstring(",");
             end;
-            weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & INr.UPrice1 & "\"}");
+            reb = blankval;
+            curncy = "EUR";
+            weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
           end;
           needcome = true;
         end;

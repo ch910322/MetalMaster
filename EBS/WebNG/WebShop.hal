@@ -25,6 +25,7 @@ external inner procedure CalcSum(val,val,val,val,var val,Integer);
 external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
 external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
+external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
 
 
 global function string 255 getWebProductFilters(record WebNGProductVc WebNGProductr)
@@ -874,9 +875,10 @@ begin
   row MMItemSetVc INVrw;
   integer rwcnt,i;
   val minprice,maxprice;
-  string 10 country;
+  string 10 country,curncy,vatcode;
   record WebNGCountryPricesVc WebNGCountryPricer;
   record PLVc PLr;
+  val reb;
   
   
   country = ToolWebNGGetCountry;
@@ -896,12 +898,16 @@ begin
       end;
     end else begin
       while(loopmain(INr,1,true))begin
-        vItemPrice[INr.Code] = INr.UPrice1;
+        reb = blankval;
+        curncy = "EUR";
+        vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
       end;
     end;
   end else begin
     while(loopmain(INr,1,true))begin
-      vItemPrice[INr.Code] = INr.UPrice1;
+      reb = blankval;
+      curncy = "EUR";
+      vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
     end;
   end;
 
