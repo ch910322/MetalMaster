@@ -197,7 +197,7 @@ begin
   
   if(nonblank(MMWSRb.RebCode))then begin
     if(outreb>0)then begin
-      CalcSum(1,price,0,outreb,price,1);
+      CalcSum(1,price,0,100-outreb,price,1);
       outreb = 0;
       CUr.RebCode = "";
     end;
