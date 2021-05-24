@@ -1100,6 +1100,24 @@ begin
   return;
 end;
 
+global webpublic updating procedure WebGetCabinetData()
+begin
+  record WebNGShopBasketVc WSBr;
+  record CUVc CUr;
+  
+  weboutstring("{");
+  CUr.Code = CurrentCust;
+  if (ReadFirstMain(CUr,1,true)) then begin
+    weboutstring("\"name\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+    weboutstring("\"phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+    weboutstring("\"email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
+  end;
+  weboutstring("}");
+  
+  return;
+end;
+
+
 global webpublic updating procedure WebDeliveryMode()
 begin
   record WebNGShopBasketVc WSBr;

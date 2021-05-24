@@ -1102,14 +1102,14 @@ begin
           weboutstring("Ok");
           RedirectToShopStartPage;
         end else begin
-          weboutstring("Error");
+          weboutstring("CustomerSaveError");
         end;
       end;
     end else begin
-      weboutstring("Error");
+      weboutstring("EmailExistsError");
     end;
   end else begin
-    weboutstring("Error");
+    weboutstring("EmailError");
   end;
   
  
