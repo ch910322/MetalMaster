@@ -1094,9 +1094,8 @@ begin
     weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
     weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
     weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\"");
-    weboutstring("}");
   end;
-  
+  weboutstring("}");
   
   return;
 end;
