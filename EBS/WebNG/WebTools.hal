@@ -1111,6 +1111,7 @@ begin
     weboutstring("\"name\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
     weboutstring("\"phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
     weboutstring("\"email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
+    weboutstring("\"address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\"");
   end;
   weboutstring("}");
   
