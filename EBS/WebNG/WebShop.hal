@@ -717,7 +717,6 @@ begin
     cleararray(aTypes);
     cleararray(aColors);
     GetProductVars(WebNGProductr,aTypes,aColors);
-    logtext(0, "dima");
     if (listview=="list") then begin
       WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & " class='productItem col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'  ><div class='row'>");
       WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
@@ -725,18 +724,16 @@ begin
       WebOutString("<div class='text'>");
       ShowProductShortDescription(WebNGProductr);
       WebOutString("</div>");
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
       if (aTypes.length==0) then begin
-        WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price' style='font-size: 22px;'>&euro;" & price & "</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
         WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
-        WebOutString("</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
         modal = "";
       end else begin
-      WebOutString("<div class='row no-gutters'><div class='col-md-8 col-8'><div class='Price' style='font-size: 22px;'>&euro;" & price & "</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><a href='#'  class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
         modal = " data-toggle='modal'";
       end;
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' onclick='console.log(1)' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
       WebOutString("</div></div>");
       WebOutString("</div></div>");
       WebOutString("</div></div>");
@@ -748,19 +745,16 @@ begin
       WebOutString("<div class='text'>");
       ShowProductShortDescription(WebNGProductr);
       WebOutString("</div>");
-
+      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
       if (aTypes.length==0) then begin
-        WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price' style='font-size: 22px;'>&euro;" & price & "</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
         WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
-        WebOutString("</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
         modal = "";
       end else begin
-      WebOutString("<div class='row no-gutters'><div class='col-md-8 col-8'><div class='Price' style='font-size: 22px;'>&euro;" & price & "</div></div>");
-        WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
         modal = " data-toggle='modal'";
       end;
+      WebOutString("</div></div>");
+      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89007) & "</a></div>");
       WebOutString("</div>");
       WebOutString("</div>");
       WebOutString("</div></div>");
