@@ -195,6 +195,14 @@ begin
     RecordField(Delivery,M4Code,20,0);
     RecordField(SelfPick,M4Code,20,0);
   EndBlock;
+  
+  BlockBegin(MMWebShopRebateBlock,-,"");
+    RecordField(RebCode,M4Code,20,0);
+  EndBlock;
+  
+  RecordAddBegin(RebVc,"RebVc_Custom");
+		ArrayField(Classification,M4Code,50,0); // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Anton Preisinger 10:39 04.07.2019
+  EndRecordAdd;
 
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
@@ -205,6 +213,7 @@ begin
   SourceFile("halcust/EBS/WebNG",3);
   SourceFile("halcust/EBS/Level0/RActions",0);
   SourceFile("halcust/EBS/Level0/WebNG",0);
+  SourceFile("halcust/EBS/Level0/Tools",0);
 
   return;
 end;

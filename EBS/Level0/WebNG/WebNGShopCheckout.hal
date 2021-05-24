@@ -1072,6 +1072,7 @@ begin
   string 255 passw,name,mail;
   Integer oldcomp,newcomp;
   Boolean res,res1;
+  record MMWebShopRebateBlock MMWSRb;
   
   oldcomp = CurrentCompany;
   newcomp = StringToInt(WebGetArg("company"));
@@ -1088,6 +1089,10 @@ begin
       CUr.eMail = WebGetArg("E-mail");
       CUr.AllowLogin = 1;
       CUr.CustCat = "WWW";
+      blockload(MMWSRb);
+      if(nonblank(MMWSRb.RebCode))then begin
+        CUr.RebCode = MMWSRb.RebCode;
+      end;
       
       if (GetNextCustNr(passw)) then begin end;
       CUr.Code = passw;

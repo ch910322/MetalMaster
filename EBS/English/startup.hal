@@ -2,10 +2,22 @@ event startup
 begin
   SetLangMode(LangEnglish,"ENG",0);
   
+  Setting("Number Series - Mails",MailSerTClass,modTC); 
+  Setting("MM tīmekļa iestatījumi",MMWebSetTClass,modWebShopNG);
+  Setting("MM artikulu variācijas",MMItemSetLClass,modWebShopNG);
+  Setting("MM artikulu tipi",MMItemTypeLClass,modWebShopNG);
+  Setting("MM artikulu krāsas",MMItemColorLClass,modWebShopNG);
+  Setting("Artikulu dokumenti",INDocLClass,modWebShopNG);
+  
+  Setting("Amati",MMUserTitleLClass,modSY);
+  Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
+  Setting("Metalmaster deklarāciju klasifikācijas",MM_DeclarationClassLClass,modSO);
+  Setting("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,modSO);
+  
   Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
   Setting("MM Country Prices List",WebNGCountryPricesLClass,modWebShopNG);
   Setting("MM Delivery Mode",MMWebDelModeTClass,modWebShopNG);
-  
+  Setting("MM WebShop Rebate",MMWebShopRebateTClass,modWebShopNG);  
   
   return;
 end;
