@@ -26,6 +26,7 @@ external inner procedure WebNGInsertCustOrderNr_IVVc(var record IVVc);
 external inner updating procedure SendWebshopMail(Integer,Longint);
 external inner updating procedure ClearShopBasket(integer);
 external inner procedure RedirectToPaymentCompletedPage(record WebNGPaySessionVc);
+external inner updating procedure MoveShoppingBasket(string,string);
 
 global function string 255 NormalizeStrToJson (string Str)
 begin
@@ -1009,9 +1010,10 @@ begin
   return;
 end;
 
-global webpublic procedure WebCuMainMenu()
+global webpublic updating procedure WebCuMainMenu()
 begin
   
+  MoveShoppingBasket(GetWebSessionUUID,CurrentCust);
   weboutstring("Ok");
   
   return;

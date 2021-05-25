@@ -90,7 +90,6 @@ begin
       result_string = result_string & "," & options[i];
     end;
   end;
-  logtext(0, "result_string = " & result_string);
   joinComa = result_string;
   return;
 end;

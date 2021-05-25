@@ -121,9 +121,7 @@ begin
   
   blockload(WSb);
   
-  cls = tmpcls;
-  
-  logtext(0,"GetCTypeTranslation " & cls);
+  cls = tmpcls;  
   switch(cls)begin
     case "FilterType":cls = WSb.WebShowClass;
     case "FilterMaterial":cls = WSb.Filter2;
@@ -337,7 +335,6 @@ begin
       result_string = result_string & "," & options[i];
     end;
   end;
-  logtext(0, "result_string = " & result_string);
   joinComa = result_string;
   return;
 end;
@@ -659,7 +656,6 @@ begin
   //res = res & ShowClassTypeList(WSb.Filter4,getWebProductFilters(WebNGProductr.Classification);
   
   res = getWebProductFilterslist(WebNGProductr);
-  logtext(0,"res  " & res);
   ShowWebNGProductClasses = res;
   return;
 end;
