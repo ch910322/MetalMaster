@@ -955,7 +955,7 @@ begin
         if(minprice==maxprice)then begin
           WebNGProductr.PriceTextCalculation = ValToString(maxprice,M4Val,"",".",0);
         end else begin
-          if(minprice==99999999 and maxprice==blankval)then begin
+          if(minprice==99999999 and maxprice==0)then begin
             WebNGProductr.PriceTextCalculation = ValToString(minprice,M4Val,"",".",0) & " - " & ValToString(WebNGProductr.Price,M4Val,"",".",0);
           end else begin
             WebNGProductr.PriceTextCalculation = ValToString(minprice,M4Val,"",".",0) & " - " & ValToString(maxprice,M4Val,"",".",0);
