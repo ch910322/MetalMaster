@@ -94,6 +94,7 @@ begin
   MatCol(1,24,"Tips",0,Type,false,MMItemTypeSClass);
   MatCol(1,104,"Krāsa",0,Color,false,MMItemColorSClass);
   MatCol(1,224,"Artikuls",0,Item,false,INSClass);
+  MatCol(1,-70,"Artikuls",0,ShowOnWeb,false,SetSClass);
   EndMatrix;
   EndWindow;
 end;
