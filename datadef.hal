@@ -75,6 +75,9 @@ begin
   RecordField(AutoPrecuSanemsana,M4Int,0,0);//2020.09.30
   RecordField(SerijasNrNosutisana,M4Int,0,0);//2020.09.30
   RecordField(AtlautMainitCenuPasut,M4Int,0,0);//2020.10.07
+  RecordField(SvarsNoRazojumiem,M4Int,0,0);//2021.03.23
+  RecordField(PlatumsTM,M4Int,0,0);//2021.03.25
+  RecordField(SvarsTM,M45Val,0,0);//2021.03.25
   EndRecordAdd;
 
   RecordAddBegin(SDVc,"halSDVc");//2019.10.22
@@ -158,6 +161,7 @@ begin
   RecordField(IekNosaukums,M4Str,60,0);
   RecordField(AtjaunotRazPas,M4Int,0,0);
   RecordField(UzlimesForma,M4Code,20,0);
+  ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
   EndRecordAdd;
   
   RecordAddBegin(ProdVc,"halProdVc");
@@ -174,6 +178,7 @@ begin
   RecordField(DefectiveQty,M4Qty,0,0);//2019.10.06
   ArrayField(Izmers,M4Val,0,0);//2020.09.28
   ArrayField(IzejvielasVeids,M4Set,-903,0);//2020.10.08
+  ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
   EndRecordAdd;
 
   RecordAddBegin(ProdOrderVc,"halProdOrderVc");
@@ -205,6 +210,7 @@ begin
   ArrayField(WebColor,M4Str,100,0);//2018.01.14
   ArrayField(LoksnesPlatums,M4Str,100,0);//2019.10.02
   ArrayField(IzejvielasVeids,M4Set,-903,0);//2020.10.08
+  ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
   KeyBegin(Comment2);//2015.04.23
   KeySegment(Comment2);
   KeySegment(SerNr);
