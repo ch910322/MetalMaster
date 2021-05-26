@@ -51,11 +51,13 @@ begin
         rwcnt = MatRowCnt(INVr);
         for (i=0;i<rwcnt;i=i+1) begin
           MatRowGet(INVr,i,INVrw);
-          if(nonblank(INVrw.Type))then begin
-            res = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
-          end;
-          if(nonblank(INVrw.Color))then begin
-            res = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+          if(INVrw.ShowOnWeb==1)then begin
+            if(nonblank(INVrw.Type))then begin
+              res = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+            end;
+            if(nonblank(INVrw.Color))then begin
+              res = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+            end;
           end;
         end;
       end;
@@ -91,11 +93,13 @@ begin
         rwcnt = MatRowCnt(INVr);
         for (i=0;i<rwcnt;i=i+1) begin
           MatRowGet(INVr,i,INVrw);
-          if(nonblank(INVrw.Type))then begin
-            res2 = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
-          end;
-          if(nonblank(INVrw.Color))then begin
-            res3 = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+          if(INVrw.ShowOnWeb==1)then begin
+            if(nonblank(INVrw.Type))then begin
+              res2 = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+            end;
+            if(nonblank(INVrw.Color))then begin
+              res3 = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+            end;
           end;
         end;
       end;
@@ -560,8 +564,10 @@ begin
     rwcnt = MatRowCnt(INVr);
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(INVr,i,INVrw);
-      AddToArray(INVrw.Type,aTypes);
-      AddToArray(INVrw.Color,aColors);
+      if(INVrw.ShowOnWeb==1)then begin
+        AddToArray(INVrw.Type,aTypes);
+        AddToArray(INVrw.Color,aColors);
+      end;
     end;
   end;
 
@@ -582,8 +588,10 @@ begin
     rwcnt = MatRowCnt(INVr);
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(INVr,i,INVrw);
-      AddToArray(INVrw.Type,aTypes);
-      AddToArray(INVrw.Color,aColors);
+      if(INVrw.ShowOnWeb==1)then begin
+        AddToArray(INVrw.Type,aTypes);
+        AddToArray(INVrw.Color,aColors);
+      end;
     end;
   end;
   
@@ -933,12 +941,14 @@ begin
         rwcnt = MatRowCnt(INVr);
         for (i=0;i<rwcnt;i=i+1) begin
           MatRowGet(INVr,i,INVrw);
-          if(vItemPrice[INVrw.Item]!=0)then begin
-            if(minprice>vItemPrice[INVrw.Item])then begin
-              minprice = vItemPrice[INVrw.Item];
-            end;
-            if(maxprice<vItemPrice[INVrw.Item])then begin
-              maxprice = vItemPrice[INVrw.Item];
+          if(INVrw.ShowOnWeb==1)then begin
+            if(vItemPrice[INVrw.Item]!=0)then begin
+              if(minprice>vItemPrice[INVrw.Item])then begin
+                minprice = vItemPrice[INVrw.Item];
+              end;
+              if(maxprice<vItemPrice[INVrw.Item])then begin
+                maxprice = vItemPrice[INVrw.Item];
+              end;
             end;
           end;
         end;
@@ -1667,9 +1677,11 @@ begin
     rwcnt = MatRowCnt(INVr);
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(INVr,i,INVrw);
-      if (type==INVrw.Type and color==INVrw.Color) then begin
-        res = true;
-        resitem = INVrw.Item;
+      if(INVrw.ShowOnWeb==1)then begin
+        if (type==INVrw.Type and color==INVrw.Color) then begin
+          res = true;
+          resitem = INVrw.Item;
+        end;
       end;
     end;
   end else begin

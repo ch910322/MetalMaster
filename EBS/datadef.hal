@@ -101,6 +101,7 @@ begin
   ArrayField(Type,M4Str,200,0);//SET??
   ArrayField(Color,M4Str,200,0);//SET??
   ArrayField(Item,M4Code,20,INVc);
+  ArrayField(ShowOnWeb,M4Set,432,0);
   EndArray;
   MainKeyBegin(ArtCode,0);
   KeySegment(ArtCode);

@@ -317,8 +317,10 @@ begin
     rwcnt = MatRowCnt(INVr);
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(INVr,i,INVrw);
-      AddToArray(INVrw.Type,aTypes);
-      AddToArray(INVrw.Color,aColors);
+      if(INVrw.ShowOnWeb==1)then begin
+        AddToArray(INVrw.Type,aTypes);
+        AddToArray(INVrw.Color,aColors);
+      end;
     end;
   end;
 
@@ -857,19 +859,30 @@ begin
       rwcnt = MatRowCnt(INVr);
       for (i=0;i<rwcnt;i=i+1) begin
         MatRowGet(INVr,i,INVrw);
-        
-        if(country!="global")then begin
-          WebNGCountryPricer.Country = country;
-          if(readfirstmain(WebNGCountryPricer,1,true))then begin
-            PLr.PLCode = WebNGCountryPricer.PriceList;
-            PLr.ArtCode = INVrw.Item;
-            if(readfirstmain(PLr,2,true))then begin
-              if(needcome)then begin
-                weboutstring(",");
+          if(INVrw.ShowOnWeb==1)then begin
+          if(country!="global")then begin
+            WebNGCountryPricer.Country = country;
+            if(readfirstmain(WebNGCountryPricer,1,true))then begin
+              PLr.PLCode = WebNGCountryPricer.PriceList;
+              PLr.ArtCode = INVrw.Item;
+              if(readfirstmain(PLr,2,true))then begin
+                if(needcome)then begin
+                  weboutstring(",");
+                end;
+                reb = blankval;
+                curncy = "EUR";
+                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
               end;
-              reb = blankval;
-              curncy = "EUR";
-              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
+            end else begin
+              INr.Code = INVrw.Item;
+              if(readfirstmain(INr,1,true))then begin
+                if(needcome)then begin
+                  weboutstring(",");
+                end;
+                reb = blankval;
+                curncy = "EUR";
+                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
+              end;
             end;
           end else begin
             INr.Code = INVrw.Item;
@@ -881,18 +894,8 @@ begin
               curncy = "EUR";
               weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
             end;
+            needcome = true;
           end;
-        end else begin
-          INr.Code = INVrw.Item;
-          if(readfirstmain(INr,1,true))then begin
-            if(needcome)then begin
-              weboutstring(",");
-            end;
-            reb = blankval;
-            curncy = "EUR";
-            weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
-          end;
-          needcome = true;
         end;
       end;
     end;
