@@ -1132,7 +1132,7 @@ begin
 //    shortname = WebGetArg("shortname");
 //  end;
 //  wn = StringToLongInt(WebGetArg("wn"));
-  WebClientWindow(wname,repname,shortname,wn);
+//  WebClientWindow(wname,repname,shortname,wn);// Edit ************************** BPI Ukraine - KramarAlexandr - 01, 31 05 2021 y. at 10:54:20 AM
   
   return;
 end;
