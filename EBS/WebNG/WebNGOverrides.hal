@@ -16,12 +16,15 @@ external procedure CustShowLanguageSelectElement();
 external updating procedure MM_ShopAddToBasket();
 external procedure CustShowBasketElement();
 external procedure ShowItemVarsAjax();
+external procedure MM_ShowOrders(record WebNGElementVc);
+
 
 global
 function boolean ShowSpecialWebElementInternal(record WebNGElementVc WEr)
 begin
   boolean res;
-		
+	// record WebNGStructVc WSr;
+	
   res = true;
   switch (WEr.Type) begin
     case 200:
@@ -42,6 +45,8 @@ begin
       CustPDFDocuments(WEr);
     case 208:
       CustDOCDocuments(WEr);
+		case 209:
+			MM_ShowOrders(WEr);
     otherwise
       res = false;
   end;

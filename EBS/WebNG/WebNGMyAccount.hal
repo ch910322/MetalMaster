@@ -647,33 +647,29 @@ begin
 end;
 
 global
-procedure MM_ShowOrders(record WebNGStructVc WSr,Boolean showpage)
+procedure MM_ShowOrders(record WebNGElementVc WEr)
 begin
   record WebNGPageVc WPr;
   record PeriodBlock PeriodRec;
   row PeriodBlock Periodrw;
   date startdate,enddate;
   string 255 tstr,status,link;
+	integer s,rwcnt;
   record ORVc ORr;
-  boolean TrHs,testf,printf;
+	row ORVc ORrw;
+	record DMVc DMr;
+  boolean TrHs,testf,printf,stestf;
   string 10 dateformat;
   string 255 templatepage,templateelement;
   Boolean dontshowhead;
   
-  
 
-  if (showpage) then begin
-    MyAccountGetTemplates(WSr,kMyAccountPageOrders,templatepage,templateelement,dontshowhead);
-    LoadWebPage(templatepage,WPr);
-    ShowWebAppPageStart(WPr,"my_account");
-    ShowWebElementTemplate(templateelement,0); //before
-  end;
-
-  
   ORr.CustCode = CurrentCust;
   ORr.OrdDate = AddDay(CurrentDate,1);
   startdate = addyear(CurrentDate,-2);
   TrHs = true;
+  WebOutString("<div class='tab-pane fade show active Tab-panel-works' id='works1' role='tabpanel'>");
+  WebOutString("<div class='row'>");
   while (LoopBackKey("CustDate",ORr,2,TrHs)) begin
     if (ORr.CustCode!=CurrentCust) then begin
       TrHs = false;
@@ -683,32 +679,57 @@ begin
     end;
     testf = TrHs;
     if (testf) then begin
-      if (!printf) then begin
-        WebOutTagOpen("<table class=""orderstable2"">");
-        WebOutTagOpen("<tr>");
-        WebOutStringFormatNL("<th class='or_no'>" & ToolWebNGTranslateText(25804) & "</th>");
-        WebOutStringFormatNL("<th class='or_date'>" & ToolWebNGTranslateText(25805) & "</th>");
-        WebOutStringFormatNL("<th class='or_sum'>" & ToolWebNGTranslateText(25806) & "</th>");
-        WebOutTagClose("</tr>");
-        printf = true;
-      end;
-      link = FormatLink("/WebUpdatingAction.hal","?action=download_order&sernr=" & ORr.SerNr,true,true);
-      WebOutTagOpen("<tr>");
-      WebOutStringFormatNL("<td class='or_no'><a target=""_blank"" href="""& link & """>" & ORr.SerNr & "</a></td>");
-      WebOutStringFormatNL("<td class='or_date'>" & ORr.OrdDate & "</td>");
-      WebOutStringFormatNL("<td class='or_sum'>" & ORr.Sum4 & "</td>");
-      WebOutTagClose("</tr>");
+			DMr.Code = ORr.ShipMode;
+			ReadFirstMain(DMr,1,true);
+			rwcnt = MatRowCnt(ORr);
+			for(s=0;s<rwcnt;s=s+1) begin
+				MatRowGet(ORr,s,ORrw);
+				stestf = false;
+				// filter 
+				if(ORrw.Shipd2-ORrw.Quant==0)then begin
+					stestf = true;
+				end;
+				// filter
+
+				if(ORrw.stp==1)then begin
+					if(nonblank(ORrw.ArtCode))then begin
+						stestf = true;
+					end;
+				end;
+				if(blank(ORrw.ArtCode))then begin
+					stestf = false;
+				end;
+
+				if(stestf)then begin
+          WebOutString("<div class='col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12'>");
+					WebOutString("<div class='ListCabinet'>");
+					WebOutString("<div class='BoxTitleImageCab'>");
+					WebOutString("<div class='ImageCab'> <a href=''><img src='../../../webcust/web/img/3465759.jpg' alt='image'></a> </div>");
+					WebOutString("<div class='InfoBox'> <h2><a href=''>" & ORrw.Spec & "</a></h2> <div class='descrip'>descrip</div>");
+					WebOutString("<div class='price'>" & ORrw.Price & "</div> </div> </div>");
+					WebOutString("<div class='ListInfoCab'>");
+					WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>order number:</div> </div>");
+					WebOutString("<div class='col-6'> <div class='Info2'>" & ORr.SerNr & "</div> </div> </div> </div>");
+					WebOutString("<div class='ListInfoCab'>");
+					WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Preču pārvadātājs:</div> </div>");
+					WebOutString("<div class='col-6'> <div class='Info2'>" & DMr.Comment & "</div> </div> </div> </div>");
+					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Saņēmējs:</div></div>");
+					WebOutString("<div class='col-6'> <div class='Info2'>" & ORr.Addr0 & "</div> </div> </div></div>");
+					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'> <div class='Info1'>Samaksas veids:</div> </div>");
+					WebOutString("<div class='col-6'> <div class='Info2'>-</div> </div> </div></div>");
+					WebOutString("<div class='ListInfoCab'> <div class='row'>");
+					WebOutString("<div class='col-6'> <div class='Info1'>Statuss:</div> </div> <div class='col-6'>");
+					WebOutString("<div class='Info2 Status'>-</div> </div> </div> </div>");
+					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Datums:</div>");
+					WebOutString("</div> <div class='col-6'> <div class='Info2'>" & ORr.OrdDate & "</div> </div>");
+					WebOutString("</div></div><div class='BoxBtns'> <a href='' class='btns-blue-dark'>Pasutīt velreiz</a> </div> </div>");
+          WebOutString("</div>");
+					logtext(0,ORrw.ArtCode & " - " & ORrw.Spec);
+				end;
+			end;
     end;
   end;
-  if (printf) then begin
-    WebOutTagClose("</table>");
-  end;
-  WebOutTagOpen("</div>");
-
-  if (showpage) then begin
-    ShowWebElementTemplate(templateelement,2); //after
-    ShowWebAppPageEnd(WPr);
-  end;
+  WebOutString("</div></div>");
   return;
 end;
 
@@ -1208,8 +1229,8 @@ begin
     switch (node) begin
       case "details":
         ShowDetailsEdit(WSr);
-      case "orders":
-        MM_ShowOrders(WSr,true);
+      // case "orders":
+        // MM_ShowOrders(WSr,true);
       case "invoices":
         ShowInvoices(WSr,true);
       case "changepassword":
