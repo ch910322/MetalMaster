@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 external function roundmode DefaultRoundMode();
 //tools
 external function string 255 removenextnode(var string);

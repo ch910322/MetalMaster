@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 //tools
 external procedure ToolWebOutElementTextFormat(record WebNGElementVc);
 external function string 255 GetNextValue(var string);

@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 external function Boolean AnyClassInSet(string,string);
 //tools
 external outer function Boolean IsMarketplaceServer();

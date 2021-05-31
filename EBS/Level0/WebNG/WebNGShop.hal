@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 //tools
 external function string 255 removenextnode(var string);
 external function string 255 CleanPath(string);

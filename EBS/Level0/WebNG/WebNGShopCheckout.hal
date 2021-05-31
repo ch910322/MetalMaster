@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 //tools
 external procedure ShowInputWithLabel2(string,string,string,string,string,boolean,boolean,integer);
 external function string 255 removenextnode(var string);
