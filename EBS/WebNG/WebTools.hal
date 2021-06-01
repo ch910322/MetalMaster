@@ -203,12 +203,19 @@ function string 255 GetContentText(record WebNGTranslateVc WTr)
 begin
   string 255 res;
   Longint pos;
-
-  pos = 0;
+  area temparr;
+  
+  GETAREAFROMTEXTFIELD(WTr,temparr);
+  for(pos=0;pos<getarealength(temparr);pos=pos+1)begin
+    //res = res & GetByteFromArea(temparr,pos);
+    res = res & getstringfromarea(temparr,pos,1);
+  end;
+  
+  /*pos = 0;
   while (pos<=SizeTextCnt(WTr)) begin
     res = res & StringFromText(WTr,pos,255);
     pos = pos + 255;
-  end;
+  end;*/
 
   GetContentText = res;
   return;
