@@ -143,7 +143,7 @@ begin
     PutSessionString("cu_form_" & CFr.Code & "_ok","");
     PutSessionString("cu_form_" & CFr.Code & "_err","");
 
-    WebOutString("<div class='cu_form'><form method='POST' action=''>");///WebUpdatingAction.hal?action=submitcuform //CUST REMOVED
+    WebOutString("<div class='cu_form'><form method='POST' action='/WebUpdatingAction.hal?action=submitcuform'>");///WebUpdatingAction.hal?action=submitcuform //CUST REMOVED
     WebOutString("<input type='hidden' name='form' value='" & CFr.Code & "'>");
     WebOutString("<input type='hidden' name='path' value='" & WebGetArg("path") & "'>");
 
@@ -255,12 +255,15 @@ begin
   record MailVc Mailr;
   area WebPostArea;
   string 255 msg;
-
+  
+  logtext(0,currentcompany & "StoreContactUsFormDetails");
+  
   CFr.Code = WebGetArg("form");
   if (ReadFirstMain(CFr,1,true)) then begin
     CFFr.Code = CFr.Code;
     TrHs = true;
     while (LoopKey("Sorting",CFFr,1,TrHs)) begin
+      logtext(0,CFFr.Code);
       if (CFFr.Code!=CFr.Code) then begin
         TrHs = false;
       end else begin
@@ -289,6 +292,11 @@ begin
     if (CheckRecaptcha(WebPostArea)==false) then begin
       err = err + 8;
     end;
+  end;
+  
+  if (err==0) then begin
+    SetupAndSendMail(Mailr,CFr);
+    ClearFormValues(CFr.Code,i);
   end;
 //CUST-BEGIN
 /*
