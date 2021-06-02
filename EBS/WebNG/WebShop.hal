@@ -889,7 +889,7 @@ begin
   val reb;
   
   
-  country = ToolWebNGGetCountry;
+  /*country = ToolWebNGGetCountry;
   if(country!="global")then begin
     WebNGCountryPricer.Country = country;
     if(readfirstmain(WebNGCountryPricer,1,true))then begin
@@ -911,13 +911,13 @@ begin
         vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
       end;
     end;
-  end else begin
-    while(loopmain(INr,1,true))begin
-      reb = blankval;
-      curncy = "EUR";
-      vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
-    end;
+  end else begin*/
+  while(loopmain(INr,1,true))begin
+    reb = blankval;
+    curncy = "EUR";
+    vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
   end;
+  //end;
 
   //sorting?
   BlockLoad(WebShopb);
