@@ -654,22 +654,27 @@ begin
   row PeriodBlock Periodrw;
   date startdate,enddate;
   string 255 tstr,status,link;
-	integer s,rwcnt;
+	integer s,rwcnt,i,j;
   record ORVc ORr;
 	row ORVc ORrw;
 	record DMVc DMr;
+	record INVc INr;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
   boolean TrHs,testf,printf,stestf;
   string 10 dateformat;
-  string 255 templatepage,templateelement;
+  string 255 templatepage,templateelement,imglink,base;
   Boolean dontshowhead;
-  
+	array string 200 aspec,aprice,asernr,acomm,aaddr,aordate;
+	array string 200 aspec2,aprice2,asernr2,acomm2,aaddr2,aordate2;
+	array string 200 apict,apict2;
 
   ORr.CustCode = CurrentCust;
   ORr.OrdDate = AddDay(CurrentDate,1);
   startdate = addyear(CurrentDate,-2);
-  TrHs = true;
-  WebOutString("<div class='tab-pane fade show active Tab-panel-works' id='works1' role='tabpanel'>");
-  WebOutString("<div class='row'>");
+	
+	TrHs = true;
+
   while (LoopBackKey("CustDate",ORr,2,TrHs)) begin
     if (ORr.CustCode!=CurrentCust) then begin
       TrHs = false;
@@ -685,11 +690,6 @@ begin
 			for(s=0;s<rwcnt;s=s+1) begin
 				MatRowGet(ORr,s,ORrw);
 				stestf = false;
-				// filter 
-				if(ORrw.Shipd2-ORrw.Quant==0)then begin
-					stestf = true;
-				end;
-				// filter
 
 				if(ORrw.stp==1)then begin
 					if(nonblank(ORrw.ArtCode))then begin
@@ -699,36 +699,104 @@ begin
 				if(blank(ORrw.ArtCode))then begin
 					stestf = false;
 				end;
-
+				
 				if(stestf)then begin
-          WebOutString("<div class='col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12'>");
-					WebOutString("<div class='ListCabinet'>");
-					WebOutString("<div class='BoxTitleImageCab'>");
-					WebOutString("<div class='ImageCab'> <a href=''><img src='../../../webcust/web/img/3465759.jpg' alt='image'></a> </div>");
-					WebOutString("<div class='InfoBox'> <h2><a href=''>" & ORrw.Spec & "</a></h2> <div class='descrip'>descrip</div>");
-					WebOutString("<div class='price'>" & ORrw.Price & "</div> </div> </div>");
-					WebOutString("<div class='ListInfoCab'>");
-					WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>order number:</div> </div>");
-					WebOutString("<div class='col-6'> <div class='Info2'>" & ORr.SerNr & "</div> </div> </div> </div>");
-					WebOutString("<div class='ListInfoCab'>");
-					WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Preču pārvadātājs:</div> </div>");
-					WebOutString("<div class='col-6'> <div class='Info2'>" & DMr.Comment & "</div> </div> </div> </div>");
-					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Saņēmējs:</div></div>");
-					WebOutString("<div class='col-6'> <div class='Info2'>" & ORr.Addr0 & "</div> </div> </div></div>");
-					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'> <div class='Info1'>Samaksas veids:</div> </div>");
-					WebOutString("<div class='col-6'> <div class='Info2'>-</div> </div> </div></div>");
-					WebOutString("<div class='ListInfoCab'> <div class='row'>");
-					WebOutString("<div class='col-6'> <div class='Info1'>Statuss:</div> </div> <div class='col-6'>");
-					WebOutString("<div class='Info2 Status'>-</div> </div> </div> </div>");
-					WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Datums:</div>");
-					WebOutString("</div> <div class='col-6'> <div class='Info2'>" & ORr.OrdDate & "</div> </div>");
-					WebOutString("</div></div><div class='BoxBtns'> <a href='' class='btns-blue-dark'>Pasutīt velreiz</a> </div> </div>");
-          WebOutString("</div>");
-					logtext(0,ORrw.ArtCode & " - " & ORrw.Spec);
+					INr.Code = ORrw.ArtCode;
+					ReadFirstMain(INr,1,true);
+					if (ReadRecordLink(INr,j,Attachr,RLr)) begin
+						if(nonblank(Attachr.FileName))then begin
+							base = GetLinkToShop;
+							imglink = base & "images/" & Attachr.FileName;
+							imglink = FormatSimpleLink(imglink,true);
+							apict[apict.length] = imglink;
+						end else begin
+							apict[apict.length] = "empty.jpg";
+						end;
+					end;
+					aspec[aspec.length] = ORrw.Spec;
+					aprice[aprice.length] = ORrw.Price;
+					asernr[asernr.length] = ORr.SerNr;
+					acomm[acomm.length] = DMr.Comment;
+					aaddr[aaddr.length] = ORr.Addr0;
+					aordate[aordate.length] = ORr.OrdDate;
 				end;
+
+				if(stestf and ORrw.Shipd2-ORrw.Quant!=0)then begin
+					INr.Code = ORrw.ArtCode;
+					ReadFirstMain(INr,1,true);
+					if (ReadRecordLink(INr,j,Attachr,RLr)) begin
+						if(nonblank(Attachr.FileName))then begin
+							base = GetLinkToShop;
+							imglink = base & "images/" & Attachr.FileName;
+							imglink = FormatSimpleLink(imglink,true);
+							apict2[apict2.length] = imglink;
+						end else begin
+							apict2[apict2.length] = "empty.jpg";
+						end;
+					end;
+					aspec2[aspec2.length] = ORrw.Spec;
+					aprice2[aprice2.length] = ORrw.Price;
+					asernr2[asernr2.length] = ORr.SerNr;
+					acomm2[acomm2.length] = DMr.Comment;
+					aaddr2[aaddr2.length] = ORr.Addr0;
+					aordate2[aordate2.length] = ORr.OrdDate;					
+				end;
+
 			end;
     end;
   end;
+  WebOutString("<div class='tab-pane fade show active Tab-panel-works' id='works1' role='tabpanel'>");
+	WebOutString("<div class='row'>");	
+	for(i=0;i<aspec.length;i=i+1)begin		
+		WebOutString("<div class='ListCabinet'>");
+		WebOutString("<div class='BoxTitleImageCab'>");
+		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict[j] & "'alt='image'></a> </div>");
+		WebOutString("<div class='InfoBox'> <h2><a href=''>" & aspec[i] & "</a></h2> <div class='descrip'></div>");
+		WebOutString("<div class='price'>" & aprice[i] & "</div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'>");
+		WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Order number:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & asernr[i] & "</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'>");
+		WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Freight carrier:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & acomm[i] & "</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Beneficiary:</div></div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & aaddr[i] & "</div> </div> </div></div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'> <div class='Info1'>Method of payment:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>-</div> </div> </div></div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'>");
+		WebOutString("<div class='col-6'> <div class='Info1'>Status:</div> </div> <div class='col-6'>");
+		WebOutString("<div class='Info2 Status'>-</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Date:</div>");
+		WebOutString("</div> <div class='col-6'> <div class='Info2'>" & aordate[i] & "</div> </div>");
+		WebOutString("</div></div> </div>");
+	end;
+	WebOutString("</div></div>");
+    
+  WebOutString("<div class='tab-pane fade Tab-panel-works' id='works2' role='tabpanel'>");
+	WebOutString("<div class='row'>");	
+	for(i=0;i<aspec2.length;i=i+1)begin		
+		WebOutString("<div class='ListCabinet'>");
+		WebOutString("<div class='BoxTitleImageCab'>");
+		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict2[j] & "'alt='image'></a> </div>");
+		WebOutString("<div class='InfoBox'> <h2><a href=''>" & aspec2[i] & "</a></h2> <div class='descrip'></div>");
+		WebOutString("<div class='price'>" & aprice2[i] & "</div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'>");
+		WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Order number:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & asernr2[i] & "</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'>");
+		WebOutString("<div class='row'> <div class='col-6'> <div class='Info1'>Freight carrier:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & acomm2[i] & "</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Beneficiary:</div></div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>" & aaddr2[i] & "</div> </div> </div></div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'> <div class='Info1'>Method of payment:</div> </div>");
+		WebOutString("<div class='col-6'> <div class='Info2'>-</div> </div> </div></div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'>");
+		WebOutString("<div class='col-6'> <div class='Info1'>Status:</div> </div> <div class='col-6'>");
+		WebOutString("<div class='Info2 Status'>-</div> </div> </div> </div>");
+		WebOutString("<div class='ListInfoCab'> <div class='row'> <div class='col-6'><div class='Info1'>Date:</div>");
+		WebOutString("</div> <div class='col-6'> <div class='Info2'>" & aordate2[i] & "</div> </div>");
+		WebOutString("</div></div></div>");
+	end;
   WebOutString("</div></div>");
   return;
 end;
