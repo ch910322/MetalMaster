@@ -279,7 +279,7 @@ begin
       tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
       tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
       tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
-      tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(32521));
+      tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
       
       WebOutString(tstr);
       goto LShowTranslatedContent;

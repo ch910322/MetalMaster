@@ -250,13 +250,15 @@ BEGIN
 //            GetStaffReb(INr,Rebrw.StaffCode,qtp,pricep,Rebr,rebvp,foundstaff);
             if(blank(Rebrw.Classification))then begin
               GetStaffReb(INr,Rebrw.StaffCode,qtp,pricep,Rebr,i,rebvp,foundstaff);
+              res = true;
+              goto LGetRebate;
             end else begin
               if(setinset(Rebrw.Classification,INr.DispGroups))then begin
                 GetStaffReb(INr,Rebrw.StaffCode,qtp,pricep,Rebr,i,rebvp,foundstaff);
+                res = true;
+                goto LGetRebate;
               end;
             end;
-            res = true;
-            goto LGetRebate;
           end;
         end;
         if (Rebrw.CodeType==1) then begin
