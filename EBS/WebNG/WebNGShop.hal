@@ -150,7 +150,7 @@ begin
   
   res = false;
   
-  if (LoginState==false and nonblank(country)) then begin
+  /*if (LoginState==false and nonblank(country)) then begin
     newcompany = -1;
     foundf = true;
     WCCr.Country = country;
@@ -170,7 +170,13 @@ begin
     if (newcompany!=-1 and newcompany!=CurrentCompany) then begin
       res = SetCompany(WCCr.CompanyNr,false);
     end;
-  end;
+  end;*/
+  
+  //cust
+    if(currentcompany!=3)then begin
+      res = SetCompany(3,false);
+    end;
+  //cust  
   
   ShopSetCompany = res;
   return;

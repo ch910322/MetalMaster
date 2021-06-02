@@ -57,14 +57,19 @@ begin
   record WebNGCompCountryVc WCCr;
 
   res = -1;
-  WCCr.Country = ToolWebNGGetCountry;
+  /*WCCr.Country = ToolWebNGGetCountry;
   if (ReadFirstKey("Country",WCCr,1,true)) then begin
     if (CurrentCompany!=WCCr.CompanyNr) then begin
       res = CurrentCompany;
       SetCompany(WCCr.CompanyNr,false);
     end;
-  end;
-
+  end;*/
+  
+  //cust
+    res = CurrentCompany;
+    SetCompany(3,false);
+  //cust
+  
   SetCompanyBasedOnCountry = res;
   return;
 end;
