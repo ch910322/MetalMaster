@@ -82,7 +82,7 @@ begin
       ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
       while(nonblank(tstr))begin
         if(nonblank(tstr))then begin
-          res1 = AddObjectToObjectList(res,"CAT_" & tstr);
+          res1 = AddObjectToObjectList(res1,"CAT_" & tstr);
         end;
         ExtractObj(WebNGProductr.ProductCategory,pos,tstr);
       end;
@@ -95,10 +95,10 @@ begin
           MatRowGet(INVr,i,INVrw);
           if(INVrw.ShowOnWeb==1)then begin
             if(nonblank(INVrw.Type))then begin
-              res2 = AddObjectToObjectList(res,"TYPE_" & INVrw.Type);
+              res2 = AddObjectToObjectList(res2,"TYPE_" & INVrw.Type);
             end;
             if(nonblank(INVrw.Color))then begin
-              res3 = AddObjectToObjectList(res,"COLOR_" & INVrw.Color);
+              res3 = AddObjectToObjectList(res3,"COLOR_" & INVrw.Color);
             end;
           end;
         end;

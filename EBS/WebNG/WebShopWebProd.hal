@@ -365,7 +365,7 @@ begin
 end;
 
 
-function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,record MMWebSetBlock WSb)
+/*function string 255 ShowWebNGProductClasses(record WebNGProductVc WebNGProductr,record MMWebSetBlock WSb)
 begin
   string 255 res;
 
@@ -376,7 +376,7 @@ begin
   
   ShowWebNGProductClasses = res;
   return;
-end;
+end;*/
 
 function boolean checkclassexists(string classtype, string classifications)
 begin
