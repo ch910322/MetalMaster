@@ -515,7 +515,7 @@ begin
     WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89011) & "</div>");
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
-    WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & ToolWebNGTranslateText2(89012) & "'>");
+		WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & WebNGProductr.Unittext & "'>");
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                  </div>");
     WebOutStringFormatNL("              </div> ");
