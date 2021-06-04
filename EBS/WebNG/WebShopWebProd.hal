@@ -859,7 +859,7 @@ begin
       rwcnt = MatRowCnt(INVr);
       for (i=0;i<rwcnt;i=i+1) begin
         MatRowGet(INVr,i,INVrw);
-          if(INVrw.ShowOnWeb==1)then begin
+        if(INVrw.ShowOnWeb==1)then begin
           if(country!="global")then begin
             WebNGCountryPricer.Country = country;
             if(readfirstmain(WebNGCountryPricer,1,true))then begin
@@ -873,6 +873,7 @@ begin
                 curncy = "EUR";
                 weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
               end;
+							needcome = true;
             end else begin
               INr.Code = INVrw.Item;
               if(readfirstmain(INr,1,true))then begin
@@ -883,6 +884,7 @@ begin
                 curncy = "EUR";
                 weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
               end;
+							needcome = true;
             end;
           end else begin
             INr.Code = INVrw.Item;
