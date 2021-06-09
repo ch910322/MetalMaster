@@ -26,7 +26,7 @@ external inner function string 255 GetTranslatedNameProduct(record WebNGProductV
 external inner procedure ShowProductShortDescription(record WebNGProductVc);
 external inner procedure ExtractObj(string,var Integer,var string);
 external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
-
+// test
 
 global function string 255 getWebProductFilters(record WebNGProductVc WebNGProductr)
 begin
