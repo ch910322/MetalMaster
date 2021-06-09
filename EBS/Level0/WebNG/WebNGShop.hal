@@ -238,9 +238,7 @@ begin
   integer oldcompany;
   boolean res;
   longint structnode;
-  
-  logtext(0,"ShopApp2 " & path & " " & simplef);
-  
+    
   mpath = path;
   node = removenextnode(mpath);
 

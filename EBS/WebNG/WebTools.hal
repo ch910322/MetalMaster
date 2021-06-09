@@ -797,9 +797,7 @@ begin
       end;
     end;
   end;
-  
-  logtext(0,Userr.Job & " GetEmplJobTitle " & Userr.Code & "  " & Userr.Name & " -> " & res);
-  
+    
   GetEmplJobTitle = res;
   return;
 end;
@@ -1045,11 +1043,9 @@ begin
   record CUVc CUr;
   
   GetShoppingBasket(WSBr,0);
-  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   
   CUr.Code = CurrentCust;
   if (ReadFirstMain(CUr,1,true)) then begin
-    logtext(0,"webgetarg(\"mode\") " & webgetarg("mode"));
     if(webgetarg("mode")=="2")then begin
       if(nonblank(webgetarg("fiz_sia")))then begin
         CUr.Name = webgetarg("fiz_sia");
@@ -1060,7 +1056,6 @@ begin
       end;
     end;
     if(webgetarg("mode")=="1")then begin
-      logtext(0,"jur_sia " & webgetarg("jur_sia"));
       if(nonblank(webgetarg("jur_sia")))then begin
         CUr.Name = webgetarg("jur_sia");
         CUr.RegNr1 = webgetarg("jur_regNr");
@@ -1155,8 +1150,6 @@ begin
     recordstore(WSBr,true);
   end;
   
-  
-  logtext(0,",WSBr.CustCode" & WSBr.CustCode);
   weboutstring("Ok");
   
   return;
@@ -1175,20 +1168,15 @@ begin
   
   
   if (GetShoppingBasket(WSBr,0)) then begin
-    logtext(0,"GetShoppingBasket");
     if (WSBr.OrderNr>-1) then begin
-      logtext(0,"1");
       orderokf = ShopUpdateExistingOrder(WSBr);
       recsernr = WSBr.OrderNr;
     end else begin
-      logtext(0,"2");
       if (BuildWebNGOrder(ORr,0,paydeal,false,"",WPSr.DelAddrCode)) then begin
-        logtext(0,"BuildWebNGOrder");
         WebNGInsertCustOrderNr_ORVc(ORr);
         if (ORr.SerNr<0) then begin
           ORr.SerNr = NextSerNr("ORVc",ORr.OrdDate,-1,false,"");
         end;
-        logtext(0,"ORr.SerNr " & ORr.SerNr);
         recsernr = ORr.SerNr;
         if (ORr.SerNr>0) then begin
           if (RecordInsert(ORr,true)) then begin
@@ -1235,20 +1223,15 @@ begin
   
   
   if (GetShoppingBasket(WSBr,0)) then begin
-    logtext(0,"GetShoppingBasket");
     if (WSBr.OrderNr>-1) then begin
-      logtext(0,"1");
       orderokf = ShopUpdateExistingOrder(WSBr);
       recsernr = WSBr.OrderNr;
     end else begin
-      logtext(0,"2");
       if (BuildWebNGOrder(ORr,0,paydeal,false,"",WPSr.DelAddrCode)) then begin
-        logtext(0,"BuildWebNGOrder");
         WebNGInsertCustOrderNr_ORVc(ORr);
         if (ORr.SerNr<0) then begin
           ORr.SerNr = NextSerNr("ORVc",ORr.OrdDate,-1,false,"");
         end;
-        logtext(0,"ORr.SerNr " & ORr.SerNr);
         recsernr = ORr.SerNr;
         if (ORr.SerNr>0) then begin
           if (RecordInsert(ORr,true)) then begin

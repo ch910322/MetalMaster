@@ -99,7 +99,6 @@ begin
   array string 255 a_options;
   Integer i; 
 
-  logtext(0, "vals_listview = " & listview);
   GetVectorTags(options,a_options);
   if (a_options.length>0) then begin
     if (listview=="list") then begin

@@ -452,9 +452,7 @@ begin
   boolean res,foundf;
   boolean encapsulateindiv;
   longint loginnode,selcountrynode;
-  
-  logtext(0,"ShowWebPage-- " & WSr.SerNr);
-  
+    
   res = false;
   if (nonblank(WSr.WebPage)) then begin
     WPr.Code = WSr.WebPage;

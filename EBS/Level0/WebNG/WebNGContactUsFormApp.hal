@@ -255,15 +255,12 @@ begin
   record MailVc Mailr;
   area WebPostArea;
   string 255 msg;
-  
-  logtext(0,currentcompany & "StoreContactUsFormDetails");
-  
+    
   CFr.Code = WebGetArg("form");
   if (ReadFirstMain(CFr,1,true)) then begin
     CFFr.Code = CFr.Code;
     TrHs = true;
     while (LoopKey("Sorting",CFFr,1,TrHs)) begin
-      logtext(0,CFFr.Code);
       if (CFFr.Code!=CFr.Code) then begin
         TrHs = false;
       end else begin

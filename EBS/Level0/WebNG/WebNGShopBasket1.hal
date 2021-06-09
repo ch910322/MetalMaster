@@ -788,7 +788,6 @@ begin
       ClearRow(WSBr,WSBrw,1);
       rownr = 0;
     end;
-    logtext(0,"WSBrw.Product = product;");
     WSBrw.Product = product;
     if (WSBrw.QtyType==1) then begin
       WSBrw.PalletQty = WSBrw.PalletQty + qty;
@@ -810,7 +809,6 @@ begin
         if (nonblank(WSBr.CustCode)) then begin
           tstr = " - Customer: " & WSBr.CustCode & " (Company = " & WSBr.CompanyNr & ")";
         end;
-        LogText(0,"WebShopNG: Cannot mix currencies in shopping basket" & tstr);
         goto LAddProductToBasket;
       end;
     end else begin

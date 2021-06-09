@@ -3179,7 +3179,6 @@ begin
         res = true;
       end;
   end;
-  logtext(0,"can upload");
 
   WebManagersUploadRecordExists = res;
   return;

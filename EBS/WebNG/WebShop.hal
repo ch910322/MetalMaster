@@ -1839,9 +1839,7 @@ begin
   record WebNGPageVc WPr;
   record WebNGShopBlock WSb;
   record WebNGProductVc WebNGProductr,mainWebNGProductr;
-  
-  logtext(0,"MM_ShopBasketApp");
-  
+    
   BlockLoad(WSb);
   if (nonblank(WSb.ShopBasketTemplPage)) then begin
     WPr.Code = WSb.ShopBasketTemplPage;
@@ -1861,7 +1859,6 @@ begin
   if (GetShoppingBasket(WSBr,0)) then begin
     rwcnt = MatRowCnt(WSBr);
   end;
-  logtext(0,"MM_ShopBasketApp rwcnt " & rwcnt);
   if (rwcnt>0) then begin
     WebOutString("    <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
     WebOutString("        <div class='boxCartList'>");
@@ -1886,16 +1883,10 @@ begin
     WebOutString("            </div>");
     for (i=0;i<rwcnt;i=i+1) begin
       MatRowGet(WSBr,i,WSBrw);
-      logtext(0,"WSBrw.Product " & WSBrw.Product);
       GetBasketItem(WSBrw.Product,WebNGProductr,mainWebNGProductr,material,color);
-      logtext(0,"WebNGProductr code " & WebNGProductr.Code);
-      logtext(0,"mainWebNGProductr code " & mainWebNGProductr.Code);
       imglink = base & "images/";
       imglink = FormatSimpleLink(imglink & URLEncodeCS(mainWebNGProductr.Code),true);
-      link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainWebNGProductr.Code),true);
-      
-      logtext(0,"material " & material);
-      logtext(0,"color " & color);
+      link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainWebNGProductr.Code),true);      
       title = GetTranslatedNameProduct(mainWebNGProductr) & " " & material & " " & color;
       CalcSum(WSBrw.Qty,WSBrw.Price,0,WSBrw.Discount,rowsum,GenOptRec.UseDiscount);
 
@@ -2420,7 +2411,6 @@ begin
     
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
-    logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
       TrHs = true;
       while (LoopKey(ckey,Mailr,1,TrHs)) begin
@@ -2473,7 +2463,6 @@ begin
     
   Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
-    logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
       TrHs = true;
       while (LoopKey(ckey,Mailr,1,TrHs)) begin
@@ -2533,7 +2522,6 @@ end;
 
 Confr.AddrName = "Documents";
   if(readfirstkey("AddrName",Confr,1,true))then begin
-    logtext(0,Confr.AddrName);
     ckey = "UserTime:" & Confr.SerNr;
       TrHs = true;
       while (LoopKey(ckey,Mailr,1,TrHs)) begin
@@ -2543,7 +2531,6 @@ Confr.AddrName = "Documents";
             checklang = true;
             for(i=0;i<weblang.length;i=i+1)begin
               tstr = weblang[i];
-              logtext(0,Attach2r.FileName);
               if((left(Attach2r.FileName,len(tstr)) & "_")==tstr & "_")then begin
                 if(lang!=tstr)then begin
                   checklang = false;

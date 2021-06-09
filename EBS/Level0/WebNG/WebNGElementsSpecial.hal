@@ -180,9 +180,7 @@ begin
     // WebOutStringFormat(ToolWebNGTranslateText(20026)); //Logout
     // http://localhost:81/dologin&company=3&login=1005&passwd=123
     CUr.Code = CurrentCust;
-    logtext(0, "before if =  " & CurrentCust);
     if (ReadFirstMain(CUr,1,true)) then begin
-      logtext(0, "in if! ");
       WebOutString(CUr.Name);
     end;
     WebOutTagClose("</a>");

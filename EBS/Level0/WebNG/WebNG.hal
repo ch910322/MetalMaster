@@ -439,9 +439,7 @@ begin
   array longint visitednodes;
   transaction string 60 gCountryCode;
   transaction string 20 gLangcode;
-  
-  logtext(0,"HandlePath " & path & " " & mother);
-  
+    
   gCountryCode = "";
   gLangcode = "";
   
@@ -477,7 +475,6 @@ begin
     justloggedout = false;
   end;
   
-  logtext(0,"Start while");
   while (len(mpath)>0) begin
     cnt = cnt+1;
     if (rootrequested==false) then begin
@@ -530,11 +527,9 @@ begin
       end;
     end;
     if (cnt>10) then begin
-      LogText(0,"link too deep");
       goto LHandlePathOut;
     end;
   end;
-  logtext(0,"End while");
   
 LHandlePath:;
   if (lasttype>=0) then begin
@@ -553,7 +548,6 @@ LHandlePath:;
     end;
   end;
   StoreVisitedNodes(visitednodes);
-  logtext(0,"start switch lasttype " & lasttype & " " & WSr.SerNr & "  " & WSr.Name & " " & WSr.Comment);
   switch (lasttype) begin
     case -2:
       RollbackOneRequestURL; 
@@ -585,7 +579,6 @@ LHandlePath:;
         ShowErrorPage(ToolWebNGTranslateText(25000)); //File not found
       end;
   end;
-  logtext(0,"end switch lasttype " & lasttype);
 LHandlePathOut:;
   return;
 end;
