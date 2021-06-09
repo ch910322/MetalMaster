@@ -2110,7 +2110,7 @@ begin
 				curncy = "EUR";
 				reb = blankval;
 				
-				WebOutStringFormatNL("<option value='emptyMaterial' class='ColorItem color-class-emptyMaterial' selected='selected'>Select Material...</option>");
+				WebOutStringFormatNL("<option value='emptyMaterial' class='ColorItem' selected='selected'>Select material...</option>");
         for (i=0;i<aTypes.length;i=i+1) begin
           WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & ShopGetItemPrice(aItems[i],1,reb,vatcode,curncy,0) & "</option>");
         end;
@@ -2129,7 +2129,7 @@ begin
         WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
         WebOutStringFormatNL("                          <div class='ColorProduct'>");
         WebOutStringFormatNL("                              <select name='color'>");  
-				WebOutStringFormatNL("<option value='emptyColor' class='ColorItem color-class-emptyColor' selected='selected'>Select Color...</option>");
+				WebOutStringFormatNL("<option value='emptyColor' class='ColorItem' selected='selected'>Select сolor...</option>");
         for (i=0;i<aColors.length;i=i+1) begin
           WebOutStringFormatNL("<option value='" & aColors[i] & "' class='ColorItem color-class-" & aColors[i] & "'>" & GetVarColorName(aColors[i],lang) & "</option>");
         end;
