@@ -530,7 +530,7 @@ begin
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
 
-		WebOutStringFormatNL("                          <input type='text' readonly name='unit' placeholder='" & tstr & "'>");
+		WebOutStringFormatNL("                          <input type='text' name='unit' placeholder='" & tstr & "'>");
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                  </div>");
     WebOutStringFormatNL("              </div> ");
