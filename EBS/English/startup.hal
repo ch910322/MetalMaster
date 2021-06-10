@@ -19,5 +19,7 @@ begin
   Setting("MM Delivery Mode",MMWebDelModeTClass,modWebShopNG);
   Setting("MM WebShop Rebate",MMWebShopRebateTClass,modWebShopNG);  
   
+  Register("Email Queue","Email Queue",EMailQueVc,modWebShopNG);
+  
   return;
 end;
