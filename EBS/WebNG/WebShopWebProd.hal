@@ -29,7 +29,7 @@ external function string 255 getWebProductFilters(record WebNGProductVc);
 external procedure ShowSingleFilter(string,string,var vector string);
 external function string 255 GetVarTypeName(string,string);
 external function string 255 GetVarColorName(string,string);
-external procedure GetProductVars(record WebNGProductVc,var array string,var array string,var array string);
+external procedure GetProductVars(record WebNGProductVc,var array string,var array string,var vector string);
 external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
 
 function string 255 GetCTypeTranslation(string cls)
@@ -305,7 +305,7 @@ begin
 end;
 
 
-procedure GetItemVars(record INVc INr,var array string aTypes,var array string aColors,var array string aItems)
+procedure GetItemVars(record INVc INr,var array string aTypes,var array string aColors,var vector string vItems)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
@@ -319,7 +319,7 @@ begin
       if(INVrw.ShowOnWeb==1)then begin
         AddToArray(INVrw.Type,aTypes);
         AddToArray(INVrw.Color,aColors);
-				AddToArray(INVrw.Item,aItems);
+        vItems[INVrw.Type] = INVrw.Item;
       end;
     end;
   end;
@@ -406,12 +406,13 @@ end;
 procedure ShowWebItemInfoPage(record WebNGProductVc WebNGProductr)
 begin
   string 255 description,base,imglink,lang,tstr;
-	string 20 vatcode,curncy;
+	string 20 vatcode,curncy,itemprice;
   record Attach2Vc Attachr;
   record RLinkVc RLr;
 	record INVc INr;
   Integer i,num,le;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   array string 255 thumb;
   record DIVc DIr;
   boolean TrHs;
@@ -469,14 +470,14 @@ begin
   WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
   cleararray(aTypes);
   cleararray(aColors);
-	cleararray(aItems);
-  GetProductVars(WebNGProductr,aTypes,aColors,aItems);
+	clearVector(vItems);
+  GetProductVars(WebNGProductr,aTypes,aColors,vItems);
 	
-	for(i=0;i<aItems.length;i=i+1)begin
-		INr.Code = aItems[i];
+	//for(i=0;i<aItems.length;i=i+1)begin
+		INr.Code = vItems[aTypes[0]];
 		readfirstmain(INr,1,true);
 		tstr = INr.Unittext;
-	end;
+	//end;
 	
   if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
@@ -493,7 +494,9 @@ begin
     for (i=0;i<aTypes.length;i=i+1) begin
       curncy = "EUR";
       reb = blankval;
-      WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & ShopGetItemPrice(aItems[i],1,reb,vatcode,curncy,0) & "</option>");
+      itemprice = valtostring(round(ShopGetItemPrice(vItems[aTypes[i]],1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
+      
+      WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & itemprice & "</option>");
     end;
 		
     WebOutStringFormatNL("                          </select>");
@@ -572,7 +575,8 @@ begin
   array record INVc aINr;
   Integer i;
   val price;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   
   lang = CurrentWebLang;
   base = GetLinkToShop;
@@ -597,8 +601,8 @@ begin
         link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(CINr.CrossItemCode),true);
         ClearArray(aTypes);
         ClearArray(aColors);
-				ClearArray(aItems);
-        GetItemVars(tINr,aTypes,aColors,aItems);
+				ClearVector(vItems);
+        GetItemVars(tINr,aTypes,aColors,vItems);
 
         WebOutString("<div class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'>");
         WebOutString("    <div class='RecommendList'>");
@@ -861,7 +865,7 @@ begin
   record INVc INr;
   record WebNGCountryPricesVc WebNGCountryPricer;
   record PLVc PLr;
-  string 20 country,curncy,vatcode;
+  string 20 country,curncy,vatcode,itemprice;
   val reb;
   
   oldcomp = SetCompanyBasedOnCountry;
@@ -888,7 +892,8 @@ begin
                 end;
                 reb = blankval;
                 curncy = "EUR";
-                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
+                itemprice = valtostring(round(ShopGetItemPrice(INVrw.Item,1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
+                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & itemprice & "\"}");
               end;
 							needcome = true;
             end else begin
@@ -899,7 +904,8 @@ begin
                 end;
                 reb = blankval;
                 curncy = "EUR";
-                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
+                itemprice = valtostring(round(ShopGetItemPrice(INVrw.Item,1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
+                weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & itemprice & "\"}");
               end;
 							needcome = true;
             end;
@@ -911,7 +917,8 @@ begin
               end;
               reb = blankval;
               curncy = "EUR";
-              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0) & "\"}");
+              itemprice = valtostring(round(ShopGetItemPrice(INVrw.Item,1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
+              weboutstring("{\"" & INVrw.Type & "_" &  INVrw.Color & "\":\"" & itemprice & "\"}");
             end;
             needcome = true;
           end;

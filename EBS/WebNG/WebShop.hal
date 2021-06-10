@@ -553,7 +553,7 @@ begin
 end;
 
 
-procedure GetItemVars(record INVc INr,var array string aTypes,var array string aColors,var array string aItems)
+procedure GetItemVars(record INVc INr,var array string aTypes,var array string aColors,var vector string vItems)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
@@ -567,7 +567,8 @@ begin
       if(INVrw.ShowOnWeb==1)then begin
         AddToArray(INVrw.Type,aTypes);
         AddToArray(INVrw.Color,aColors);
-				AddToArray(INVrw.Item,aItems);
+        vItems[INVrw.Item] = INVrw.Item;
+				//AddToArray(INVrw.Item,aItems);
       end;
     end;
   end;
@@ -576,7 +577,7 @@ begin
 end;
 
 global
-procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,var array string aItems)
+procedure GetProductVars(record WebNGProductVc WebNGProductr,var array string aTypes,var array string aColors,var vector string vItems)
 begin
   record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
@@ -592,7 +593,8 @@ begin
       if(INVrw.ShowOnWeb==1)then begin
         AddToArray(INVrw.Type,aTypes);
         AddToArray(INVrw.Color,aColors);
-				AddToArray(INVrw.Item,aItems);
+        vItems[INVrw.Type] = INVrw.Item;
+				//AddToArray(INVrw.Item,aItems);
       end;
     end;
   end;
@@ -676,10 +678,10 @@ begin
   record WebNGProductVc WebNGProductr;
   string 255 link,imglink,shorttext,tstr,base,lang,modal;
   string 100 price;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
   record MMWebProdSetBlock MMWPSb;
   record DIVc DIr;
-  vector string 255 vColors,vMateraials;
+  vector string 255 vColors,vMateraials,vItems;
   boolean TrHs;
   vector val vprices;
   
@@ -723,8 +725,8 @@ begin
     tstr = GetTranslatedNameProduct(WebNGProductr);//GetItemTitle(INr,lang);
     cleararray(aTypes);
     cleararray(aColors);
-		cleararray(aItems);
-    GetProductVars(WebNGProductr,aTypes,aColors,aItems);
+		clearVector(vItems);
+    GetProductVars(WebNGProductr,aTypes,aColors,vItems);
     if (listview=="list") then begin
       WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & " class='productItem col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'  ><div class='row'>");
       WebOutString("<div class='col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12'><div class='ProdImg'><a href='" & link & "'><img class='imageRespon' src='" & imglink & "' alt='image'></a></div></div>");
@@ -733,12 +735,12 @@ begin
       ShowProductShortDescription(WebNGProductr);
       WebOutString("</div>");
       if (aTypes.length==0) then begin
-      WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
-      WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
-      WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
-      WebOutString("</div></div>");
+        WebOutString("<div class='row no-gutters'><div class='col-md-4 col-4'><div class='Price'>&euro;" & price & "</div></div>");
+        WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
+        WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
+        WebOutString("</div></div>");
         modal = "";
-      WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89990) & "</a></div>");
+        WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89990) & "</a></div>");
       end else begin
         modal = " data-toggle='modal'";
         WebOutString("<div class='row no-gutters'><div class='col-md-8 col-8'><div class='Price'>&euro;" & price & "</div></div>");
@@ -783,7 +785,9 @@ begin
   record INVc INr;
   string 255 link,imglink,shorttext,tstr,base,lang,modal;
   val price;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
+  
   
   WebOutString("<div class='row product-catalog-list hal36'>");
   lang = CurrentWebLang;
@@ -796,7 +800,7 @@ begin
     price = INr.InPrice;
     shorttext = GetItemDescription(INr,lang);
     tstr = GetItemTitle(INr,lang);
-    GetItemVars(INr,aTypes,aColors,aItems);
+    GetItemVars(INr,aTypes,aColors,vItems);
 
     if (listview=="list") then begin
       WebOutString("<div " & ShowItemClasses(INr,WSb) & " class='col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item GorizontalList' itemcode='" & URLEncodeCS(INr.Code) & "'><div class='row'>");
@@ -1061,8 +1065,9 @@ begin
   record Attach2Vc Attachr;
   record RLinkVc RLr;
   Integer i,num;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
   array string 255 thumb;
+  vector string 100 vItems;
   
   lang = CurrentWebLang;
   description = GetItemDescription(INr,lang);
@@ -1114,7 +1119,7 @@ begin
   WebOutStringFormatNL("          </div>");
   WebOutStringFormatNL("          <div class='DetailsProd'>");
   WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(INr.Code) & "'>");
-  GetItemVars(INr,aTypes,aColors,aItems);
+  GetItemVars(INr,aTypes,aColors,vItems);
   if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
     WebOutStringFormatNL("                  <div class='row'>");
@@ -1163,11 +1168,11 @@ begin
     WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89011) & "</div>");
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-12 col-md-12 col-12'>");
-		for(i=0;i<aItems.length;i=i+1)begin
-			INr.Code = aItems[i];
-			Readfirstmain(INr,1,true);
-			tstr = INr.Unittext;
-		end;
+		
+    INr.Code = vItems[aTypes[0]];
+    Readfirstmain(INr,1,true);
+    tstr = INr.Unittext;
+    
 		WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & tstr & "'>");
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                  </div>");
@@ -1209,7 +1214,8 @@ begin
   array record INVc aINr;
   Integer i;
   val price;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   
   lang = CurrentWebLang;
   base = GetLinkToShop;
@@ -1234,8 +1240,8 @@ begin
         link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(CINr.CrossItemCode),true);
         ClearArray(aTypes);
         ClearArray(aColors);
-				ClearArray(aItems);
-        GetItemVars(tINr,aTypes,aColors,aItems);
+				ClearVector(vItems);
+        GetItemVars(tINr,aTypes,aColors,vItems);
 
         WebOutString("<div class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'>");
         WebOutString("    <div class='RecommendList'>");
@@ -2038,7 +2044,8 @@ global
 procedure ShowItemVarsAjax()
 begin
   Integer i,num;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   record INVc INr;  
   record WebNGProductVc WebNGProductr;
   string 255 lang,tstr;
@@ -2050,7 +2057,7 @@ begin
 	val reb;
   record UnitVc Unitr;
   vector val vprices;
-	string 20 vatcode,curncy;
+	string 20 vatcode,curncy,itemprice;
   
   blockload(MMWPSb);
   
@@ -2086,7 +2093,7 @@ begin
     // Unitr.Code = WebNGProductr.Unittext;
 		// INr.Code = WebNGProductr.Code;
     // readfirstmain(INr,1,true);
-    GetProductVars(WebNGProductr,aTypes,aColors,aItems);
+    GetProductVars(WebNGProductr,aTypes,aColors,vItems);
     if (aTypes.length>0) then begin
       WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
       if (aTypes.length>0) then begin
@@ -2104,7 +2111,8 @@ begin
         for (i=0;i<aTypes.length;i=i+1) begin
           curncy = "EUR";
 				  reb = blankval;
-          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & ShopGetItemPrice(aItems[i],1,reb,vatcode,curncy,0) & "</option>");
+				  itemprice = valtostring(round(ShopGetItemPrice(vItems[aTypes[i]],1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
+          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & itemprice & "</option>");
         end;
 				
         WebOutStringFormatNL("                          </select>");
@@ -2142,11 +2150,10 @@ begin
       // if(blank(Unitr.Comment))then begin
         // Unitr.Comment = ToolWebNGTranslateText2(89012);
       // end;
-			for(i=0;i<aItems.length;i=i+1)begin
-				INr.Code = aItems[i];
+				INr.Code = vItems[aTypes[0]];
 				readfirstmain(INr,1,true);
 				tstr = INr.Unittext;
-			end;
+
 			WebOutStringFormatNL("                          <input type='text' readonly name='unit' placeholder='" & tstr & "'>");
       WebOutStringFormatNL("                          <input style='display:none' type='text' readonly name='qty' value='" & 1 & "' placeholder='" & 1 & "'>");
       WebOutStringFormatNL("                      </div>");
@@ -2168,7 +2175,8 @@ global
 procedure ShowItemVarsAjaxIN()
 begin
   Integer i,num;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   record INVc INr;  
   string 255 lang,tstr;
   Integer oldcomp;
@@ -2178,7 +2186,7 @@ begin
   lang = CurrentWebLang;
   INr.Code = UrlDecode(WebGetArg("item"));
   if (ReadFirstMain(INr,1,true)) then begin
-    GetItemVars(INr,aTypes,aColors,aItems);
+    GetItemVars(INr,aTypes,aColors,vItems);
     if (aTypes.length>0) then begin
       WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(INr.Code) & "'>");
       if (aTypes.length>0) then begin
@@ -2223,11 +2231,9 @@ begin
       WebOutStringFormatNL("                          <div class='Text'>" & ToolWebNGTranslateText2(89011) & "</div>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
-			for(i=0;i<aItems.length;i=i+1)begin
-				INr.Code = aItems[i];
+				INr.Code = vItems[aTypes[i]];
 				readfirstmain(INr,1,true);
 				tstr = INr.Unittext;
-			end;
 			WebOutStringFormatNL("                          <input type='text' name='qty' placeholder='" & tstr & "'>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                  </div>");
@@ -2250,7 +2256,8 @@ begin
   string 255 lang,base,imglink,link;
   val price;
   string 255 title,description;
-  array string 255 aTypes,aColors,aItems;
+  array string 255 aTypes,aColors;
+  vector string 100 vItems;
   record INVc INr;
   string 255 modal;
   
@@ -2265,7 +2272,7 @@ begin
       price = INr.InPrice;
       description = GetItemDescription(INr,lang);
       title = GetItemTitle(INr,lang);
-      GetItemVars(INr,aTypes,aColors,aItems);
+      GetItemVars(INr,aTypes,aColors,vItems);
       WebOutStringFormatNL("    <div class='col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'>");
       WebOutStringFormatNL("        <div class='ProductList-item' itemcode='" & URLEncodeCS(INr.Code) & "'>");
       WebOutStringFormatNL("            <div class='ProdImg'>");

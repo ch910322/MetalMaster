@@ -796,7 +796,7 @@ begin
     end;
     custcurrency = "";
     reb = blankval;
-    WSBrw.Price = ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0);
+    WSBrw.Price = round(ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0),defaultcurroundoff);
     WSBrw.Discount = reb;
     WSBrw.VATCode = vatcode;
     WSBrw.DateAdded = CurrentDate;
@@ -1215,7 +1215,7 @@ begin
         MatRowGet(WSBr,i,WSBrw);
         custcurrency = "";
         reb = blankval;
-        WSBrw.Price = ShopGetItemPrice(WSBrw.Product,1,reb,vatcode,custcurrency,0);
+        WSBrw.Price = round(ShopGetItemPrice(WSBrw.Product,1,reb,vatcode,custcurrency,0),defaultcurroundoff);
         WSBrw.Discount = reb;
         WSBrw.VATCode = vatcode;
         MatRowPut(WSBr,i,WSBrw);
