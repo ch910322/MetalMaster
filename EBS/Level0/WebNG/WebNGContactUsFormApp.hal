@@ -9,6 +9,7 @@ external function string 255 RecaptchaSiteKey();
 external function boolean CheckRecaptcha(area);
 external function string 255 GetLinkToStruct(LongInt,boolean);
 external outer function Boolean MM_ShowContactUsForm(record WebNGContactFormVc);
+external updating function Boolean RecordAction_raEMailQue(var record MailVc,Boolean);
 
 
 function string 255 GetFormValue(string code,Integer i)
@@ -237,8 +238,10 @@ begin
 
   if (RecordStore(Mailr,true)) then begin
     RecordCopy(oldMailr,Mailr);
-    Mailr.SendFlag = 1;
-    RecordUpdate(oldMailr,Mailr,true);
+    if(RecordAction_raEMailQue(Mailr,false))then begin
+      Mailr.SendFlag = 1;
+      RecordUpdate(oldMailr,Mailr,true);
+    end;
   end;
 
   return;
