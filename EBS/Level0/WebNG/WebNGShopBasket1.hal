@@ -794,6 +794,8 @@ begin
     end else begin
       WSBrw.Qty = WSBrw.Qty + qty;
     end;
+    custcurrency = "";
+    reb = blankval;
     WSBrw.Price = ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0);
     WSBrw.Discount = reb;
     WSBrw.VATCode = vatcode;
@@ -1211,6 +1213,8 @@ begin
       cnt = MatRowCnt(WSBr);
       for (i=0;i<cnt;i=i+1) begin
         MatRowGet(WSBr,i,WSBrw);
+        custcurrency = "";
+        reb = blankval;
         WSBrw.Price = ShopGetItemPrice(WSBrw.Product,1,reb,vatcode,custcurrency,0);
         WSBrw.Discount = reb;
         WSBrw.VATCode = vatcode;

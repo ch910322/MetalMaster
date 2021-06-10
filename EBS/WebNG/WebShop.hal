@@ -2098,11 +2098,12 @@ begin
         WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
         WebOutStringFormatNL("                          <select name='type'>");
 				
-				curncy = "EUR";
-				reb = blankval;
+				
 				
 				WebOutStringFormatNL("<option value='emptyMaterial' class='ColorItem' selected='selected'>Select material...</option>");
         for (i=0;i<aTypes.length;i=i+1) begin
+          curncy = "EUR";
+				  reb = blankval;
           WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & ShopGetItemPrice(aItems[i],1,reb,vatcode,curncy,0) & "</option>");
         end;
 				

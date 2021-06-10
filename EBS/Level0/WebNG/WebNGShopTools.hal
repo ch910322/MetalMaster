@@ -221,6 +221,8 @@ begin
         for (i=0;i<cnt;i=i+1) begin
           MatRowGet(WPr,i,WPrw);
           if (WPrw.SelectionType==0 and WPrw.Requirement==1) then begin
+            tmpoutcurrency = "";
+            tmpoutreb = blankval;
             tmpprice = ShopGetItemPrice(WPrw.ComponentCode,qty,tmpoutreb,tmpoutvatcode,tmpoutcurrency,calllevel+1); //TODO: handle discount/VAT code correctly
             if (blank(tmpprice)) then begin
               tmpprice = 0;
