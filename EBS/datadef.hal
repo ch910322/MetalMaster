@@ -195,6 +195,7 @@ begin
   BlockBegin(MMWebDelModeBlock,-,"");
     RecordField(Delivery,M4Code,20,0);
     RecordField(SelfPick,M4Code,20,0);
+    RecordField(PayDeal,M4Code,20,0);
   EndBlock;
   
   BlockBegin(MMWebShopRebateBlock,-,"");

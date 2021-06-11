@@ -1219,7 +1219,7 @@ begin
         end;
         recsernr = ORr.SerNr;
         if (ORr.SerNr>0) then begin
-          if (RecordInsert(ORr,true)) then begin
+          if (RecordStore(ORr,true)) then begin
             orderokf = true;
             SendWebshopMail(kWebshopMailOrder,ORr.SerNr);
             if (WSCb.DontOKOrders==0) then begin

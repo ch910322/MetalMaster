@@ -25,6 +25,7 @@ begin
   Sizeable(-1,-1,0,0);
   EditField(h=150,v=20,100,"Delivery",Normal,Delivery,false,DMSClass);
   EditField(h,v+=20,100,"Self Pick Up",Normal,SelfPick,false,DMSClass);
+  EditField(h,v+=20,100,"Pay Deal",Normal,PayDeal,false,PDSClass);
   EndWindow;
 end;
 
