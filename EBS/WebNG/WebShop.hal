@@ -1945,7 +1945,7 @@ begin
     WebOutString("            </div>");
     // VAT
     WebOutString("            <div class='CartColumList'>");
-      WebOutString("                <div class='row' style="background-color:white;">");  
+      WebOutString("                <div class='row' style='background-color:white;'>");  
       WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(90004) & "</div>  ");//Subtotal:
       WebOutString("                    <div class='col-6 right'>" & WSBr.VAT & " " & WSBr.CurrencyCode & "</div> ");
       WebOutString("                </div>");
