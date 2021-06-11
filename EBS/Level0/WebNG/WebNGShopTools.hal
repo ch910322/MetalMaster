@@ -749,6 +749,7 @@ begin
   val freight;
   boolean res;
   string 20 oldsalesman;
+  record MMWebDelModeBlock MMWebDelModeb;
   
   res = false;
   
@@ -761,10 +762,18 @@ begin
     ORr.CurncyCode = ovrcurrency;
     ORVc_PasteCurncyCode(ORr,"");
   end;
-
+  
+  ORr.SalesMan = "ADM";
+  ORr.OrderClass = "WEB";
+  
   if (forcepaydealf or blank(ORr.PayDeal)) then begin
     ORr.PayDeal = defpaydeal;
+    blockload(MMWebDelModeb);
+    if(nonblank(MMWebDelModeB.PayDeal))then begin
+      ORr.PayDeal = MMWebDelModeb.PayDeal;
+    end;
     ORVc_PastePayDeal(ORr);
+    
   end;
 
   if (blank(WSBr.DelAddrCode)) then begin
