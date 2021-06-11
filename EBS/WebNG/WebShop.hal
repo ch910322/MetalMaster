@@ -1943,6 +1943,14 @@ begin
     WebOutString("                    <div class='col-6 right'>" & WSBr.Sum & " " & WSBr.CurrencyCode & "</div> ");
     WebOutString("                </div>");
     WebOutString("            </div>");
+    // VAT
+    WebOutString("            <div class='CartColumList'>");
+      WebOutString("                <div class='row' style="background-color:white;">");  
+      WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(90004) & "</div>  ");//Subtotal:
+      WebOutString("                    <div class='col-6 right'>" & WSBr.VAT & " " & WSBr.CurrencyCode & "</div> ");
+      WebOutString("                </div>");
+      WebOutString("            </div>");
+    // 
     WebOutString("            <div class='CartColumList'>");
     WebOutString("                <div class='row'>");
     WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(89016) & "</div>  ");//Shipping:
@@ -1956,7 +1964,7 @@ begin
     WebOutString("            </div>");
     WebOutString("            <div class='CartColumTotal'>");
     WebOutString("                <div class='row'>");
-    WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(89017) & "</div>  ");//TOTAL:
+    WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(89017) & "</div>  ");//TOTAL// WSBr.VAT
     WebOutString("                    <div class='col-6 right'>" & (WSBr.Sum+shippingcost) & " " & WSBr.CurrencyCode & "</div> ");
     WebOutString("                </div>                                ");
     WebOutString("            </div>");
@@ -2107,12 +2115,12 @@ begin
 				
 				
 				
-				WebOutStringFormatNL("<option value='emptyMaterial' class='ColorItem' selected='selected'>Select material...</option>");
+				WebOutStringFormatNL("<option value='emptyMaterial' selected='selected'>" & ToolWebNGTranslateText2(90002) & "</option>");
         for (i=0;i<aTypes.length;i=i+1) begin
           curncy = "EUR";
 				  reb = blankval;
 				  itemprice = valtostring(round(ShopGetItemPrice(vItems[aTypes[i]],1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
-          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - " & itemprice & "</option>");
+          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - &euro;" & itemprice & "</option>");
         end;
 				
         WebOutStringFormatNL("                          </select>");
@@ -2129,7 +2137,7 @@ begin
         WebOutStringFormatNL("                      <div class='col-xl-8 col-lg-8 col-md-12 col-12'>");
         WebOutStringFormatNL("                          <div class='ColorProduct'>");
         WebOutStringFormatNL("                              <select name='color'>");  
-				WebOutStringFormatNL("<option value='emptyColor' class='ColorItem' selected='selected'>Select сolor...</option>");
+				WebOutStringFormatNL("<option value='emptyColor' selected='selected'>" & ToolWebNGTranslateText2(90003) & "</option>");
         for (i=0;i<aColors.length;i=i+1) begin
           WebOutStringFormatNL("<option value='" & aColors[i] & "' class='ColorItem color-class-" & aColors[i] & "'>" & GetVarColorName(aColors[i],lang) & "</option>");
         end;
@@ -2154,13 +2162,14 @@ begin
 				readfirstmain(INr,1,true);
 				tstr = INr.Unittext;
 
-			WebOutStringFormatNL("                          <input type='text' readonly name='unit' placeholder='" & tstr & "'>");
+			WebOutStringFormatNL("                          <input type='text' name='unit' placeholder='" & tstr & "'>");
       WebOutStringFormatNL("                          <input style='display:none' type='text' readonly name='qty' value='" & 1 & "' placeholder='" & 1 & "'>");
       WebOutStringFormatNL("                      </div>");
       WebOutStringFormatNL("                  </div>");
       WebOutStringFormatNL("              </div> ");
-      WebOutStringFormatNL("              <div class='ModProdLi text-center'>");
-      WebOutStringFormatNL("                  <input type='button' class='btns-white-red' value='" & ToolWebNGTranslateText2(89007) & "'>");
+      WebOutStringFormatNL("              <div class='row no-gutters'>");
+      WebOutStringFormatNL("<div class='col-md-8 col-8'> <div class='modalPrice Price'></div> </div>");
+      WebOutStringFormatNL("<div class='col-md-4 col-4'> <input type='button' class='btns-white-red' value='" & ToolWebNGTranslateText2(89007) & "'> </div>");
       WebOutStringFormatNL("              </div>");
       WebOutStringFormatNL("          </form>  ");
     end;
