@@ -303,7 +303,7 @@ begin
       ShopNotImplemented(WSr,"EDITCONFIG");
       //make sure that the incoming parameter (sernr or productconfig record) belongs to the current user
     case "recommendations":
-      ShopNotImplemented(WSr,"RECOMMEND");
+      //ShopNotImplemented(WSr,"RECOMMEND");//TODO// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 11 06 2021 y. at 11:52:57 AM
       //ShopListRecommendations(WSr,mpath); //TODO: add this functionality
     case "justadded":
       ShopAfterAddingToBasketApp(WSr,mpath);
