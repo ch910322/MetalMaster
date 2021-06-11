@@ -637,7 +637,7 @@ begin
     res = SetCompany(1,false);
   end else begin
     if (CountryCompanyMismatch) then begin
-      RedirectToLogoutPage;
+      //RedirectToLogoutPage;
       goto LWeb;
     end;
   end;
