@@ -27,6 +27,7 @@ external inner updating procedure SendWebshopMail(Integer,Longint);
 external inner updating procedure ClearShopBasket(integer);
 external inner procedure RedirectToPaymentCompletedPage(record WebNGPaySessionVc);
 external inner updating procedure MoveShoppingBasket(string,string);
+external inner function Boolean FindStringInString(string,string);
 
 global function string 255 NormalizeStrToJson (string Str)
 begin
@@ -272,19 +273,58 @@ begin
         pos = pos + 255;
       end; 
       link = GetLinkToStruct(WCSr.HandlerAppNode,true) & WCr.SerNr;
-      tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
-      tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
-      tstr = StrReplace(tstr,"{Title}",WTr.Comment);
-      tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
-      tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
-      tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
-      tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
-      tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
-      tstr = StrReplace(tstr,"{link}",link);
-      tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
-      tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
-      tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
-      tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
+      if(StringInText("{BannerImages}",Noter))then begin
+        tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
+      end;
+      if(StringInText("{BannerImageLink}",Noter))then begin
+        tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
+      end;
+      if(StringInText("{Title}",Noter))then begin
+        tstr = StrReplace(tstr,"{Title}",WTr.Comment);
+      end;
+      if(StringInText("{ShortDescription}",Noter))then begin
+        tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
+      end;
+      if(StringInText("{Content}",Noter))then begin
+        tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
+      end;
+      if(StringInText("{Date}",Noter))then begin
+        tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
+      end;
+      if(StringInText("{listthumb}",Noter))then begin
+        tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
+      end;
+      if(StringInText("{contentthumb}",Noter))then begin
+        tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
+      end;
+      if(StringInText("{link}",Noter))then begin
+        tstr = StrReplace(tstr,"{link}",link);
+      end;
+      if(StringInText("{sernr}",Noter))then begin
+        tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
+      end;
+      if(StringInText("{text}",Noter))then begin
+        tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
+      end;
+      if(StringInText("{ContentImage}",Noter))then begin
+        tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
+      end;
+      if(StringInText("{ReadMoreText}",Noter))then begin
+        tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
+      end;
+      //tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
+      //tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
+      //tstr = StrReplace(tstr,"{Title}",WTr.Comment);
+      //tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
+      //tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
+      //tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
+      //tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
+      //tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
+      //tstr = StrReplace(tstr,"{link}",link);
+      //tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
+      //tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
+      //tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
+      //tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
       
       WebOutString(tstr);
       goto LShowTranslatedContent;
