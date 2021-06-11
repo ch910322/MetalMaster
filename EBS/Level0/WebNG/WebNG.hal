@@ -634,7 +634,7 @@ begin
   res = false;
   if (LoginState==false) then begin
     oldcomp = CurrentCompany;
-    res = SetCompany(1,false);
+    res = SetCompany(3,false);
   end else begin
     if (CountryCompanyMismatch) then begin
       //RedirectToLogoutPage;
