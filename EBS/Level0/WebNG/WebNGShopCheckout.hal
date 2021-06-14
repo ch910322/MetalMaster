@@ -1155,6 +1155,7 @@ end;
 global webpublic updating procedure WebRestorePasswordEmail()
 begin
 	record CUVc CUr;
+	record CUVc OldCUr;
 	record MailVc Mailr;
 	record MailVc oldMailr;
 	record WebNGContactFormVc CFr;
