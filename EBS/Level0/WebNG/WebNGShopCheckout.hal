@@ -1162,15 +1162,18 @@ begin
   record WebNGContactFormFieldVc CFFr;
 	string 255 tstr,newpass1;
 	integer lcnt;
-
+  
+  setcompany(3,false);
+  
 	lcnt = 0;
 	CUr.eMail = WebGetArg("eMail");
+	logtext(0,"CUr.eMail " & CUr.eMail);
 	if(ReadFirstKey("eMail",CUr,1,true))then begin
+	  logtext(0,"CUr.Code " & CUr.Code);
 		newpass1 = Random(10000,99999);
 		
-		RecordCopy(OldCUr,CUr);
 		CUr.Password = CalcPassword(newpass1,CUr.Code,0);
-		RecordUpdate(OldCUr,CUr,true);
+		recordstore(CUr,true);
 		
 		LineTextPut(Mailr,lcnt,newpass1);
 		
