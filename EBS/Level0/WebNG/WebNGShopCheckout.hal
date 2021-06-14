@@ -51,6 +51,8 @@ external procedure ShowWebElement(string);
 external procedure ShowDelAddrEdit(string,string,Boolean);
 external function Boolean CheckoutQtyFail();
 external procedure RedirectToShopStartPage;
+external procedure AddMailRow(var record MailVc,Integer,string);
+
 
 global
 function string 255 GetLinkToCheckoutPage()
@@ -1115,6 +1117,71 @@ begin
   
  
   ResetCompany(oldcomp);
+
+return;
+end;
+
+
+//Edit **********************************************Vas-P 02/06/2021
+global webpublic updating procedure WebChangePassword()
+begin
+	record CUVc CUr;
+	record CUVc OldCUr;
+	string 255 newpass1,newpass2;
+	boolean testf;
+	
+	newpass1 = WebGetArg("NewPassword");
+	newpass2 = WebGetArg("RepeatNewPassword");
+	
+	testf = true;
+	if(blank(newpass1) or blank(newpass2))then begin
+		testf = false;
+	end;
+	if(newpass1!=newpass2)then begin
+		testf = false;
+	end;
+	if(testf)then begin
+		CUr.Code = CurrentCust;
+		ReadFirstMain(CUr,1,true);
+		RecordCopy(OldCUr,CUr);
+		CUr.Password = CalcPassword(newpass1,CUr.Code,0);
+		RecordUpdate(OldCUr,CUr,true);
+	end;
+
+return;
+end;
+
+//Edit **********************************************Vas-P  14/06/2021
+global webpublic updating procedure WebRestorePasswordEmail()
+begin
+	record CUVc CUr;
+	record MailVc Mailr;
+	record MailVc oldMailr;
+	record WebNGContactFormVc CFr;
+  record WebNGContactFormFieldVc CFFr;
+	string 255 tstr,newpass1;
+	integer lcnt;
+
+	lcnt = 0;
+	CUr.eMail = WebGetArg("eMail");
+	if(ReadFirstKey("eMail",CUr,1,true))then begin
+		newpass1 = Random(10000,99999);
+		
+		RecordCopy(OldCUr,CUr);
+		CUr.Password = CalcPassword(newpass1,CUr.Code,0);
+		RecordUpdate(OldCUr,CUr,true);
+		
+		LineTextPut(Mailr,lcnt,newpass1);
+		
+		AddMailRow(Mailr,kMailRowTypeFrom,"Admin");
+		AddMailRow(Mailr,kMailRowTypeTo,CUr.eMail);
+		
+		if(RecordStore(Mailr,true))then begin
+			RecordCopy(oldMailr,Mailr);
+			Mailr.SendFlag = 1;
+			RecordUpdate(oldMailr,Mailr,true);
+		end;
+	end;
 
 return;
 end;
