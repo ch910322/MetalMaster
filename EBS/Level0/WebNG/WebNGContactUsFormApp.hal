@@ -214,6 +214,7 @@ begin
   return;
 end;
 
+global
 procedure AddMailRow(var record MailVc Mailr,Integer type,string addr)
 begin
   row MailVc Mailrw;
