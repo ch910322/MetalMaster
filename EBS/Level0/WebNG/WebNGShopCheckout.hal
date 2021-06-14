@@ -1161,11 +1161,8 @@ begin
 	record MailVc Mailr;
 	record MailVc oldMailr;
 	record WebNGTranslateVc WTr;
-	// record WebNGLanguageVc WLr;
-	// row WebNGLanguageVc WLrw;
 	string 255 tstr,newpass;
-	integer lcnt;
-	Longint pos;
+	Longint pos,spos;
 	boolean TrHs;
   
   setcompany(3,false);
@@ -1173,9 +1170,7 @@ begin
 	newpass = Random(10000,99999);
 	WTr.Comment = "Restoring password";
 	TrHs = true;
-	logtext(0,"WebRestorePasswordEmail   " & WTr.Comment);
 	while(LoopKey("Comment",WTr,1,TrHs))begin
-	  logtext(0,"WTr.SerNr " & WTr.Code);
 		if(WTr.Comment=="Restoring password")then begin
 			if(WTr.LangCode==CurrentWebLang)then begin
 				pos = 0;
@@ -1186,7 +1181,6 @@ begin
 				if(StringInText("{newpass}",WTr))then begin
 					tstr = StrReplace(tstr,"{newpass}",newpass);
 				end;
-				logtext(0,tstr);
 				goto lWebRestorePasswordEmail;
 			end;
 		end else begin
@@ -1195,21 +1189,18 @@ begin
 	end;
 
 lWebRestorePasswordEmail:;
-
-	lcnt = 0;
 	CUr.eMail = WebGetArg("eMail");
 	if(ReadFirstKey("eMail",CUr,1,true))then begin
 		
 		CUr.Password = CalcPassword(newpass,CUr.Code,0);
 		recordstore(CUr,true);
-		
-		LineTextPut(Mailr,lcnt,tstr);
+		for(spos=0;spos<Len(tstr);spos=spos+1)begin
+			AddToText(Mid(tstr,spos,1),Mailr);
+		end;
 		
 		AddMailRow(Mailr,kMailRowTypeFrom,"Admin");
 		AddMailRow(Mailr,kMailRowTypeTo,CUr.eMail);
 	  Mailr.Header = ToolWebNGTranslateText2(90005);
-		//Mailr.Header = "Restoring password notification";
-
 
 		if(RecordStore(Mailr,true))then begin
 			RecordCopy(oldMailr,Mailr);
