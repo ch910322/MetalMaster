@@ -51,7 +51,8 @@ external procedure ShowWebElement(string);
 external procedure ShowDelAddrEdit(string,string,Boolean);
 external function Boolean CheckoutQtyFail();
 external procedure RedirectToShopStartPage;
-external procedure AddMailRow(var record MailVc,Integer,string);
+external procedure AddMailRow(var record MailVc,Integer,string);	//Edit **********************************************Vas-P 14/06/2021
+external inner function string 255 StrReplace(string,string,string);	//Edit **********************************************Vas-P 14/06/2021
 
 
 global
@@ -1155,31 +1156,49 @@ end;
 global webpublic updating procedure WebRestorePasswordEmail()
 begin
 	record CUVc CUr;
-	record CUVc OldCUr;
 	record MailVc Mailr;
 	record MailVc oldMailr;
-	record WebNGContactFormVc CFr;
-  record WebNGContactFormFieldVc CFFr;
-	string 255 tstr,newpass1;
+	record WebNGTranslateVc WTr;
+	// record WebNGLanguageVc WLr;
+	// row WebNGLanguageVc WLrw;
+	string 255 tstr,newpass;
 	integer lcnt;
+	Longint pos;
   
   setcompany(3,false);
   
+	newpass = Random(10000,99999);
+	WTr.Comment = "Restoring password";
+	while(LoopKey("Comment",WTr,1,true))begin
+		if(WTr.Comment=="Restoring password")then begin
+			if(WTr.LangCode==CurrentWebLang)then begin
+				pos = 0;
+				while (pos<SizeTextCnt(WTr)) begin
+					tstr = tstr & StringFromText(WTr,pos,255);
+					pos = pos + 255;
+				end; 
+				if(StringInText("{newpass}",WTr))then begin
+					tstr = StrReplace(tstr,"{newpass}",newpass);
+				end;
+			end;
+		end;
+	end;
+
 	lcnt = 0;
 	CUr.eMail = WebGetArg("eMail");
-	logtext(0,"CUr.eMail " & CUr.eMail);
 	if(ReadFirstKey("eMail",CUr,1,true))then begin
-	  logtext(0,"CUr.Code " & CUr.Code);
-		newpass1 = Random(10000,99999);
 		
-		CUr.Password = CalcPassword(newpass1,CUr.Code,0);
+		CUr.Password = CalcPassword(newpass,CUr.Code,0);
 		recordstore(CUr,true);
 		
-		LineTextPut(Mailr,lcnt,newpass1);
+		LineTextPut(Mailr,lcnt,tstr);
 		
 		AddMailRow(Mailr,kMailRowTypeFrom,"Admin");
 		AddMailRow(Mailr,kMailRowTypeTo,CUr.eMail);
-		
+		// Mailr.Header = ToolWebNGTranslateText(90005);
+		Mailr.Header = "Restoring password notification";
+
+
 		if(RecordStore(Mailr,true))then begin
 			RecordCopy(oldMailr,Mailr);
 			Mailr.SendFlag = 1;
