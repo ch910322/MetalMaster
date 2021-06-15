@@ -956,7 +956,7 @@ begin
 		if(needcome)then begin
 			weboutstring(",");
 		end;
-		weboutstring("\[" & "CAT_" & FIBrw.Category & "," & "TYPE_" & FIBrw.Type & "," & "COLOR_" & FIBrw.Color & "\"]");
+		weboutstring("\[" & "CAT_" & FIBrw.Category & "," & "TYPE_" & FIBrw.Type & "," & "COLOR_" & FIBrw.Color & "]");
     needcome = true;
 	end;
 

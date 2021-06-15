@@ -12,6 +12,7 @@ begin
   row MMItemSetVc INVrw;
 	vector boolean vcat;
 	string 255 cat;
+	array string 255 acat;
 	
 	SetCompany(3,false);
 	blockload(FIBb);
@@ -30,16 +31,25 @@ begin
 					rwcnttwo = MatRowCnt(INVr);
 					for (i=0;i<rwcnttwo;i=i+1) begin
 						MatRowGet(INVr,i,INVrw);
-						FIBrw.Category = cat;
-						FIBrw.Type = INVrw.Type;
-						FIBrw.Color = INVrw.Color;
-						vcat["CAT_" & FIBrw.Category & "," & "TYPE_" & FIBrw.Type & "," & "COLOR_" & FIBrw.Color] = true;
-						MatRowPut(FIBb,MatRowCnt(FIBb),FIBrw);
+						vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
 					end;
 				end;
 				ExtractObj(WebNGProductr.ProductCategory,pos,cat);
 			end;
 		end;
+	end;
+	GetVectorTags(vcat,acat);
+	for(i=0;i<acat.length;i=i+1)begin
+		pos = 0;
+		cat = "";
+		ExtractObj(acat[i],pos,cat);
+		FIBrw.Category = cat;
+		ExtractObj(acat[i],pos,cat);
+		FIBrw.Type = cat;
+		ExtractObj(acat[i],pos,cat);
+		FIBrw.Color = cat;
+	
+		MatRowPut(FIBb,MatRowCnt(FIBb),FIBrw);
 	end;
 	blockstore(FIBb);
   return;
