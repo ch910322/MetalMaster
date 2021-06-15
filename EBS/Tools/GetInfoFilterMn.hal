@@ -1,0 +1,46 @@
+//Edit **********************************************Vas-P 	15/06/2021
+
+external inner procedure ExtractObj(string,var Integer,var string);
+
+global updating	procedure GetInfoFilterMn()
+begin 
+  Integer i,j,rwcnt,rwcntone,rwcnttwo,pos;
+	record FilterInfoBlock FIBb;
+	row FilterInfoBlock FIBrw;
+  record WebNGProductVc WebNGProductr;
+	record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+	vector boolean vcat;
+	string 255 cat;
+	
+	SetCompany(3,false);
+	blockload(FIBb);
+	rwcnt = MatRowCnt(FIBb);
+	for(j=0;j<rwcnt;j=j+1)begin
+		MatRowDelete(FIBb,0);
+	end;
+	while(loopmain(INVr,1,true))begin
+		WebNGProductr.Code = INVr.ArtCode;
+		if(ReadFirstMain(WebNGProductr,1,true))then begin
+			pos = 0;
+			cat = "";
+			ExtractObj(WebNGProductr.ProductCategory,pos,cat);
+			while(nonblank(cat))begin
+				if(nonblank(cat))then begin
+					rwcnttwo = MatRowCnt(INVr);
+					for (i=0;i<rwcnttwo;i=i+1) begin
+						MatRowGet(INVr,i,INVrw);
+						FIBrw.Category = cat;
+						FIBrw.Type = INVrw.Type;
+						FIBrw.Color = INVrw.Color;
+						vcat["CAT_" & FIBrw.Category & "," & "TYPE_" & FIBrw.Type & "," & "COLOR_" & FIBrw.Color] = true;
+						MatRowPut(FIBb,MatRowCnt(FIBb),FIBrw);
+					end;
+				end;
+				ExtractObj(WebNGProductr.ProductCategory,pos,cat);
+			end;
+		end;
+	end;
+	blockstore(FIBb);
+  return;
+end;

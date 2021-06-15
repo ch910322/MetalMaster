@@ -205,7 +205,18 @@ begin
   RecordAddBegin(RebVc,"RebVc_Custom");
 		ArrayField(Classification,M4Code,50,0); // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Anton Preisinger 10:39 04.07.2019
   EndRecordAdd;
-
+	
+	//Edit **********************************************Vas-P 15/06/2021
+  BlockBegin(FilterInfoBlock,-,"");
+  RecordField(Math,M4Matrix,0,0);
+  ArrayBegin(Math,-,1);
+  ArrayField(Category,M4Str,100,0);
+  ArrayField(Type,M4Str,100,0);
+  ArrayField(Color,M4Str,100,0);
+  EndArray;
+  EndBlock;
+	//Edit **********************************************Vas-P 15/06/2021
+	
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
   SourceFile("halcust/EBS/Windows",3);

@@ -935,56 +935,28 @@ begin
   return;
 end;
 
-
 //Edit **********************************************Vas-P	15/06/2021
 global webpublic
 procedure WebProductMaterialColor()
 begin 
-  Integer i,rwcnt,pos;
+  Integer i,rwcnt;
   boolean needcome;
-  record WebNGProductVc WebNGProductr;
-  record WebNGProductCatVc WebNGProductCatr;
-  record MMItemTypeVc MMItemTyper;
-  record MMItemColorVc MMItemColorr;
-	row MMItemColorVc MMItemColorrw;
-	record MMItemSetVc INVr;
-  row MMItemSetVc INVrw;
-	string 255 cat,type,color;
+	record FilterInfoBlock FIBb;
+	row FilterInfoBlock FIBrw;
 	vector boolean vcat;
-	array string 255 acat,atype,acolor,asmth;
+	array string 255 acat;
 	
 	SetCompany(3,false);
-	
+	blockload(FIBb);
   weboutstring("{");
 	
-	while(loopmain(INVr,1,true))begin
-		WebNGProductr.Code = INVr.ArtCode;
-		if(ReadFirstMain(WebNGProductr,1,true))then begin
-			pos = 0;
-			cat = "";
-			ExtractObj(WebNGProductr.ProductCategory,pos,cat);
-      while(nonblank(cat))begin
-				if(nonblank(cat))then begin
-					rwcnt = MatRowCnt(INVr);
-					for (i=0;i<rwcnt;i=i+1) begin
-						MatRowGet(INVr,i,INVrw);
-						type = INVrw.Type;
-						color = INVrw.Color;
-						vcat["CAT_" & cat & "," & "TYPE_" & type & "," & "COLOR_" & color] = true;
-					end;
-				end;
-				ExtractObj(WebNGProductr.ProductCategory,pos,cat);
-      end;	
-		end;
-	end;
-	GetVectorTags(vcat,acat);
-	
-	for(i=0;i<acat.length;i=i+1)begin
-		logtext(0,acat[i]);
+	rwcnt = MatRowCnt(FIBb);
+	for(i=0;i<rwcnt;i=i+1)begin
+		MatRowGet(FIBb,i,FIBrw);
 		if(needcome)then begin
 			weboutstring(",");
 		end;
-		weboutstring("\[" & acat[i] & "\"]");
+		weboutstring("\[" & "CAT_" & FIBrw.Category & "," & "TYPE_" & FIBrw.Type & "," & "COLOR_" & FIBrw.Color & "\"]");
     needcome = true;
 	end;
 
