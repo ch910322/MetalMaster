@@ -1798,6 +1798,9 @@ begin
   Boolean foundf;
   row MMItemSetVc INVrw;
   integer i,rwcnt;
+  string 20 lang;
+  
+  lang = CurrentWebLang;
   
   WebNGProductr.Code = product;
   if (LoopKey("RowItem:" & product,INVr,1,true)) then begin
@@ -1808,8 +1811,8 @@ begin
       for(i=0;i<rwcnt;i=i+1)begin
         matrowget(INVr,i,INVrw);
         if(INVrw.Item==product)then begin
-          material = GetVarTypeName(INVrw.Type,CurrentWebLang);
-          color = GetVarColorName(INVrw.Color,CurrentWebLang);
+          material = GetVarTypeName(INVrw.Type,lang);
+          color = GetVarColorName(INVrw.Color,lang);
         end;
       end;
     end;

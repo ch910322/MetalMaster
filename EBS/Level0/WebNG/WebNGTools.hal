@@ -260,7 +260,7 @@ begin
     end;
     
     if (blank(langcode)) then begin
-      langcode = "en";
+      langcode = "ENG";
     end else begin
       UpdateWebLanguage(langcode);
     end;

@@ -1161,18 +1161,19 @@ begin
 	record MailVc Mailr;
 	record MailVc oldMailr;
 	record WebNGTranslateVc WTr;
-	string 255 tstr,newpass;
+	string 255 tstr,newpass,lang;
 	Longint pos,spos;
 	boolean TrHs;
   
   setcompany(3,false);
   
+  lang = CurrentWebLang;
 	newpass = Random(10000,99999);
 	WTr.Comment = "Restoring password";
 	TrHs = true;
 	while(LoopKey("Comment",WTr,1,TrHs))begin
 		if(WTr.Comment=="Restoring password")then begin
-			if(WTr.LangCode==CurrentWebLang)then begin
+			if(WTr.LangCode==lang)then begin
 				pos = 0;
 				while (pos<SizeTextCnt(WTr)) begin
 					tstr = tstr & StringFromText(WTr,pos,255);
