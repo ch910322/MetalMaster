@@ -944,9 +944,10 @@ begin
   array record UserVc aUser;
   Integer i;
   Integer oldcomp;
+  string 10 curlangcode;
 
   oldcomp = SetCompanyBasedOnCountry;
-
+  curlangcode = CurrentWebLang;
 /*
   EGr.Code = WEr.HALFunc;
   if (ReadFirstMain(EGr,1,true)) then begin
@@ -970,7 +971,7 @@ begin
 
     while (LoopKey("ActCode",Userr,1,true)) begin
       if (blank(WEr.HALFunc) or Userr.Department==WEr.HALFunc) then begin
-        if(blank(Userr.WebLangCodes) or setinset(CurrentWebLang,Userr.WebLangCodes))then begin
+        if(blank(Userr.WebLangCodes) or setinset(curlangcode,Userr.WebLangCodes))then begin
           if (ReadRecordLink(Userr,1,Attachr,RLr)) then begin
             aUser[aUser.length] = Userr;
           end;
