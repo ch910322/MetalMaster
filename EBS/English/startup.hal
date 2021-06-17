@@ -21,5 +21,7 @@ begin
   
   Register("Email Queue","Email Queue",EMailQueVc,modWebShopNG);
   
+	Maintenance("Get info for filter",FilterVClass,GetInfoFilterMn,modWebShopNG);	//Edit **********************************************Vas-P	15/06/2021
+
   return;
 end;
