@@ -23,18 +23,20 @@ begin
 	while(loopmain(INVr,1,true))begin
 		WebNGProductr.Code = INVr.ArtCode;
 		if(ReadFirstMain(WebNGProductr,1,true))then begin
-			pos = 0;
-			cat = "";
-			ExtractObj(WebNGProductr.ProductCategory,pos,cat);
-			while(nonblank(cat))begin
-				if(nonblank(cat))then begin
-					rwcnttwo = MatRowCnt(INVr);
-					for (i=0;i<rwcnttwo;i=i+1) begin
-						MatRowGet(INVr,i,INVrw);
-						vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
-					end;
-				end;
+			if(nonblank(WebNGProductr.ProductCategory))then begin
+				pos = 0;
+				cat = "";
 				ExtractObj(WebNGProductr.ProductCategory,pos,cat);
+				while(nonblank(cat))begin
+					if(nonblank(cat))then begin
+						rwcnttwo = MatRowCnt(INVr);
+						for (i=0;i<rwcnttwo;i=i+1) begin
+							MatRowGet(INVr,i,INVrw);
+							vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
+						end;
+					end;
+					ExtractObj(WebNGProductr.ProductCategory,pos,cat);
+				end;
 			end;
 		end;
 	end;
