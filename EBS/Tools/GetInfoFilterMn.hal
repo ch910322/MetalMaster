@@ -33,11 +33,12 @@ begin
 						for (i=0;i<rwcnttwo;i=i+1) begin
 							MatRowGet(INVr,i,INVrw);
 							if(blank(INVrw.Type))then begin
-								INVrw.Type = "0";
-								vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
-							end else begin
-								vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
+								INVrw.Type = "-";
 							end;
+							if(blank(INVrw.Color))then begin
+								INVrw.Color = "-";
+							end;
+							vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
 						end;
 					end;
 					ExtractObj(WebNGProductr.ProductCategory,pos,cat);
