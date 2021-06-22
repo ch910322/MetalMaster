@@ -1105,6 +1105,7 @@ begin
         passw = WebGetArg("Password");
         storef = WebStoreCust(CUr,passw);
         if(storef)then begin
+				
           weboutstring("Ok");
           //RedirectToShopStartPage;
         end else begin
@@ -1173,6 +1174,7 @@ begin
 	TrHs = true;
 	while(LoopKey("Comment",WTr,1,TrHs))begin
 		if(WTr.Comment=="Restoring password")then begin
+			weboutstring("WTr.Comment - " & WTr.Comment);
 			if(WTr.LangCode==lang)then begin
 				pos = 0;
 				while (pos<SizeTextCnt(WTr)) begin
@@ -1209,6 +1211,79 @@ lWebRestorePasswordEmail:;
 			RecordUpdate(oldMailr,Mailr,true);
 		end;
 	end;
+
+return;
+end;
+
+
+global webpublic updating procedure WebHBSRegistrationCustMM()
+begin 
+  record CUVc CUr;
+  record CUVc tempCUr;
+	record MailVc Mailr;
+	record MailVc oldMailr;
+	record WebNGTranslateVc WTr;
+  Boolean storef,TrHs;
+  string 255 passw,name,email,mail,tstr,lang,maillink;
+  Integer oldcomp,newcomp,pos;
+	Longint spos,token;
+  Boolean res,res1;
+  
+	setcompany(3,false);
+
+	CUr.eMail = WebGetArg("E-mail");
+	if(nonblank(CUr.eMail))then begin
+		if(ReadFirstKey("eMail",CUr,1,true)==false)then begin
+			name = WebGetArg("Username");
+			email = WebGetArg("E-mail");
+			token = CalcPassword(email,"",0);
+			maillink = "https://" & WebHost & "/ConfirmRegistration?name=" & name & ",email=" & email & ",token=" & token;
+			
+			lang = CurrentWebLang;
+			WTr.Comment = "Registration mail";
+			TrHs = true;
+			while(LoopKey("Comment",WTr,1,TrHs))begin
+				if(WTr.Comment=="Registration mail")then begin
+					if(WTr.LangCode==lang)then begin
+						pos = 0;
+						while (pos<SizeTextCnt(WTr)) begin
+							tstr = tstr & StringFromText(WTr,pos,255);
+							pos = pos + 255;
+						end; 
+						if(StringInText("{maillink}",WTr))then begin
+							tstr = StrReplace(tstr,"{maillink}",maillink);
+						end;
+						goto lWebRegistration;
+					end;
+				end else begin
+					TrHs = false;
+				end;
+			end;
+lWebRegistration:;			
+			if(nonblank(tstr))then begin
+				for(spos=0;spos<Len(tstr);spos=spos+1)begin
+					AddToText(Mid(tstr,spos,1),Mailr);
+				end;
+				
+				AddMailRow(Mailr,kMailRowTypeFrom,"Admin");
+				AddMailRow(Mailr,kMailRowTypeTo,email);
+				Mailr.Header = ToolWebNGTranslateText2(90006);
+
+				if(RecordStore(Mailr,true))then begin
+					RecordCopy(oldMailr,Mailr);
+					Mailr.SendFlag = 1;
+					RecordUpdate(oldMailr,Mailr,true);
+					weboutstring(" Ok ");
+				end else begin
+					weboutstring(" MailStoreError ");
+				end;
+			end else begin
+				weboutstring( "EmptyLinkError ");
+			end;
+		end else begin
+			weboutstring(" EmailExistError ");
+		end;
+  end;
 
 return;
 end;
