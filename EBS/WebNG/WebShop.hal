@@ -1676,7 +1676,7 @@ begin
             end;
           end;
         end;
-      end;
+      //end;
       if (res) then begin
         ResetCompany(oldcompany);
       end;
