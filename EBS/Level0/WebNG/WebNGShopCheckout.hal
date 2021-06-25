@@ -1079,6 +1079,7 @@ begin
   string 255 passw,name,mail;
   Integer oldcomp,newcomp;
   Boolean res,res1;
+	LongInt token,emtoken;
   
   oldcomp = CurrentCompany;
   newcomp = StringToInt(WebGetArg("company"));
@@ -1088,31 +1089,38 @@ begin
   storef = true;
   
   CUr.eMail = WebGetArg("E-mail");
+	token = WebGetArg("token");
   if(nonblank(CUr.eMail))then begin
     if(ReadFirstKey("eMail",CUr,1,true)==false)then begin
-      RecordNew(CUr);
-      CUr.Name = WebGetArg("Username");
-      CUr.eMail = WebGetArg("E-mail");
-      CUr.AllowLogin = 1;
-      CUr.CustCat = "WWW";
-      
-      if (GetNextCustNr(passw)) then begin end;
-      CUr.Code = passw;
-      RecordCopy(tempCUr,CUr);
-      if (ReadFirstMain(tempCUr,1,true)) then begin
-        storef = false;
-      end;
-      if(storef)then begin
-        passw = WebGetArg("Password");
-        storef = WebStoreCust(CUr,passw);
-        if(storef)then begin
+			emtoken = CalcPassword(CUr.eMail,"",0);
+			if(emtoken==token)then begin
+
+				RecordNew(CUr);
+				CUr.Name = WebGetArg("Username");
+				CUr.eMail = WebGetArg("E-mail");
+				CUr.AllowLogin = 1;
+				CUr.CustCat = "WWW";
 				
-          weboutstring("Ok");
-          //RedirectToShopStartPage;
-        end else begin
-          weboutstring("CustomerSaveError");
-        end;
-      end;
+				if (GetNextCustNr(passw)) then begin end;
+				CUr.Code = passw;
+				RecordCopy(tempCUr,CUr);
+				if (ReadFirstMain(tempCUr,1,true)) then begin
+					storef = false;
+				end;
+				if(storef)then begin
+					passw = WebGetArg("Password");
+					storef = WebStoreCust(CUr,passw);
+					if(storef)then begin
+					
+						weboutstring("Ok");
+						//RedirectToShopStartPage;
+					end else begin
+						weboutstring("CustomerSaveError");
+					end;
+				end;
+			end else begin
+				weboutstring("TokenMatchError");
+			end;
     end else begin
       weboutstring("EmailExistsError");
     end;

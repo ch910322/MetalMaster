@@ -803,7 +803,11 @@ begin
   end;
   PasteUserRefStr(ORr);
   ORr.PlanShipDate = WSBr.ShipDate;
-  ORr.PlanShip = WSBr.ShipDate;
+	if(nonblank(WSBr.ShipDate))then begin
+		ORr.PlanShip = WSBr.ShipDate;
+	end else begin
+		ORr.PlanShip = ORr.OrdDate;
+	end;
   ORr.ShipMode = WSBr.DelMode;
   
   BuildWebNGOrderFromBasket = res;
