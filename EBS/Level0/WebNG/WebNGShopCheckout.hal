@@ -1076,7 +1076,7 @@ begin
   record CUVc CUr;
   record CUVc tempCUr;
   Boolean storef;
-  string 255 passw,name,mail;
+  string 255 passw,name,mail,webmail;
   Integer oldcomp,newcomp;
   Boolean res,res1;
 	LongInt token,emtoken;
@@ -1092,7 +1092,8 @@ begin
 	token = WebGetArg("token");
   if(nonblank(CUr.eMail))then begin
     if(ReadFirstKey("eMail",CUr,1,true)==false)then begin
-			emtoken = CalcPassword(CUr.eMail,"",0);
+			webmail = WebGetArg("E-mail");
+			emtoken = CalcPassword(webmail,"",0);
 			if(emtoken==token)then begin
 
 				RecordNew(CUr);
