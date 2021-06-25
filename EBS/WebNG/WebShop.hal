@@ -1599,7 +1599,7 @@ begin
     if (imgno>=0) then begin
       oldcompany = CurrentCompany;
       res = ShopSetCompany(ToolWebNGGetCountry);
-      INr.Code = productcode;
+      /*INr.Code = productcode;
       if (ReadFirstMain(INr,1,true)) then begin
         LRetryFindImage:;
         i = 1;
@@ -1638,7 +1638,7 @@ begin
         if(foundf==false)then begin
           goto LRetryWebFindImage;
         end;
-      end else begin//INr
+      end else begin//INr*/
         LRetryWebFindImage:;
         i = 1;
         WebNGProductr.Code = productcode;
