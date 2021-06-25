@@ -1635,6 +1635,9 @@ begin
             SendAttachedFile(Attachr,downloadf);
           end;
         end;
+        if(foundf==false)then begin
+          goto LRetryWebFindImage;
+        end;
       end else begin//INr
         LRetryWebFindImage:;
         i = 1;
