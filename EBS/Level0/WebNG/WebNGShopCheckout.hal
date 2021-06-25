@@ -1207,8 +1207,10 @@ lWebRestorePasswordEmail:;
 
 		if(RecordStore(Mailr,true))then begin
 			RecordCopy(oldMailr,Mailr);
-			Mailr.SendFlag = 1;
-			RecordUpdate(oldMailr,Mailr,true);
+			if(RecordAction_raEMailQue(Mailr,false))then begin
+				Mailr.SendFlag = 1;
+				RecordUpdate(oldMailr,Mailr,true);
+			end;
 		end;
 	end;
 
@@ -1271,9 +1273,11 @@ lWebRegistration:;
 
 				if(RecordStore(Mailr,true))then begin
 					RecordCopy(oldMailr,Mailr);
-					Mailr.SendFlag = 1;
-					RecordUpdate(oldMailr,Mailr,true);
-					weboutstring(" Ok ");
+					if(RecordAction_raEMailQue(Mailr,false))then begin
+						Mailr.SendFlag = 1;
+						RecordUpdate(oldMailr,Mailr,true);
+						weboutstring(" Ok ");
+					end;
 				end else begin
 					weboutstring(" MailStoreError ");
 				end;
