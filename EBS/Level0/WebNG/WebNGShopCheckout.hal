@@ -55,6 +55,7 @@ external function Boolean CheckoutQtyFail();
 external procedure RedirectToShopStartPage;
 external procedure AddMailRow(var record MailVc,Integer,string);	//Edit **********************************************Vas-P 14/06/2021
 external function string 255 StrReplace(string,string,string);	//Edit **********************************************Vas-P 14/06/2021
+external updating function Boolean RecordAction_raEMailQue(var record MailVc,Boolean);
 
 
 global
@@ -1276,16 +1277,16 @@ lWebRegistration:;
 					if(RecordAction_raEMailQue(Mailr,false))then begin
 						Mailr.SendFlag = 1;
 						RecordUpdate(oldMailr,Mailr,true);
-						weboutstring(" Ok ");
+						weboutstring("Ok");
 					end;
 				end else begin
-					weboutstring(" MailStoreError ");
+					weboutstring("MailStoreError");
 				end;
 			end else begin
-				weboutstring( "EmptyLinkError ");
+				weboutstring("EmptyLinkError");
 			end;
 		end else begin
-			weboutstring(" EmailExistError ");
+			weboutstring("EmailExistError");
 		end;
   end;
 
