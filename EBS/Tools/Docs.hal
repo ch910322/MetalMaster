@@ -47,7 +47,6 @@ begin
   record MM_DeclarationClassVc MM_DECr;
   
   Ext_CommonDocumentFields(vVals);
-  logtext(0,1);
   num = 1;
   rwcnt = MatRowCnt(ORr);
   for (i=0;i<rwcnt;i=i+1) begin
@@ -75,9 +74,7 @@ begin
           vVals["F_MATERIAL"] = INr.Materials;
           vVals["F_FIRERESISTANCE"] = MM_DECr.FireResistance;
           vVals["F_CADMIUM"] = MM_DECr.Cadmium;
-          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;
-          logtext(0,"MM_DECr.Radioactivity " & MM_DECr.Radioactivity);
-          
+          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;          
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
@@ -102,14 +99,31 @@ end;
 
 
 global
-procedure ExternalPrintDeclOfPerformanceForm(record IVVc IVr,var vector string vVals)
+procedure ExternalPrintDeclOfPerformanceForm(record IVVc IVr,var vector string vVals,record RcVc RepSpec)
 begin
   record INVc INr;
-  row IVVc IVrw;
-  Integer i,rwcnt,num;
+  row IVVc IVrw,IV2rw;
+  Integer i,rwcnt,num,j;
   string 255 strnum;
+  vector boolean vitemused;
+  record MM_DeclarationClassVc MM_DECr;
+  val sum,qty;
+  record ITVc ITr;
+  record MM_DeclarationSetBlock MM_DSb;
+  
+  blockload(MM_DSb);
+  
+  
 
   Ext_CommonDocumentFields(vVals);
+  
+  vVals["F_DECL1NAME"] = MM_DSb.Decl1Name;
+  vVals["F_DECL1STD"] = MM_DSb.Decl1Std;
+  vVals["F_DECL1CERTCOMP"] = MM_DSb.Decl1CertComp;
+  vVals["F_DECL1SIGNER"] = MM_DSb.Decl1Signer;
+  vVals["F_DECL1CONTROLPROCESS"] = MM_DSb.Decl1ControlProcess;
+  
+  
   
   num = 1;
   rwcnt = MatRowCnt(IVr);
@@ -118,12 +132,60 @@ begin
     if (IVrw.ShowCEMark==1) then begin
       M4PadString(num,3,"0",true,strnum);
       ReadFirstItem(IVrw.ArtCode,INr,true,false);
-      vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
-      vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
-      vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
-      vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
-      ExportDeclarationValues(vVals,strnum,INr);
-      num = num + 1;
+      if(blank(RepSpec.f10))then begin
+        vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
+        vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
+        vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+        vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+        ExportDeclarationValues(vVals,strnum,INr);
+        num = num + 1;
+      end else begin
+        if(vitemused[INr.Code]==false and INr.Group==RepSpec.f10)then begin
+          sum = 0;
+          if(setinset("SS",INr.DispGroups)==false)then begin
+            for(j=0;j<rwcnt;j=j+1)begin
+              MatRowGet(IVr,j,IV2rw);
+              if(IVrw.ArtCode==IV2rw.ArtCode)then begin
+                sum = sum + IV2rw.Sum;
+                qty = qty + IV2rw.Quant;
+              end;
+            end;
+          end else begin
+            for(j=i;j<rwcnt;j=j+1)begin
+              MatRowGet(IVr,j,IV2rw);
+              if(IV2rw.stp==kInvoiceRowTypeSubtotal)then begin
+                sum = IV2rw.Sum;
+                qty = IV2rw.Quant;
+                j=rwcnt;
+              end;
+            end;
+          end;
+          vVals["ROW_" & strnum & "_F_QTY"] = qty;
+          vVals["ROW_" & strnum & "_F_SUM"] = sum;
+          
+          logtext(0,"sum " & sum);
+          ITr.Code = RepSpec.f10;
+          readfirstmain(ITr,1,true);
+          vVals["F_ITEMGROUPNAME"] = ITr.Comment;
+          MM_DECr.ItemGroup = RepSpec.f10;
+          readfirstmain(MM_DECr,1,true);
+          vVals["F_FACILITYADDRESS"] = MM_DECr.FacilityAddress;
+          vVals["F_PERFORMANCECLASS"] = MM_DECr.PerfomanceClass;
+          vVals["F_DECLMETHOD"] = MM_DECr.DeclMethod;
+          vVals["F_CONTROLCODE"] = MM_DECr.ControlCode;
+          vVals["F_MATERIAL"] = INr.Materials;
+          vVals["F_FIRERESISTANCE"] = MM_DECr.FireResistance;
+          vVals["F_CADMIUM"] = MM_DECr.Cadmium;
+          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;          
+          vitemused[INr.Code] = true;
+          vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
+          vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
+          vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+          vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+          ExportDeclarationValues(vVals,strnum,INr);
+          num = num + 1;
+        end;
+      end;
     end;
   end;
   if (IVr.OrderNr>-1) then begin

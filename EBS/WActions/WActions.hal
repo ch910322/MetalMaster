@@ -91,7 +91,7 @@ begin
         rwcnt = matrowcnt(ORr);
         for(i=0;i<rwcnt;i=i+1)begin
           matrowget(ORr,i,ORrw);
-          if(ORrw.stp==1 and nonblank(ORrw.ArtCode))then begin
+          if(ORrw.stp==1 and nonblank(ORrw.ArtCode) and ORrw.ShowCEMark==1)then begin
             INr.Code = ORrw.ArtCode;
             if(readfirstmain(INr,1,true))then begin
               vgroups[INr.Group] = true;
@@ -149,7 +149,12 @@ begin
   record RcVc RepSpec,tRepSpec;
   Integer wn,num;
   record IVVc IVr;
- 
+  row IVVc IVrw;
+  record INVc INr;
+  integer i,rwcnt;
+  vector boolean vgroups;
+  array string 20 agroups;
+  string 200 newfilename;
 
   num = StringToInt(PushButtonTag);
   wn = CurWindow;
@@ -158,9 +163,31 @@ begin
     GetWindowRecord(tRepSpec.flags[0],IVr);
     fname = SaveFileDialog("","","pdf");
     if (nonblank(fname)) then begin
-      RepSpec.long1 = num;
-      threadremote.PrintEBSDocument("DeclarationOfPerformance","",RepSpec,IVr.SerNr,IVr.LangCode,farea);
-      WriteAreaToFile(farea,fname,0);
+      rwcnt = matrowcnt(IVr);
+      for(i=0;i<rwcnt;i=i+1)begin
+        matrowget(IVr,i,IVrw);
+        if(IVrw.stp==1 and nonblank(IVrw.ArtCode) and IVrw.ShowCEMark==1)then begin
+          INr.Code = IVrw.ArtCode;
+          if(readfirstmain(INr,1,true))then begin
+            vgroups[INr.Group] = true;
+          end;
+        end;
+      end;
+      getvectortags(vgroups,agroups);
+      if(agroups.length<=1)then begin
+        RepSpec.long1 = num;
+        threadremote.PrintEBSDocument("DeclarationOfPerformance","",RepSpec,IVr.SerNr,IVr.LangCode,farea);
+        WriteAreaToFile(farea,fname,0);
+      end else begin
+        for(i=0;i<agroups.length;i=i+1)begin
+          setareazerosize(farea);
+          newfilename = left(fname,len(fname)-4) & agroups[i] & right(fname,4);
+          RepSpec.f10 = agroups[i];
+          RepSpec.long1 = num;
+          threadremote.PrintEBSDocument("DeclarationOfPerformance","",RepSpec,IVr.SerNr,IVr.LangCode,farea);
+          WriteAreaToFile(farea,newfilename,0);
+        end;
+      end;
     end;
   end;
 
