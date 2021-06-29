@@ -1,5 +1,5 @@
 //<halrule>server-only</halrule>
-external procedure ExternalPrintCEMarkForm(record ORVc,var vector string);
+external procedure ExternalPrintCEMarkForm(record ORVc,var vector string,record RcVc);
 external procedure ExternalPrintDeclOfPerformanceForm(record IVVc,var vector string);
 external procedure ExternalPrintProductionForm(record ProdOrderVc,record RcVc,var vector string);
 
@@ -8,14 +8,14 @@ procedure OuterPrintEBSDocument(string docname,string id,var Boolean printf,reco
 begin
   record IVVc IVr;
   record ORVc ORr;
-  record ProdOrderVc ProdOrdr;
+  record ProdOrderVc ProdOrdr;  
 
   switch (docname) begin
     case "CEMarkForm":
       ORr.SerNr = StringToLongint(id);
       printf = (ReadFirstMain(ORr,1,true) or id=="-2");
       if (printf) then begin
-        ExternalPrintCEMarkForm(ORr,vVals);
+        ExternalPrintCEMarkForm(ORr,vVals,RepSpec);
       end;
     case "DeclarationOfPerformance":
       IVr.SerNr = StringToLongint(id);

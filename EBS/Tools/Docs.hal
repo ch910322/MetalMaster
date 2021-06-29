@@ -37,15 +37,17 @@ begin
 end;
 
 global
-procedure ExternalPrintCEMarkForm(record ORVc ORr,var vector string vVals)
+procedure ExternalPrintCEMarkForm(record ORVc ORr,var vector string vVals,record RcVc RepSpec)
 begin
   record INVc INr;
   row ORVc ORrw;
   Integer i,rwcnt,num;
   string 255 strnum;
-
-  Ext_CommonDocumentFields(vVals);
+  vector boolean vitemused;
+  record MM_DeclarationClassVc MM_DECr;
   
+  Ext_CommonDocumentFields(vVals);
+  logtext(0,1);
   num = 1;
   rwcnt = MatRowCnt(ORr);
   for (i=0;i<rwcnt;i=i+1) begin
@@ -53,14 +55,42 @@ begin
     if (ORrw.ShowCEMark==1) then begin
       M4PadString(num,3,"0",true,strnum);
       ReadFirstItem(ORrw.ArtCode,INr,true,false);
-      vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
-      vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
-      vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
-      vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
-      ExportDeclarationValues(vVals,strnum,INr);
-      num = num + 1;
+      if(blank(RepSpec.f10))then begin
+        if(vitemused[INr.Code]==false)then begin
+          vitemused[INr.Code] = true;
+          vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
+          vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
+          vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+          vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+          ExportDeclarationValues(vVals,strnum,INr);
+          num = num + 1;
+        end;
+      end else begin
+        if(vitemused[INr.Code]==false and INr.Group==RepSpec.f10)then begin
+          MM_DECr.ItemGroup = RepSpec.f10;
+          readfirstmain(MM_DECr,1,true);
+          vVals["F_PERFORMANCECLASS"] = MM_DECr.PerfomanceClass;
+          vVals["F_DECLMETHOD"] = MM_DECr.DeclMethod;
+          vVals["F_CONTROLCODE"] = MM_DECr.ControlCode;
+          vVals["F_MATERIAL"] = INr.Materials;
+          vVals["F_FIRERESISTANCE"] = MM_DECr.FireResistance;
+          vVals["F_CADMIUM"] = MM_DECr.Cadmium;
+          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;
+          logtext(0,"MM_DECr.Radioactivity " & MM_DECr.Radioactivity);
+          
+          vitemused[INr.Code] = true;
+          vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
+          vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
+          vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+          vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+          ExportDeclarationValues(vVals,strnum,INr);
+          num = num + 1;
+        end;
+      end;
     end;
   end;
+  
+  
   
   vVals["F_ORDERNR"] = ORr.SerNr;
   vVals["F_CUSTNAME"] = ORr.Addr0;
