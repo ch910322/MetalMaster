@@ -29,6 +29,9 @@ external inner procedure RedirectToPaymentCompletedPage(record WebNGPaySessionVc
 external inner updating procedure MoveShoppingBasket(string,string);
 external inner function Boolean FindStringInString(string,string);
 
+external inner updating function Boolean AddContactCUDsmRemote(record CUVc,string);
+
+
 global function string 255 NormalizeStrToJson (string Str)
 begin
 	integer strln,i;
@@ -1082,6 +1085,8 @@ global webpublic updating procedure WebRequisitesSave()
 begin
   record WebNGShopBasketVc WSBr;
   record CUVc CUr;
+	record CUVc CU2r;
+	record ContactRelVc ContactRelr;
   
   GetShoppingBasket(WSBr,0);
   
@@ -1094,29 +1099,46 @@ begin
         CUr.InvAddr2 = webgetarg("fiz_bankCode");
         CUr.Phone = webgetarg("fiz_phone");
         recordstore(Cur,true);
+				weboutstring("Fiz");
       end;
     end;
-    if(webgetarg("mode")=="1")then begin
-      if(nonblank(webgetarg("jur_sia")))then begin
-        CUr.Name = webgetarg("jur_sia");
-        CUr.RegNr1 = webgetarg("jur_regNr");
-        CUr.InvAddr0 = webgetarg("jur_address");
-        CUr.InvAddr3 = webgetarg("jur_accNumber");
-        CUr.InvAddr2 = webgetarg("jur_bankCode");
-        CUr.Person = webgetarg("jur_contactPersonSIA");
-        //CUr. = webgetarg("reqjur_source");
-        CUr.Phone = webgetarg("jur_phone");
-        //CUr. = webgetarg("reqjur_email");
- 
-      
-      
-        recordstore(Cur,true);
-      end;
-    end;
+	end;
+	
+	if(webgetarg("mode")=="1")then begin
+		CUr.Code = CurrentCust;
+		if(ReadFirstMain(CUr,1,true))then begin
+			ContactRelr.ContactCode = CUr.Code;
+			if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
+				if(nonblank(webgetarg("jur_sia")))then begin
+					CU2r.Name = webgetarg("jur_sia");
+					CU2r.RegNr1 = webgetarg("jur_regNr");
+					CU2r.InvAddr0 = webgetarg("jur_address");
+					CU2r.InvAddr3 = webgetarg("jur_accNumber");
+					CU2r.InvAddr2 = webgetarg("jur_bankCode");
+					CU2r.Person = webgetarg("jur_contactPersonSIA");
+					//CUr. = webgetarg("reqjur_source");
+					CU2r.Phone = webgetarg("jur_phone");
+				end;
+			end else begin
+				if(nonblank(webgetarg("jur_sia")))then begin
+					AddContactCUDsmRemote(CU2r,ContactRelr.ContactCode);
+					CU2r.Name = webgetarg("jur_sia");
+					CU2r.RegNr1 = webgetarg("jur_regNr");
+					CU2r.InvAddr0 = webgetarg("jur_address");
+					CU2r.InvAddr3 = webgetarg("jur_accNumber");
+					CU2r.InvAddr2 = webgetarg("jur_bankCode");
+					CU2r.Person = webgetarg("jur_contactPersonSIA");
+					//CUr. = webgetarg("reqjur_source");
+					CU2r.Phone = webgetarg("jur_phone");
+					//CUr. = webgetarg("reqjur_email");
+					recordstore(CU2r,true);
+					weboutstring("Jur");
+				end;
+			end;
+		end;
+	end;
     //webgetarg("reqfiz_email");
-    
-  end;
-  
+      
   weboutstring("Ok");
   
   return;
@@ -1127,23 +1149,24 @@ global webpublic updating procedure WebGetRequisitesSave()
 begin
   record WebNGShopBasketVc WSBr;
   record CUVc CUr;
+	boolean isJur;
   
   weboutstring("{");
   CUr.Code = CurrentCust;
   if (ReadFirstMain(CUr,1,true)) then begin
-    weboutstring("\"fiz_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
-    weboutstring("\"fiz_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
-    weboutstring("\"fiz_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
-    weboutstring("\"fiz_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
-    weboutstring("\"fiz_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
-    weboutstring("\"jur_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
-    weboutstring("\"jur_regNr\":\"" & NormalizeStrToJson(CUr.RegNr1) & "\",");
-    weboutstring("\"jur_address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\",");
-    weboutstring("\"jur_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
-    weboutstring("\"jur_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
-    weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
-    weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
-    weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\"");
+		weboutstring("\"fiz_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+		weboutstring("\"fiz_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
+		weboutstring("\"fiz_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
+		weboutstring("\"fiz_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+		weboutstring("\"fiz_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
+		weboutstring("\"jur_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+		weboutstring("\"jur_regNr\":\"" & NormalizeStrToJson(CUr.RegNr1) & "\",");
+		weboutstring("\"jur_address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\",");
+		weboutstring("\"jur_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
+		weboutstring("\"jur_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
+		weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
+		weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+		weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\"");
   end;
   weboutstring("}");
   
