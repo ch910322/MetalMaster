@@ -3,7 +3,6 @@ external inner function string 255 FormatSimpleLink(string,boolean);
 external inner function string 255 GetLinkToShop();
 external inner function string 255 ToolWebNGTranslateText2(Longint);
 external inner function string 10 CurrentWebLang();
-external inner function string 60 AddObjectToObjectList(string,string);
 external inner procedure ShowWebAppPageStart(record WebNGPageVc,string);
 external inner procedure ShowWebAppPageEnd(record WebNGPageVc);
 external inner procedure ShowErrorPage(string);
@@ -24,9 +23,139 @@ external inner function string 255 GetLinkToCheckoutPage();
 external inner procedure CalcSum(val,val,val,val,var val,Integer);
 external inner function string 255 GetTranslatedNameProduct(record WebNGProductVc);
 external inner procedure ShowProductShortDescription(record WebNGProductVc);
-external inner procedure ExtractObj(string,var Integer,var string);
+// external inner procedure ExtractObj(string,var Integer,var string);
 external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
+// external inner procedure NormalizeObjstr(var string);
+
+global
+procedure ExtractObj(string ostr,var Integer pos,var string rstr)
+BEGIN
+  string 1 c1;
+
+  rstr = "";
+L47:;
+  if (pos>=len(ostr)) then begin goto L999; end;
+  c1 = Mid(ostr,pos,1); 
+  pos = pos + 1;
+  if ((c1==",") or (c1==".") or (c1==";")) then begin
+    if (len(rstr)==0) then begin 
+      goto L47; 
+    end;
+    goto L888;
+  end;
+  if ((len(rstr)<255)) then begin 
+    rstr = rstr & c1;
+  end;
+  goto L47;
+L888:;
+  if (pos>len(ostr)) then begin goto L999; end;
+  c1 = Mid(ostr,pos,1);  
+  pos = pos + 1;
+  if ((c1==",") or (c1==".") or (c1==";")) then begin goto L888; end;
+  pos = pos - 1;
+L999:;
+  RETURN;
+END;
+
+
+global
+procedure NormalizeObjstr(var string objstr)
+BEGIN 
+  record SMVc SMobjsr;
+  record SMVc SMresobjsr;
+  row SMVc SMorw;
+  row SMVc SMrrw;
+  row SMVc SM2rrw;
+  Integer i,j,k;
+  Integer ocnt;
+  Integer pos;
+  Integer nlen;
+  Integer maxobjcnt;
+  string 255 ostr;
+  string 255 maxobjstr;
+  Integer rrwcnt;
+  
+  //RecordClear(SMobjsr);
+  //RecordClear(SMresobjsr);
+  pos = 0;
+  ExtractObj(objstr,pos,ostr);
+  while (nonblank(ostr)) begin
+    SMorw.Objects = ostr;
+    MatRowPut(SMobjsr,ocnt,SMorw);
+    ExtractObj(objstr,pos,ostr);
+    ocnt = ocnt + 1;    
+  end;    
+  if (IsStandardProduct) then begin
+//    maxobjstr = HasObjectsMaxNumber;//done in record check
+    maxobjstr = USetStr(1799);
+  end else begin
+    maxobjstr = USetStr(1799);
+  end;
+  maxobjcnt = StringToInt(maxobjstr);
+  if (nonblank(maxobjstr)) then begin
+    if (ocnt>maxobjcnt) then begin ocnt = maxobjcnt; end;
+  end;
+
+  for (i=0;i<ocnt; i=i+1) begin
+    for (j=0;j<i;j=j+1) begin     
+      MatRowGet(SMobjsr,i,SMorw);
+      rrwcnt = MatRowCnt(SMresobjsr);    
+      if (rrwcnt<>0) then begin      
+        MatRowGet(SMresobjsr,j,SMrrw);
+      end;  
+      if (SMorw.Objects<SMrrw.Objects) then begin goto L44; end;
+    end;
+L44:;
+    rrwcnt = MatRowCnt(SMresobjsr);    
+    for (k=i;k>=j;k=k-1) begin
+      if (rrwcnt<>0) then begin
+        MatRowGet(SMresobjsr,k,SMrrw);
+      end;  
+      MatRowPut(SMresobjsr,k+1,SMrrw);
+    end;
+    MatRowGet(SMobjsr,i,SMorw);
+    SMrrw.Objects = SMorw.Objects;
+    MatRowPut(SMresobjsr,j,SMrrw);
+  end;  
+  objstr = "";
+  for (i=0;i<ocnt;i=i+1) begin
+    MatRowGet(SMresobjsr,i,SMrrw);
+    if (nonblank(SMrrw.Objects)) then begin
+      nlen = len(objstr)+len(SMrrw.Objects);
+      if (i<>0) then begin nlen = nlen + 1; end;;
+      if (nlen>255) then begin goto L99; end;
+      if (i<>0) then begin objstr = objstr & ","; end;
+      objstr = objstr & SMrrw.Objects;
+    end;
+  end; 
+L99:;
+  RETURN;
+END;
+
 // test
+global
+function string 255 AddObjectToObjectList(string objects,string addobjs)
+begin
+//returns UPPERCASE string
+  string 255 res,aobj;
+  Integer pos;
+  
+  res = objects;
+  pos = 0;
+  ExtractObj(addobjs,pos,aobj);
+  while (nonblank(aobj)) begin
+    if (SetInSet(aobj,res)==false) then begin
+      if ((nonblank(aobj)) and (nonblank(res))) then begin
+        res = res & ",";
+      end;
+      res = res & aobj;
+    end;
+    ExtractObj(addobjs,pos,aobj);
+  end;
+  NormalizeObjstr(res);
+  AddObjectToObjectList = res;
+  return;
+end;
 
 global function string 255 getWebProductFilters(record WebNGProductVc WebNGProductr)
 begin
@@ -99,6 +228,8 @@ begin
             end;
             if(nonblank(INVrw.Color))then begin
               res3 = AddObjectToObjectList(res3,"COLOR_" & INVrw.Color);
+							// logtext(0,"res3 - " & res3);
+							// logtext(0,"INVrw.Color - " & INVrw.Color);
             end;
           end;
         end;
@@ -107,9 +238,9 @@ begin
       res3 = "list-" & "FilterColor" & "='" & res3 & "'";
       
     end;
-    
     res = res1 & res2 & res3;
-  
+		// logtext(0,"WebNGProductr.Code - " & WebNGProductr.Code);
+		// logtext(0,"res - " & res);
   getWebProductFilterslist = res;
 return;
 end;

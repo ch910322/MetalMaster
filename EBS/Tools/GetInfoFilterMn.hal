@@ -1,7 +1,7 @@
 //Edit **********************************************Vas-P 	15/06/2021
 
 external inner procedure ExtractObj(string,var Integer,var string);
-external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+external inner procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 
 global updating	procedure GetInfoFilterMn()
 begin 
