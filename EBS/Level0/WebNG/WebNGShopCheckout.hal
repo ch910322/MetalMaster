@@ -1144,6 +1144,7 @@ begin
 	string 255 newpass1,newpass2;
 	boolean testf;
 	
+	SetCompany(3,false);
 	newpass1 = WebGetArg("NewPassword");
 	newpass2 = WebGetArg("RepeatNewPassword");
 	
@@ -1156,10 +1157,16 @@ begin
 	end;
 	if(testf)then begin
 		CUr.Code = CurrentCust;
-		ReadFirstMain(CUr,1,true);
-		RecordCopy(OldCUr,CUr);
-		CUr.Password = CalcPassword(newpass1,CUr.Code,0);
-		RecordUpdate(OldCUr,CUr,true);
+		if(ReadFirstMain(CUr,1,true))then begin
+			RecordCopy(OldCUr,CUr);
+			CUr.Password = CalcPassword(newpass1,CUr.Code,0);
+			RecordStore(CUr,true);
+			weboutstring("Ok");
+		end else begin
+			weboutstring("ChangePasswordError");
+		end;
+	end else begin
+		weboutstring("ChangePasswordError");
 	end;
 
 return;
