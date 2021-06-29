@@ -1,6 +1,7 @@
 //Edit **********************************************Vas-P 	15/06/2021
 
 external inner procedure ExtractObj(string,var Integer,var string);
+external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 
 global updating	procedure GetInfoFilterMn()
 begin 
@@ -32,13 +33,15 @@ begin
 						rwcnttwo = MatRowCnt(INVr);
 						for (i=0;i<rwcnttwo;i=i+1) begin
 							MatRowGet(INVr,i,INVrw);
-							if(blank(INVrw.Type))then begin
-								INVrw.Type = "-";
+							if(INVrw.ShowOnWeb==1)then begin
+								if(blank(INVrw.Type))then begin
+									INVrw.Type = "-";
+								end;
+								if(blank(INVrw.Color))then begin
+									INVrw.Color = "-";
+								end;
+								vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
 							end;
-							if(blank(INVrw.Color))then begin
-								INVrw.Color = "-";
-							end;
-							vcat[cat & "," & INVrw.Type & "," & INVrw.Color] = true;
 						end;
 					end;
 					ExtractObj(WebNGProductr.ProductCategory,pos,cat);
@@ -50,11 +53,11 @@ begin
 	for(i=0;i<acat.length;i=i+1)begin
 		pos = 0;
 		cat = "";
-		ExtractObj(acat[i],pos,cat);
+		ExtractObjWithSeparator(",",acat[i],true,pos,cat);
 		FIBrw.Category = cat;
-		ExtractObj(acat[i],pos,cat);
+		ExtractObjWithSeparator(",",acat[i],true,pos,cat);
 		FIBrw.Type = cat;
-		ExtractObj(acat[i],pos,cat);
+		ExtractObjWithSeparator(",",acat[i],true,pos,cat);
 		FIBrw.Color = cat;
 	
 		MatRowPut(FIBb,MatRowCnt(FIBb),FIBrw);
