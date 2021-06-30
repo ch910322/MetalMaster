@@ -100,6 +100,9 @@ begin
         end;
         getvectortags(vgroups,agroups);
         if(agroups.length<=1)then begin
+          if(agroups.length==1)then begin
+            RepSpec.f10 = agroups[0];
+          end;
           threadremote.PrintEBSDocument("CEMarkForm","",RepSpec,ORr.SerNr,ORr.LangCode,farea);
           WriteAreaToFile(farea,fname,0);
         end else begin
@@ -175,6 +178,9 @@ begin
       end;
       getvectortags(vgroups,agroups);
       if(agroups.length<=1)then begin
+        if(agroups.length==1)then begin
+          RepSpec.f10 = agroups[0];
+        end;
         RepSpec.long1 = num;
         threadremote.PrintEBSDocument("DeclarationOfPerformance","",RepSpec,IVr.SerNr,IVr.LangCode,farea);
         WriteAreaToFile(farea,fname,0);
