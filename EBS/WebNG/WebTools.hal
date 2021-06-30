@@ -1111,19 +1111,22 @@ begin
 			ContactRelr.ContactCode = CUr.Code;
 			if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
 				if(nonblank(webgetarg("jur_sia")))then begin
-					CU2r.Name = webgetarg("jur_sia");
-					CU2r.RegNr1 = webgetarg("jur_regNr");
-					CU2r.InvAddr0 = webgetarg("jur_address");
-					CU2r.InvAddr3 = webgetarg("jur_accNumber");
-					CU2r.InvAddr2 = webgetarg("jur_bankCode");
-					CU2r.Person = webgetarg("jur_contactPersonSIA");
-					//CUr. = webgetarg("reqjur_source");
-					CU2r.Phone = webgetarg("jur_phone");
-					recordstore(CU2r,true);
+				  CU2r.Code = ContactRelr.CustCode;
+				  if(readfirstmain(CU2r,1,true))then begin
+            CU2r.Name = webgetarg("jur_sia");
+            CU2r.RegNr1 = webgetarg("jur_regNr");
+            CU2r.InvAddr0 = webgetarg("jur_address");
+            CU2r.InvAddr3 = webgetarg("jur_accNumber");
+            CU2r.InvAddr2 = webgetarg("jur_bankCode");
+            CU2r.Person = webgetarg("jur_contactPersonSIA");
+            //CUr. = webgetarg("reqjur_source");
+            CU2r.Phone = webgetarg("jur_phone");
+            recordstore(CU2r,true);
+					end;
 				end;
 			end else begin
 				if(nonblank(webgetarg("jur_sia")))then begin
-					if (GetNextCustNr(code)) then begin end;
+					if (GetNextCustNr(code)) then begin
 						RecordNew(CU2r);
 						CU2r.Code = code;
 						CU2r.Name = webgetarg("jur_sia");
@@ -1136,7 +1139,7 @@ begin
 						CU2r.Phone = webgetarg("jur_phone");
 						//CUr. = webgetarg("reqjur_email");
 						recordstore(CU2r,true);
-						AddContactCUDsmRemote(CU2r,ContactRelr.ContactCode);
+						AddContactCUDsmRemote(CU2r,CUr.Code);
 					end;
 				end;
 			end;
