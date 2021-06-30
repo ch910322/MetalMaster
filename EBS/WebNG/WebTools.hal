@@ -1121,26 +1121,26 @@ begin
             CU2r.Person = webgetarg("jur_contactPersonSIA");
             //CUr. = webgetarg("reqjur_source");
             CU2r.Phone = webgetarg("jur_phone");
+            CU2r.eMail = webgetarg("jur_email");
             recordstore(CU2r,true);
 					end;
 				end;
 			end else begin
 				if(nonblank(webgetarg("jur_sia")))then begin
-					if (GetNextCustNr(code)) then begin
-						RecordNew(CU2r);
-						CU2r.Code = code;
-						CU2r.Name = webgetarg("jur_sia");
-						CU2r.RegNr1 = webgetarg("jur_regNr");
-						CU2r.InvAddr0 = webgetarg("jur_address");
-						CU2r.InvAddr3 = webgetarg("jur_accNumber");
-						CU2r.InvAddr2 = webgetarg("jur_bankCode");
-						CU2r.Person = webgetarg("jur_contactPersonSIA");
-						//CUr. = webgetarg("reqjur_source");
-						CU2r.Phone = webgetarg("jur_phone");
-						//CUr. = webgetarg("reqjur_email");
-						recordstore(CU2r,true);
-						AddContactCUDsmRemote(CU2r,CUr.Code);
-					end;
+					if (GetNextCustNr(code)) then begin end;
+          RecordNew(CU2r);
+          CU2r.Code = code;
+          CU2r.Name = webgetarg("jur_sia");
+          CU2r.RegNr1 = webgetarg("jur_regNr");
+          CU2r.InvAddr0 = webgetarg("jur_address");
+          CU2r.InvAddr3 = webgetarg("jur_accNumber");
+          CU2r.InvAddr2 = webgetarg("jur_bankCode");
+          CU2r.Person = webgetarg("jur_contactPersonSIA");
+          //CUr. = webgetarg("reqjur_source");
+          CU2r.Phone = webgetarg("jur_phone");
+          CU2r.eMail = webgetarg("jur_email");
+          recordstore(CU2r,true);
+          AddContactCUDsmRemote(CU2r,CUr.Code);
 				end;
 			end;
 		end;
@@ -1170,18 +1170,16 @@ begin
 		weboutstring("\"fiz_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
 		ContactRelr.ContactCode = CUr.Code;
 		if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
-			if(nonblank(webgetarg("jur_sia")))then begin
-				isJur = 1;
-				weboutstring("\"jur_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
-				weboutstring("\"jur_regNr\":\"" & NormalizeStrToJson(CUr.RegNr1) & "\",");
-				weboutstring("\"jur_address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\",");
-				weboutstring("\"jur_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
-				weboutstring("\"jur_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
-				weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
-				weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
-				weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
-				weboutstring("\"isJur\":\"" & isJur & "\"");
-			end;
+      isJur = 1;
+      weboutstring("\"jur_sia\":\"" & NormalizeStrToJson(CUr.Name) & "\",");
+      weboutstring("\"jur_regNr\":\"" & NormalizeStrToJson(CUr.RegNr1) & "\",");
+      weboutstring("\"jur_address\":\"" & NormalizeStrToJson(CUr.InvAddr0) & "\",");
+      weboutstring("\"jur_accNumber\":\"" & NormalizeStrToJson(CUr.InvAddr3) & "\",");
+      weboutstring("\"jur_bankCode\":\"" & NormalizeStrToJson(CUr.InvAddr2) & "\",");
+      weboutstring("\"jur_contactPersonSIA\":\"" & NormalizeStrToJson(CUr.Person) & "\",");
+      weboutstring("\"jur_phone\":\"" & NormalizeStrToJson(CUr.Phone) & "\",");
+      weboutstring("\"jur_email\":\"" & NormalizeStrToJson(CUr.eMail) & "\",");
+      weboutstring("\"isJur\":\"" & isJur & "\"");
 		end else begin
 			isJur = 0;
 			weboutstring("\"isJur\":\"" & isJur & "\"");
