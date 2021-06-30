@@ -1135,9 +1135,8 @@ begin
 						//CUr. = webgetarg("reqjur_source");
 						CU2r.Phone = webgetarg("jur_phone");
 						//CUr. = webgetarg("reqjur_email");
-						AddContactCUDsmRemote(CU2r,ContactRelr.ContactCode);
-						
 						recordstore(CU2r,true);
+						AddContactCUDsmRemote(CU2r,ContactRelr.ContactCode);
 					end;
 				end;
 			end;
