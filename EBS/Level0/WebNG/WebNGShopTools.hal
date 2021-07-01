@@ -809,8 +809,9 @@ begin
 		ORr.PlanShip = ORr.OrdDate;
 	end;
   ORr.ShipMode = WSBr.DelMode;
-	
+
 	if(ORr.ShipMode==MMWebDelModeb.Delivery)then begin
+		ORr.ShipDeal = "DAP";
 		rwcnt = MatRowCnt(ORr);
 		ClearRow(ORr,ORrw,1);
 		ORrw.ArtCode = "TR";
