@@ -187,7 +187,7 @@ begin
     WebOutString("</div>");
   end else begin
 
-    tstr = "<i class='fas fa-user' ></i> <a  id='notLoggedIn' style='cursor: pointer;' href='#' onclick='console.log(123123123123)' data-toggle='modal' data-target='#ModalLogin' ";
+    tstr = "<i class='fas fa-user' ></i> <a  id='notLoggedIn' style='cursor: pointer;' href='#' data-toggle='modal' data-target='#ModalLogin' ";
     if (WEr.LinkToStruct!=-1) then begin
       tstr = tstr & FormatSimpleLink(GetLinkToStruct(WEr.LinkToStruct,true),true);
     end else begin
