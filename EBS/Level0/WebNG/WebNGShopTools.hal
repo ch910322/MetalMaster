@@ -745,9 +745,10 @@ begin
   Integer i,rwcnt;
   string 255 warning,errstr;
   row WebNGShopBasketVc WSBrw;
+	row ORVc ORrw;
   record WebNGShopCompBlock WSCb;
   val freight;
-  boolean res;
+  boolean res,chsum;
   string 20 oldsalesman;
   record MMWebDelModeBlock MMWebDelModeb;
   
@@ -772,8 +773,7 @@ begin
     if(nonblank(MMWebDelModeB.PayDeal))then begin
       ORr.PayDeal = MMWebDelModeb.PayDeal;
     end;
-    ORVc_PastePayDeal(ORr);
-    
+    ORVc_PastePayDeal(ORr); 
   end;
 
   if (blank(WSBr.DelAddrCode)) then begin
@@ -809,7 +809,24 @@ begin
 		ORr.PlanShip = ORr.OrdDate;
 	end;
   ORr.ShipMode = WSBr.DelMode;
-  
+	
+	if(ORr.ShipMode==MMWebDelModeb.Delivery)then begin
+		rwcnt = MatRowCnt(ORr);
+		ClearRow(ORr,ORrw,1);
+		ORrw.ArtCode = "TR";
+		MatRowPut(ORr,rwcnt,ORrw);
+		ORVc_PasteArtCode(ORr,rwcnt,warning,warning,false);
+		MatRowGet(ORr,rwcnt,ORrw);
+		ORrw.Quant = 1;
+		MatRowPut(ORr,rwcnt,ORrw);
+		ORVc_PasteQuant(ORr,rwcnt,true,chsum);
+		chsum = ORDchrsum(ORr,rwcnt);
+		if (chsum) then begin
+			ORDchsum(ORr,rwcnt);
+			ORSumup(ORr);
+		end;
+	end;
+	
   BuildWebNGOrderFromBasket = res;
   return;
 end;
