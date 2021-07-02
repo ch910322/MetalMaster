@@ -59,6 +59,9 @@ begin
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
+          if(blank(INr.ENstandarts))then begin
+            INr.ENstandarts = "NDP";
+          end;
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
           vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
           ExportDeclarationValues(vVals,strnum,INr);
@@ -78,6 +81,9 @@ begin
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
+          if(blank(INr.ENstandarts))then begin
+            INr.ENstandarts = "NDP";
+          end;
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
           vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
           ExportDeclarationValues(vVals,strnum,INr);
@@ -135,6 +141,9 @@ begin
       if(blank(RepSpec.f10))then begin
         vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
         vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
+        if(blank(INr.ENstandarts))then begin
+          INr.ENstandarts = "NDP";
+        end;
         vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
         vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
         ExportDeclarationValues(vVals,strnum,INr);
@@ -180,6 +189,9 @@ begin
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
+          if(blank(INr.ENstandarts))then begin
+            INr.ENstandarts = "NDP";
+          end;
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
           vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
           ExportDeclarationValues(vVals,strnum,INr);
