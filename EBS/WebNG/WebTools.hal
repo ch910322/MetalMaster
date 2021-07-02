@@ -1086,6 +1086,7 @@ begin
   record WebNGShopBasketVc WSBr;
   record CUVc CUr;
 	record CUVc CU2r;
+	record CUVc CU3r;
 	record ContactRelVc ContactRelr;
 	string 255 code;
   
@@ -1121,10 +1122,15 @@ begin
 					CU2r.InvAddr4 = webgetarg("jur_source");
 					CU2r.Phone = webgetarg("jur_phone");
 					CU2r.eMail = webgetarg("jur_email");
-					recordstore(CU2r,true);
+					CU3r.eMail = CU2r.eMail;
+					if(ReadFirstKey("eMail",CU3r,1,true))then begin
+						weboutstring("EmailExistError");
+					end else begin
+						recordstore(CU2r,true);
+					end;
 				end;
 			end else begin
-				if (GetNextCustNr(code)) then begin end;
+				GetNextCustNr(code);
 				RecordNew(CU2r);
 				CU2r.Code = code;
 				CU2r.Name = webgetarg("jur_sia");
@@ -1136,15 +1142,19 @@ begin
 				CU2r.InvAddr4 = webgetarg("jur_source");
 				CU2r.Phone = webgetarg("jur_phone");
 				CU2r.eMail = webgetarg("jur_email");
-				recordstore(CU2r,true);
-				AddContactCUDsmRemote(CU2r,CUr.Code);
+				CU3r.eMail = CU2r.eMail;
+				if(ReadFirstKey("eMail",CU3r,1,true))then begin
+					weboutstring("EmailExistError");
+				end else begin
+					recordstore(CU2r,true);
+					AddContactCUDsmRemote(CU2r,CUr.Code);
+				end;
 			end;
 		end;
 	end;
     //webgetarg("reqfiz_email");
       
   // weboutstring("Ok");
-  
   return;
 end;
 
