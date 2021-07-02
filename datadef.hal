@@ -1,6 +1,7 @@
 
 Exec_File("halcust\\SWG\\datadef_swg.hal"); //OBS
 Exec_File("halcust\\OBS_BankImport\\datadef_bankimp.hal"); //OBS
+Exec_File("halcust\\OBS_Backup\\datadef_backup.hal"); //OBS
 Exec_File("halcust\\Level2\\AKP3\\datadef_AKP3.hal");//2019.09.04
 
 Exec_file("halcust/datadef_1.hal");
@@ -21,6 +22,7 @@ SourceFile("halcust/RazosanasPlanosana",3);
 SourceFile("halcust/Avendo",3);
 SourceFile("halcust/SWG",3);
 SourceFile("halcust/OBS_BankImport",3);
+SourceFile("halcust/OBS_Backup",3);
 SourceFile("halcust/PLVAT",3);
 SourceFile("halcust/PLVAT/Exports",3);
 SourceFile("halcust/PLVAT/Reports",3);

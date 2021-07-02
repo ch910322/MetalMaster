@@ -1,0 +1,27 @@
+event startup
+begin
+  
+  SetLangMode(LangLatvian,"LAT",2);
+
+  Setting("Metalmaster deklarāciju klasifikācijas",MM_DeclarationClassLClass,modSO);
+  Setting("Metalmaster deklarāciju iestatījumi",MM_DeclarationSetTClass,modSO);
+
+  SetBegin(30100);
+  SetText(0,"-");
+  SetText(1,"Declaration 1");
+  SetText(2,"Declaration 2");
+  SetText(3,"Declaration 3");
+  SetText(4,"Declaration 4");
+  EndSet;
+
+  StrSetAdd(31003);
+  StrSetText(CEMarkForm,"CE Mark");
+  StrSetText(DeclarationOfPerformance,"Declaration of Performance");
+  StrSetText(ProdOrderForm,"Production Order");
+  
+  EndStrSet;
+
+  SString(190000,"Dokuments nav aktivizēts");
+
+  return;
+end;

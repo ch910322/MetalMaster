@@ -1,0 +1,68 @@
+begin
+  transaction string 255 gModFolder;
+  
+  gModFolder = "halcust/EBS/EZT_mods";
+
+  if (DirExists(gModFolder)) then begin
+    SourceFile(gModFolder,3);//for hal rules
+    Exec_File(gModFolder & "/init.hal");
+  end;
+
+  RecordBegin(MM_DeclarationClassVc,0,"");
+  RecordField(ItemGroup,M4Code,20,0);
+  RecordField(Description,M4Str,255,0);
+  RecordField(FacilityAddress,M4Str,255,0);
+  RecordField(PerfomanceClass,M4Str,255,0);
+  RecordField(DeclMethod,M4Str,255,0);
+  RecordField(FireResistance,M4Str,255,0);
+  RecordField(Cadmium,M4Str,255,0);
+  RecordField(Radioactivity,M4Str,255,0);
+  RecordField(InspectionStandard,M4Str,255,0);
+  RecordField(ControlCode,M4Str,255,0);
+  RecordField(GeometricInspection,M4Str,255,0);
+  RecordField(CorosionClass,M4Str,255,0);
+  MainKeyBegin(ItemGroup,0);
+  KeySegment(ItemGroup);
+  KeyBegin(Description);
+  KeySegment(Description);
+  KeySegment(ItemGroup);
+  EndRecord;
+
+  BlockBegin(WebManagersSetBlock,-,"");
+  RecordField(RestrictItemClass,M4Str,60,DIVc);
+  EndBlock;
+
+  BlockBegin(MM_DeclarationSetBlock,-,"");
+  RecordField(Decl1Name,M4Str,255,0);
+  RecordField(Decl1Std,M4Str,255,0);
+  RecordField(Decl1CertComp,M4Str,255,0);
+  RecordField(Decl1Signer,M4Code,20,0);
+  RecordField(Decl1ControlProcess,M4Str,255,0);
+
+  RecordField(Decl2Name,M4Str,255,0);
+  RecordField(Decl2Std,M4Str,255,0);
+  RecordField(Decl2CertComp,M4Str,255,0);
+  RecordField(Decl2Signer,M4Code,20,0);
+  RecordField(Decl2ControlProcess,M4Str,255,0);
+  
+  RecordField(Decl3Name,M4Str,255,0);
+  RecordField(Decl3Std,M4Str,255,0);
+  RecordField(Decl3CertComp,M4Str,255,0);
+  RecordField(Decl3Signer,M4Code,20,0);
+  RecordField(Decl3ControlProcess,M4Str,255,0);
+  
+  RecordField(Decl4Name,M4Str,255,0);
+  RecordField(Decl4Std,M4Str,255,0);
+  RecordField(Decl4CertComp,M4Str,255,0);
+  RecordField(Decl4Signer,M4Code,20,0);
+  RecordField(Decl4ControlProcess,M4Str,255,0);
+  
+  EndBlock;
+
+  SourceFile("halcust/EBS/WActions",3);
+  SourceFile("halcust/EBS/Tools",3);
+  SourceFile("halcust/EBS/Windows",3);
+  SourceFile("halcust/EBS/Level0/RActions",0);
+
+  return;
+end;

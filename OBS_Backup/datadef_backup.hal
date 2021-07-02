@@ -1,0 +1,13 @@
+begin
+
+  BlockBegin(OBSBackupTaskBlock,-,"");
+    BlockInServer;
+    BlockForAllCompanies;
+    RecordField(RunFlag,M4Int,0,0);
+    RecordField(RunTime,M4Time,0,0);
+    RecordField(SaveOrigFlag,M4Int,0,0);
+    RecordField(HistFolder,M4Str,255,0);
+  EndBlock;
+  
+  return;
+end;

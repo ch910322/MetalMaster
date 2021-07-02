@@ -1,0 +1,145 @@
+//<halrule>server-only</halrule>
+external inner function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+external inner procedure Ext_CommonDocumentFields(var vector string);
+external inner procedure M4PadString(string,Integer,string,Boolean,var string);
+
+procedure OutputDecSingleValue(var vector string vVals,string fn,string tval,string fallback)
+begin
+  
+  if (blank(tval)) then begin
+    vVals[fn] = fallback;
+  end else begin
+    vVals[fn] = tval;
+  end;
+
+  return;
+end;
+
+procedure ExportDeclarationValues(var vector string vVals,string strnum,record INVc INr)
+begin
+  record MM_DeclarationClassVc DCr;
+
+  DCr.ItemGroup = INr.Group;
+  if (ReadFirstMain(DCr,1,true)) then begin
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_FACILITYADDRESS",DCr.FacilityAddress,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_PERFOMANCECLASS",DCr.PerfomanceClass,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_DECLMETHOD",DCr.DeclMethod,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_FIRERESISTANCE",DCr.FireResistance,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_CADMIUM",DCr.Cadmium,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_RADIOACTIVITY",DCr.Radioactivity,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_INSPECTIONSTANDARD",DCr.InspectionStandard,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_CONTROLCODE",DCr.ControlCode,"NDP");
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_COROSIONCLASS",DCr.CorosionClass,"NDP");
+
+  end;
+
+  return;
+end;
+
+global
+procedure ExternalPrintCEMarkForm(record ORVc ORr,var vector string vVals)
+begin
+  record INVc INr;
+  row ORVc ORrw;
+  Integer i,rwcnt,num;
+  string 255 strnum;
+
+  Ext_CommonDocumentFields(vVals);
+  
+  num = 1;
+  rwcnt = MatRowCnt(ORr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ORr,i,ORrw);
+    if (ORrw.ShowCEMark==1) then begin
+      M4PadString(num,3,"0",true,strnum);
+      ReadFirstItem(ORrw.ArtCode,INr,true,false);
+      vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
+      vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
+      vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+      vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+      ExportDeclarationValues(vVals,strnum,INr);
+      num = num + 1;
+    end;
+  end;
+  
+  vVals["F_ORDERNR"] = ORr.SerNr;
+  vVals["F_CUSTNAME"] = ORr.Addr0;
+  vVals["F_DELADDR"] = ORr.ShipAddr1;
+  vVals["F_INVDATE"] = ORr.OrdDate;
+
+  return;
+end;
+
+
+global
+procedure ExternalPrintDeclOfPerformanceForm(record IVVc IVr,var vector string vVals)
+begin
+  record INVc INr;
+  row IVVc IVrw;
+  Integer i,rwcnt,num;
+  string 255 strnum;
+
+  Ext_CommonDocumentFields(vVals);
+  
+  num = 1;
+  rwcnt = MatRowCnt(IVr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(IVr,i,IVrw);
+    if (IVrw.ShowCEMark==1) then begin
+      M4PadString(num,3,"0",true,strnum);
+      ReadFirstItem(IVrw.ArtCode,INr,true,false);
+      vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
+      vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
+      vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
+      vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+      ExportDeclarationValues(vVals,strnum,INr);
+      num = num + 1;
+    end;
+  end;
+  if (IVr.OrderNr>-1) then begin
+    vVals["F_ORDERNR"] = IVr.SerNr;
+  end;
+  vVals["F_CUSTNAME"] = IVr.Addr0;
+  vVals["F_DELADDR"] = IVr.ShipAddr1;
+  vVals["F_INVDATE"] = IVr.InvDate;
+  return;
+end;
+
+
+global
+procedure ExternalPrintProductionForm(record ProdOrderVc ProdOrdr,record RcVc RepSpec,var vector string vVals)
+begin
+  record INVc INr;
+  row IVVc IVrw;
+  Integer i,rwcnt,num;
+  string 255 strnum,size,qty,tstr;
+  record ProdVc Prodr;
+  Longint pos;
+
+  Ext_CommonDocumentFields(vVals);
+  
+  num = 1;
+  Prodr.ProdOrder = ProdOrdr.SerNr;
+  if (ReadFirstKey("ProdOrder",Prodr,1,true)) then begin
+    
+    for (i=0;i<LineTextCnt2(RepSpec);i=i+1) begin
+      pos = -1;
+      tstr = LineTextGet2(RepSpec,i);
+      GetNextSubstring(tstr,pos,"|",size);
+      M4PadString(i,3,"0",true,strnum);
+      vVals["ROW_" & strnum & "_F_LENGTH"] = size;
+      GetNextSubstring(tstr,pos,"|",qty);
+      vVals["ROW_" & strnum & "_F_QTY"] = qty;
+    end;
+
+    if (Prodr.OrderNr>0) then begin
+      vVals["F_ORDERNR"] = Prodr.OrderNr;
+    end;
+    vVals["F_PACKAGES"] = RepSpec.f4;
+    vVals["F_TOTPCS"] = RepSpec.f3;
+    vVals["F_USER"] = Prodr.User;
+    vVals["F_CREATEDATE"] = Prodr.CreateDate;
+  end;
+
+  return;
+end;
