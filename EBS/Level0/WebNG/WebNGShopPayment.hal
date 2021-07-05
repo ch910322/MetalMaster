@@ -476,9 +476,9 @@ begin
               orderokf = true;
               SendWebshopMail(kWebshopMailOrder,ORr.SerNr);
               if (WSCb.DontOKOrders==0) then begin
-                RecordCopy(oldORr,ORr);
+                /*RecordCopy(oldORr,ORr);
                 ORr.OKFlag = 1;
-                RecordUpdate(oldORr,ORr,true);
+                RecordUpdate(oldORr,ORr,true);*/
               end;
             end;
           end;
@@ -620,7 +620,7 @@ begin
       ORr.SerNr = NextSerNr("ORVc",ORr.OrdDate,-1,false,"");
     end;
     if (okf) then begin
-      ORr.OKFlag = 1;
+      //ORr.OKFlag = 1;
     end;
     if (createinvf) then begin
       ORr.InvBeforeShip = 1;
