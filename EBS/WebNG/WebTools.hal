@@ -1127,11 +1127,13 @@ begin
 						weboutstring("EmailExistError");
 					end else begin
 						recordstore(CU2r,true);
+						weboutstring("JurChanged");
 					end;
 				end;
 			end else begin
 				GetNextCustNr(code);
 				RecordNew(CU2r);
+				CU2r.CustCat = "WWW";
 				CU2r.Code = code;
 				CU2r.Name = webgetarg("jur_sia");
 				CU2r.RegNr1 = webgetarg("jur_regNr");
@@ -1148,6 +1150,7 @@ begin
 				end else begin
 					recordstore(CU2r,true);
 					AddContactCUDsmRemote(CU2r,CUr.Code);
+					weboutstring("JurCreated");
 				end;
 			end;
 		end;
