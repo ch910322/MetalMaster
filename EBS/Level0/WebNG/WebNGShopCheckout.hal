@@ -57,6 +57,8 @@ external procedure AddMailRow(var record MailVc,Integer,string);	//Edit ********
 external function string 255 StrReplace(string,string,string);	//Edit **********************************************Vas-P 14/06/2021
 external updating function Boolean RecordAction_raEMailQue(var record MailVc,Boolean);
 
+external outer function Boolean GetNextWebCustNr(var string); //Edit **********************************************Vas-P	05/07/2021
+
 
 global
 function string 255 GetLinkToCheckoutPage()
@@ -1075,8 +1077,9 @@ global webpublic updating procedure WebHBSStoreCustMM()
 begin 
   record CUVc CUr;
   record CUVc tempCUr;
+	record WebSRBlock WebSRRec;
   Boolean storef;
-  string 255 passw,name,mail,webmail;
+  string 255 passw,name,mail,webmail,password;
   Integer oldcomp,newcomp;
   Boolean res,res1;
 	LongInt token,emtoken;
@@ -1101,16 +1104,19 @@ begin
 				CUr.eMail = WebGetArg("E-mail");
 				CUr.AllowLogin = 1;
 				CUr.CustCat = "WWW";
-				GetNextCustNr(passw);
+				GetNextWebCustNr(passw);
 				CUr.Code = passw;
 				RecordCopy(tempCUr,CUr);
 				if (ReadFirstMain(tempCUr,1,true)) then begin
 					storef = false;
 				end;
 				if(storef)then begin
-					passw = WebGetArg("Password");
-					storef = WebStoreCust(CUr,passw);
+					password = WebGetArg("Password");
+					storef = WebStoreCust(CUr,password);
 					if(storef)then begin
+						BlockLoad(WebSRRec);
+						WebSRRec.LastCustCode = passw;
+						BlockStore(WebSRRec);
 						weboutstring("Ok");
 						//RedirectToShopStartPage;
 					end else begin

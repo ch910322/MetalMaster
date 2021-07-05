@@ -30,7 +30,43 @@ external inner updating procedure MoveShoppingBasket(string,string);
 external inner function Boolean FindStringInString(string,string);
 
 external inner updating function Boolean AddContactCUDsmRemote(record CUVc,string);
+external inner procedure NextM4Number(string,var string);
 
+//Added **********************************************Vas-P	05/07/2021
+global function Boolean GetNextWebCustNr(var string custnr)
+BEGIN
+  Boolean res;
+  record CUVc CUr;
+  record WebSRBlock WebSRRec;
+  integer counter;
+
+  BlockLoad(WebSRRec);
+lGetNextWebCustNr:;
+  NextM4Number(WebSRRec.LastCustCode,custnr);
+  if (nonblank(custnr)) then begin
+    CUr.Code = custnr;
+    if (ReadFirstMain(CUr,1,true)==false) then begin
+      WebSRRec.LastCustCode = custnr;
+    end else begin
+    	if(counter<100)then begin
+    		counter = counter + 1;
+    		WebSRRec.LastCustCode = custnr;
+    		goto lGetNextWebCustNr;
+    	end;
+      CUr.Code = "ZZZZZZZZZZZZZZZZZZZ";
+      if (ReadLastMain(CUr,1,false)) then begin
+        NextM4Number(CUr.Code,custnr);
+        if (nonblank(custnr)) then begin
+          WebSRRec.LastCustCode = custnr; 
+        end else begin
+          custnr = "1";
+        end;
+      end;
+    end;
+  end;
+  GetNextWebCustNr = res;
+  RETURN;
+END;
 
 global function string 255 NormalizeStrToJson (string Str)
 begin
@@ -1087,6 +1123,7 @@ begin
   record CUVc CUr;
 	record CUVc CU2r;
 	record CUVc CU3r;
+	record WebSRBlock WebSRRec;
 	record ContactRelVc ContactRelr;
 	string 255 code;
 	boolean storef;
@@ -1106,7 +1143,6 @@ begin
       end;
     end;
 	end;
-	
 	if(webgetarg("mode")=="1")then begin
 		CUr.Code = CurrentCust;
 		if(ReadFirstMain(CUr,1,true))then begin
@@ -1132,7 +1168,7 @@ begin
 					end;
 				end;
 			end else begin
-				GetNextCustNr(code);
+				GetNextWebCustNr(code);
 				RecordNew(CU2r);
 				CU2r.CustCat = "WWW";
 				CU2r.Code = code;
@@ -1146,17 +1182,22 @@ begin
 				CU2r.Phone = webgetarg("jur_phone");
 				CU2r.eMail = webgetarg("jur_email");
 				CU3r.eMail = CU2r.eMail;
+				storef = true;
 				if(ReadFirstKey("eMail",CU3r,1,true))then begin
 					weboutstring("EmailExistError");
 				end else begin
 					RecordCopy(CU3r,CU2r);
 					if (ReadFirstMain(CU3r,1,true)) then begin
 						storef = false;
+						logtext(0,"StoreError");
+						weboutstring("StoreError");
 					end;
-					storef = recordstore(CU2r,true);
 					if(storef)then begin
-						// recordstore(CU2r,true);
+						recordstore(CU2r,true);
 						AddContactCUDsmRemote(CU2r,CUr.Code);
+						BlockLoad(WebSRRec);
+						WebSRRec.LastCustCode = code;
+						BlockStore(WebSRRec);
 						weboutstring("Ok");
 					end;
 				end;

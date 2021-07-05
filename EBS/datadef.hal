@@ -217,6 +217,13 @@ begin
   EndBlock;
 	//Edit **********************************************Vas-P 15/06/2021
 	
+	
+	//Edit **********************************************Vas-P 05/07/2021
+	BlockBegin(WebSRBlock,-,"");
+    RecordField(LastCustCode,M4Code,20,CUVc);
+  EndBlock;
+	//Edit **********************************************Vas-P 05/07/2021
+	
   SourceFile("halcust/EBS/WActions",3);
   SourceFile("halcust/EBS/Tools",3);
   SourceFile("halcust/EBS/Windows",3);

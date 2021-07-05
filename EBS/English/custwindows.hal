@@ -49,3 +49,18 @@ WindowBegin("Maintenance",FilterVClass,CGMnt,RcType);
   SetWRect(20,120,360,220);
   EndWindow;
 end;
+
+window WebSRTClass:1	//Edit **********************************************Vas-P	05/07/2021
+ wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vm,vs;
+  WindowBegin("WebNumber Contact Defaults",WebSRTClass,CGSbl,SRType);
+  SetWRect(64,80,509,333);
+  SetBlid(WebSRBlock);
+  vs = 20; h=130;
+
+  EditField(h,vm=(v=6),65,"Web Contact Number",Normal,LastCustCode,false,0);
+
+
+  EndWindow;
+end;
