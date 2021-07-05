@@ -1127,7 +1127,7 @@ begin
 						weboutstring("EmailExistError");
 					end else begin
 						recordstore(CU2r,true);
-						weboutstring("JurChanged");
+						weboutstring("Ok");
 					end;
 				end;
 			end else begin
@@ -1150,7 +1150,7 @@ begin
 				end else begin
 					recordstore(CU2r,true);
 					AddContactCUDsmRemote(CU2r,CUr.Code);
-					weboutstring("JurCreated");
+					weboutstring("Ok");
 				end;
 			end;
 		end;
