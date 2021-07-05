@@ -1089,6 +1089,7 @@ begin
 	record CUVc CU3r;
 	record ContactRelVc ContactRelr;
 	string 255 code;
+	boolean storef;
   
   GetShoppingBasket(WSBr,0);
   
@@ -1148,9 +1149,16 @@ begin
 				if(ReadFirstKey("eMail",CU3r,1,true))then begin
 					weboutstring("EmailExistError");
 				end else begin
-					recordstore(CU2r,true);
-					AddContactCUDsmRemote(CU2r,CUr.Code);
-					weboutstring("Ok");
+					RecordCopy(CU3r,CU2r);
+					if (ReadFirstMain(CU3r,1,true)) then begin
+						storef = false;
+					end;
+					storef = recordstore(CU2r,true);
+					if(storef)then begin
+						// recordstore(CU2r,true);
+						AddContactCUDsmRemote(CU2r,CUr.Code);
+						weboutstring("Ok");
+					end;
 				end;
 			end;
 		end;

@@ -1090,15 +1090,10 @@ begin
   
   CUr.eMail = WebGetArg("E-mail");
 	token = WebGetArg("token");
-	logtext(0,"1CUr.eMail - " & CUr.eMail);
-	logtext(0,"token - " & token);
   if(nonblank(CUr.eMail))then begin
-		logtext(0,"2CUr.eMail - " & CUr.eMail);
     if(ReadFirstKey("eMail",CUr,1,true)==false)then begin
 			webmail = WebGetArg("E-mail");
 			emtoken = CalcPassword(webmail,"",0);
-			logtext(0,"webmail - " & webmail);
-			logtext(0,"emtoken - " & emtoken);
 			if(emtoken==token)then begin
 				
 				RecordNew(CUr);
@@ -1106,27 +1101,23 @@ begin
 				CUr.eMail = WebGetArg("E-mail");
 				CUr.AllowLogin = 1;
 				CUr.CustCat = "WWW";
-				logtext(0,"CUr.Name - " & CUr.Name);
-				logtext(0,"3CUr.eMail - " & CUr.eMail);
 				GetNextCustNr(passw);
 				CUr.Code = passw;
-				logtext(0,"CUr.Code - " & CUr.Code);
 				RecordCopy(tempCUr,CUr);
 				if (ReadFirstMain(tempCUr,1,true)) then begin
 					storef = false;
-					logtext(0,"storef = false");
 				end;
 				if(storef)then begin
 					passw = WebGetArg("Password");
-					logtext(0,"passw - " & passw);
 					storef = WebStoreCust(CUr,passw);
 					if(storef)then begin
-					
 						weboutstring("Ok");
 						//RedirectToShopStartPage;
 					end else begin
 						weboutstring("CustomerSaveError");
 					end;
+				end else begin
+					weboutstring("StoreError");
 				end;
 			end else begin
 				weboutstring("TokenMatchError");
