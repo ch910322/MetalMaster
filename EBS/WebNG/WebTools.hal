@@ -39,7 +39,9 @@ BEGIN
   record CUVc CUr;
   record WebSRBlock WebSRRec;
   integer counter;
-
+  
+  logtext(0,"GetNextWebCustNr");
+  
   BlockLoad(WebSRRec);
 lGetNextWebCustNr:;
   NextM4Number(WebSRRec.LastCustCode,custnr);
