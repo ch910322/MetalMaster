@@ -1233,6 +1233,7 @@ lWebRestorePasswordEmail:;
 			if(RecordAction_raEMailQue(Mailr,false))then begin
 				Mailr.SendFlag = 1;
 				RecordUpdate(oldMailr,Mailr,true);
+				weboutstring("Ok");
 			end;
 		end;
 	end;

@@ -1255,6 +1255,49 @@ begin
   return;
 end;
 
+//Edit **********************************************Vas-P	06/07/2021
+global webpublic updating procedure WebUpdateCustomerData()
+begin
+  record CUVc CUr;
+	record CUVc CU2r;
+	string 255 newpass,reppass;
+	boolean testf;
+  
+  SetCompany(3,false);
+	
+	newpass = webgetarg("newPW");
+	reppass = webgetarg("repPW");
+  testf = true;
+	if(blank(newpass) and blank(reppass))then begin
+		testf = false;
+	end;
+  CUr.Code = CurrentCust;
+  if (ReadFirstMain(CUr,1,true)) then begin
+		if(testf)then begin
+			RecordCopy(CU2r,CUr);
+			CUr.Password = CalcPassword(newpass,CUr.Code,0);
+		end;
+		if(nonblank(webgetarg("name")))then begin
+			CUr.Name = webgetarg("name");
+		end;	
+		if(nonblank(webgetarg("email")))then begin
+			CUr.eMail = webgetarg("email");
+		end;	
+		if(nonblank(webgetarg("address")))then begin
+			CUr.InvAddr0 = webgetarg("address");
+		end;	
+		if(nonblank(webgetarg("phone")))then begin
+			CUr.Phone = webgetarg("phone");
+		end;	
+		recordstore(Cur,true);
+		weboutstring("Ok");
+	end else begin
+		weboutstring("Error");
+	end;
+	return;
+end;
+
+
 global webpublic updating procedure WebGetCabinetData()
 begin
   record WebNGShopBasketVc WSBr;
