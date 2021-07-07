@@ -112,7 +112,6 @@ begin
   row WebNGPageVc WPrw;
   record WebNGPageVc TemplWPr;
   integer i,cnt,contentcnt;
-  
   contentcnt = 0;
   cnt = MatRowCnt(WPr);
   for (i=0;i<cnt;i=i+1) begin
@@ -122,7 +121,6 @@ begin
       contentcnt = contentcnt+1;
     end;
   end;
-  
   if (contentcnt==0 or position==3) then begin
     if (nonblank(WPr.TemplatePage) and SetInSet(WPr.TemplatePage,usedtemplates)==false) then begin
       TemplWPr.Code = WPr.TemplatePage;
@@ -245,7 +243,6 @@ begin
   transaction string 255 gExtraHeadHTML;
   transaction string 255 gExtraSiteTitle;
   transaction boolean gSkipAnalyticsID;
-  
   if (gDontOutputHTMLDoctype==false) then begin
   //  WebOutStringFormatNL("<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.01//EN"" ""http://www.w3.org/TR/html4/strict.dtd"">");
   end;
@@ -328,7 +325,6 @@ begin
       ShowWebElement(headerelement);
     end;
   end;
-
   return;
 end;
 
@@ -340,7 +336,6 @@ begin
   integer prependtitle;
   boolean allowlogin;
   transaction boolean gOutputTagComments;
-
   GetWebSiteSettings(startstruct,sitetitle,headerelement,footerelement,stylesheet,analyticsid,prependtitle,allowlogin,errorpage,loginnode,selectcountry);
 
   if (nonblank(footerelement)) then begin
@@ -362,7 +357,6 @@ end;
 procedure ApplyTemplate(var record WebNGPageVc WPr,string usedtemplates)
 begin
   record WebNGPageVc TemplWPr;
-
   if (nonblank(WPr.TemplatePage) and SetInSet(WPr.TemplatePage,usedtemplates)==false) then begin
     TemplWPr.Code = WPr.TemplatePage;
     if (ReadFirstMain(TemplWPr,1,true)) then begin
@@ -391,7 +385,6 @@ begin
   record WebNGTranslateVc WTr;
   boolean encapsulateindiv,foundf;
   string 20 notification_element;
-  
   foundf = FindWebPageTranslation(WPr,WTr);
   if (foundf==false) then begin
     RecordCopy(WP2r,WPr);
@@ -420,7 +413,6 @@ LShowWebAppPageStart:;
   end else begin
     WebOutStringFormatNL("<div id=""webapp"">");
   end;
-  
   return;
 end;
 
@@ -429,7 +421,6 @@ procedure ShowWebAppPageEnd(record WebNGPageVc WPr)
 begin
   record WebNGElementVc WEr;
   record WebNGTranslateVc WTr;
-  
   WebOutStringFormatNL("</div>"); // webapp div
   
   if (FindWebPageTranslation(WPr,WTr)) then begin
@@ -452,7 +443,7 @@ begin
   boolean res,foundf;
   boolean encapsulateindiv;
   longint loginnode,selcountrynode;
-    
+  
   res = false;
   if (nonblank(WSr.WebPage)) then begin
     WPr.Code = WSr.WebPage;
@@ -484,16 +475,13 @@ begin
     end;
 
     StartPage(WPr);
-
     if (foundf) then begin
       WebOutPageWithTemplate(WTr,WTr.HtmlTranslation==1,"",WPr,kWebPositionContent);
     end else begin
       encapsulateindiv = ShowEncapsulationDivOpen(WPr);
-    
       ShowPageElements(WPr,0,""); //before
       ShowPageElements(WPr,1,""); //content
       ShowPageElements(WPr,2,""); //after
-
       ShowEncapsulationDivClose(WPr,encapsulateindiv);
     end;
 
@@ -501,7 +489,7 @@ begin
   end else begin
     ShowErrorPage(ToolWebNGTranslateText(25004) & " " & WSr.WebPage); //Cannot find page:
   end;
-LShowWebPage:;  
+LShowWebPage:; 
   return;
 end;
  

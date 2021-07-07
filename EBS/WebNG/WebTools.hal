@@ -296,8 +296,15 @@ begin
   record NotePadVc Noter;
   record RLinkVc RLr;
   string 255 tstr,link;
-  Longint pos;
+  Longint pos,arealength;
   transaction string 255 gContentListStyle; 
+	vector boolean vcheck;
+	vector string 255 tstr2;
+	
+	longint j,leng,posstart,posend;
+	area noterarea,newarea;
+	area afirst,amiddle,alast;
+	string 255 c1,c2,tstrr;
 
   i = 1;
   while (ReadRecordLink(WCSr,i,Noter,RLr)) begin
@@ -308,51 +315,146 @@ begin
       foundf = true;
     end;
     if (foundf) then begin
-      pos = 0;
-      while (pos<SizeTextCnt(Noter)) begin
-        tstr = tstr & StringFromText(Noter,pos,255);
-        pos = pos + 255;
-      end; 
+      // pos = 0;
+      // while (pos<SizeTextCnt(Noter)) begin
+        // tstr = tstr & StringFromText(Noter,pos,255);
+        // pos = pos + 255;
+      // end; 
+			
+			
+			GETAREAFROMTEXTFIELD(Noter,noterarea);
+			
+			arealength = Getarealength(noterarea);
+			
+			for(j=0;j<arealength;j=j+1)begin
+				c1 = Getstringfromarea(noterarea,j,1);
+				if(c1=="{")then begin 
+					posstart = j;
+				end;
+				if(c1=="}")then begin 
+					posend = j;
+				end;
+				
+				if(posstart>-1 and posend>-1)then begin
+					if(posstart<posend) then begin
+						if((posend-posstart)<50)then begin
+							tstrr = Getstringfromarea(noterarea,posstart,posend - posstart + 1);
+							if(nonblank(tstrr))then begin
+								if(tstrr=="{BannerImages}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = OutputBannerImages(WCSr,WCr);
+								end;
+								if(tstrr=="{BannerImageLink}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = OutputBannerImageLink(WCSr,WCr);
+								end;
+								if(tstrr=="{Title}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = WTr.Comment;
+								end;
+								if(tstrr=="{ShortDescription}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetMatrixText(WTr);
+								end;
+								if(tstrr=="{Content}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetFullTranslationText(WTr);
+								end;
+								if(tstrr=="{Date}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = DateToString(specdate,"DD.MM.YYYY");
+								end;
+								if(tstrr=="{listthumb}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetContentImage(WCSr,WCr,1);
+								end;
+								if(tstrr=="{contentthumb}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetContentImage(WCSr,WCr,2);
+								end;
+								if(tstrr=="{link}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = link;
+								end;
+								if(tstrr=="{sernr}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = WCr.SerNr;
+								end;
+								if(tstrr=="{text}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetContentText(WTr);
+								end;
+								if(tstrr=="{ContentImage}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = GetContentImages(WCSr,WCr,WTr);
+								end;
+								if(tstrr=="{ReadMoreText}" and vcheck[tstrr]==false)then begin
+									tstr2[tstrr] = ToolWebNGTranslateText2(89024);
+								end;							
+								vcheck[tstrr] = true;
+								
+								SetAreaZeroSize(newarea);
+
+								SetAreaZeroSize(afirst);
+								SetAreaZeroSize(amiddle);
+								SetAreaZeroSize(alast);
+								
+								GetAreaFromArea(noterarea,0,posstart,afirst);
+								AddTextToArea(tstr2[tstrr],amiddle);
+								GetAreaFromArea(noterarea,posend + 1,arealength - posend - 1,alast);
+								
+								AddAreaToArea(afirst,newarea);  
+								AddAreaToArea(amiddle,newarea);  
+								AddAreaToArea(alast,newarea);  	
+								
+								SetAreaZeroSize(noterarea);
+								GetAreaFromArea(newarea,0,GetAreaLength(newarea),noterarea);	
+								
+								arealength = Getarealength(noterarea);
+
+								j = j + Getarealength(amiddle);
+							end;
+						end;
+						posstart = -1;
+						posend = -1;
+					end else begin
+						posstart = -1;
+						posend = -1;
+					end;
+				end;			
+			end;
+
+			
       link = GetLinkToStruct(WCSr.HandlerAppNode,true) & WCr.SerNr;
-      if(StringInText("{BannerImages}",Noter))then begin
-        tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
-      end;
-      if(StringInText("{BannerImageLink}",Noter))then begin
-        tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
-      end;
-      if(StringInText("{Title}",Noter))then begin
-        tstr = StrReplace(tstr,"{Title}",WTr.Comment);
-      end;
-      if(StringInText("{ShortDescription}",Noter))then begin
-        tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
-      end;
-      if(StringInText("{Content}",Noter))then begin
-        tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
-      end;
-      if(StringInText("{Date}",Noter))then begin
-        tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
-      end;
-      if(StringInText("{listthumb}",Noter))then begin
-        tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
-      end;
-      if(StringInText("{contentthumb}",Noter))then begin
-        tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
-      end;
-      if(StringInText("{link}",Noter))then begin
-        tstr = StrReplace(tstr,"{link}",link);
-      end;
-      if(StringInText("{sernr}",Noter))then begin
-        tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
-      end;
-      if(StringInText("{text}",Noter))then begin
-        tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
-      end;
-      if(StringInText("{ContentImage}",Noter))then begin
-        tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
-      end;
-      if(StringInText("{ReadMoreText}",Noter))then begin
-        tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
-      end;
+			// CalcVectorInNoter(Noter,vcheck);
+
+      // if(StringInText("{BannerImages}",Noter))then begin
+        // tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
+      // end;
+      // if(StringInText("{BannerImageLink}",Noter))then begin
+        // tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
+      // end;
+      // if(StringInText("{Title}",Noter))then begin
+        // tstr = StrReplace(tstr,"{Title}",WTr.Comment);
+      // end;
+      // if(StringInText("{ShortDescription}",Noter))then begin
+        // tstr = StrReplace(tstr,"{ShortDescription}",GetMatrixText(WTr));
+      // end;
+      // if(StringInText("{Content}",Noter))then begin
+        // tstr = StrReplace(tstr,"{Content}",GetFullTranslationText(WTr));
+      // end;
+      // if(StringInText("{Date}",Noter))then begin
+        // tstr = StrReplace(tstr,"{Date}",DateToString(specdate,"DD.MM.YYYY"));
+      // end;
+      // if(StringInText("{listthumb}",Noter))then begin
+        // tstr = StrReplace(tstr,"{listthumb}",GetContentImage(WCSr,WCr,1));
+      // end;
+      // if(StringInText("{contentthumb}",Noter))then begin
+        // tstr = StrReplace(tstr,"{contentthumb}",GetContentImage(WCSr,WCr,2));
+      // end;
+      // if(StringInText("{link}",Noter))then begin
+        // tstr = StrReplace(tstr,"{link}",link);
+      // end;
+      // if(StringInText("{sernr}",Noter))then begin
+        // tstr = StrReplace(tstr,"{sernr}",WCr.SerNr);
+      // end;
+      // if(StringInText("{text}",Noter))then begin
+        // tstr = StrReplace(tstr,"{text}",GetContentText(WTr));
+      // end;
+      // if(StringInText("{ContentImage}",Noter))then begin
+        // tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
+      // end;
+      // if(StringInText("{ReadMoreText}",Noter))then begin
+        // tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
+      // end;
       //tstr = StrReplace(tstr,"{BannerImages}",OutputBannerImages(WCSr,WCr));
       //tstr = StrReplace(tstr,"{BannerImageLink}",OutputBannerImageLink(WCSr,WCr));
       //tstr = StrReplace(tstr,"{Title}",WTr.Comment);
@@ -367,12 +469,12 @@ begin
       //tstr = StrReplace(tstr,"{ContentImage}",GetContentImages(WCSr,WCr,WTr));
       //tstr = StrReplace(tstr,"{ReadMoreText}",ToolWebNGTranslateText2(89024));
       
-      WebOutString(tstr);
+      // WebOutString(tstr);
+			WebOutArea2(noterarea);
       goto LShowTranslatedContent;
     end;
     i = i + 1;
   end;
-
   LShowTranslatedContent:;
   return;
 end;
@@ -382,7 +484,6 @@ function Boolean MM_ShowContentTranslation(string code,string lang,Integer filen
 begin
   Boolean res;
   record WebNGContentVc WCr;
-
   if (WTr.FileName==1) then begin
     WCr.SerNr = StringToLongint(code);
     if (ReadFirstMain(WCr,1,true)) then begin
@@ -393,10 +494,9 @@ begin
       if (!printoverview and WCSr.UseContentTemplate==1) then begin
         ShowTranslatedContent(WCSr,WCr,WTr,2,specdate);
         res = true;
-      end;
+			end;
     end;
   end;
-
   MM_ShowContentTranslation = res;
   return;
 end;
@@ -487,7 +587,6 @@ begin
   record WebNGTranslateVc WTr;
   string 255 category,style;
   Boolean fulllistf,outputaspagef;
-
   style = WEr.HALFunc;
   category = WEr.WebMenu;
   outputaspagef = false;
@@ -529,6 +628,7 @@ begin
           end;
         end;
         while (LoopBackKey(key,WCr,2,foundf)) begin
+
           if (cnt>=maxcnt) then begin
             foundf = false;
           end;
@@ -539,19 +639,17 @@ begin
           if (FindMatchingContentTranslation(WCr,WTr)==false) then begin
             testf = false;
           end;
-//CUST-BEGIN
           if (nonblank(category) and WCr.ContentCategory!=category) then begin
             testf = false;
           end;
-//CUST-END
           if (testf) then begin
+
             ToolWebOutContentTextFormat(WCr,false);
             cnt = cnt + 1;
           end;
         end;
     end;
   end;
- 
  
   return;
 end;
