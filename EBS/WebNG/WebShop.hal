@@ -883,7 +883,7 @@ begin
       
     end else begin
       WebOutString("<div " & ShowWebNGProductClasses(WebNGProductr,WSb) & "  class='productItem col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12'><div class='ProductList-item' itemcode='" & URLEncodeCS(WebNGProductr.Code) & "'>");
-      WebOutString("<div class='ProdImg'><a href='" & link & "'> <figure><img class='imageRespon' src='" & imglink & "' alt='image'></figure></a></div>");
+      WebOutString("<div class='ProdImg'><a href='" & link & "'> <figure><img class='imageRespon' src='/web/img/placeholder.svg' data-src='" & imglink & "' alt='image'></figure></a></div>");
       WebOutString("<div class='ProdInfo'><h2><a href='" & link & "'>" & tstr & "</a></h2>");
       WebOutString("<div class='text'>");
       ShowProductShortDescription(WebNGProductr);
