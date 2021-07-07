@@ -1042,10 +1042,10 @@ begin
     WebOutString("            <h2>" & Userr.Name & "</h2>");
     WebOutString("            <div class='text'>" & GetEmplDescription(Userr) & "</div>");
     if (nonblank(Userr.Phone1)) then begin
-      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89005) & Userr.Phone1 & "</div>");
+      WebOutString("        <a class='contact' href='tel:"& Userr.Phone1 & "'>" & ToolWebNGTranslateText2(89005) & Userr.Phone1 & "</a>");
     end;
     if (nonblank(Userr.emailAddr)) then begin
-      WebOutString("        <div class='contact'>" & ToolWebNGTranslateText2(89006) & Userr.emailAddr & "</div>");
+      WebOutString("        <a class='contact' href='mailto:"& Userr.emailAddr & "'>" & ToolWebNGTranslateText2(89006) & Userr.emailAddr & "</a>");
     end;
     WebOutString("        </div>");
     WebOutString("    </div>");
