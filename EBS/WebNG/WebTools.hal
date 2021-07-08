@@ -1262,10 +1262,12 @@ begin
 					CU2r.eMail = webgetarg("jur_email");
 					CU3r.eMail = CU2r.eMail;
 					if(ReadFirstKey("eMail",CU3r,1,true))then begin
-						weboutstring("EmailExistError");
-					end else begin
-						recordstore(CU2r,true);
-						weboutstring("Ok");
+						if(CU3r.Code!=CU2r.Code)then begin
+							weboutstring("EmailExistError");
+						end else begin
+							recordstore(CU2r,true);
+							weboutstring("Ok");
+						end;
 					end;
 				end;
 			end else begin
