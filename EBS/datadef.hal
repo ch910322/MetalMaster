@@ -196,6 +196,7 @@ begin
     RecordField(Delivery,M4Code,20,0);
     RecordField(SelfPick,M4Code,20,0);
     RecordField(PayDeal,M4Code,20,0);
+		RecordField(CompVatCode,M4Code,20,0);	//Edit **********************************************Vas-P	08/07/2021
   EndBlock;
   
   BlockBegin(MMWebShopRebateBlock,-,"");

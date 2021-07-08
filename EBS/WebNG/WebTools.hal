@@ -1216,7 +1216,6 @@ begin
   
   return;
 end;
-
 global webpublic updating procedure WebRequisitesSave()
 begin
   record WebNGShopBasketVc WSBr;
@@ -1229,11 +1228,12 @@ begin
 	boolean storef;
   
   GetShoppingBasket(WSBr,0);
-  
+
   CUr.Code = CurrentCust;
   if (ReadFirstMain(CUr,1,true)) then begin
     if(webgetarg("mode")=="2")then begin
       if(nonblank(webgetarg("fiz_sia")))then begin
+				CUr.CustType = 1;
         CUr.Name = webgetarg("fiz_sia");
         CUr.InvAddr3 = webgetarg("fiz_accNumber");
         CUr.InvAddr2 = webgetarg("fiz_bankCode");
@@ -1250,6 +1250,7 @@ begin
 			if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
 				CU2r.Code = ContactRelr.CustCode;
 				if(readfirstmain(CU2r,1,true))then begin
+					CU2r.CustType = 0;
 					CU2r.Name = webgetarg("jur_sia");
 					CU2r.RegNr1 = webgetarg("jur_regNr");
 					CU2r.InvAddr0 = webgetarg("jur_address");
@@ -1270,6 +1271,7 @@ begin
 			end else begin
 				GetNextWebCustNr(code);
 				RecordNew(CU2r);
+				CU2r.CustType = 0;
 				CU2r.CustCat = "WWW";
 				CU2r.Code = code;
 				CU2r.Name = webgetarg("jur_sia");

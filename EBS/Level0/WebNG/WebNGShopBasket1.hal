@@ -254,7 +254,7 @@ begin
   rowschangedf = false;
   BlockLoad(SysFormatRec);
   BlockLoad(GenOptRec);
-
+	logtext(0,"CreateBasketFromProductRegistration");
   WSBr.CustCode = custcode;
   WSBr.CompanyNr = StringToInt(company);
   WSBr.BasketNo = 0;
@@ -279,7 +279,6 @@ begin
     WSBr.BasketNo = 0;
     //TODO: lookup and set currency
   end;
-
   CUServicer.CustCode = custcode;
   foundf = true;
   while (LoopKey("CustCode",CUServicer,1,foundf)) begin
@@ -754,6 +753,10 @@ begin
   Integer res;
   record WebNGShopBasketVc oldWSBr,WSBr;
   row WebNGShopBasketVc WSBrw;
+	record CUVc CUr;
+	record CUVc CU2r;
+  record MMWebDelModeBlock MMWebDMb;
+	record ContactRelVc ContactRelr;
   boolean updatef;
   boolean foundf;
   Integer b;
@@ -761,7 +764,9 @@ begin
   integer rownr;
   string 255 custcurrency,vatcode,tstr;
   val reb;
-  
+	
+	BlockLoad(MMWebDMb);
+	
   if (qty>0) then begin
     foundf = false;
     if (GetShoppingBasket(WSBr,basketno)) then begin
@@ -798,6 +803,22 @@ begin
     reb = blankval;
     WSBrw.Price = round(ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0),defaultcurroundoff);
     WSBrw.Discount = reb;
+		logtext(0,"vatcode1 - " & vatcode);
+		CUr.Code = WSBr.CustCode;
+		if(ReadFirstMain(CUr,1,true))then begin
+			if(CUr.CustType==0)then begin
+				vatcode = MMWebDMb.CompVatCode;
+			end else begin
+				ContactRelr.ContactCode = CUr.Code;
+				if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
+					CU2r.Code = ContactRelr.CustCode;
+					if(readfirstmain(CU2r,1,true))then begin
+						vatcode = MMWebDMb.CompVatCode;
+					end;
+				end;
+			end;
+		end;
+		logtext(0,"vatcode2 - " & vatcode);
     WSBrw.VATCode = vatcode;
     WSBrw.DateAdded = CurrentDate;
     WSBrw.TimeAdded = CurrentTime;
@@ -1204,7 +1225,7 @@ begin
   boolean mergef;
   val reb;
   string 255 custcurrency,vatcode;
-  
+  logtext(0,"MoveShoppingBasket");
   if (nonblank(SessionID) and nonblank(CustCode)) then begin
     WSBr.SessionID = SessionID;
     if (ReadFirstMain(WSBr,4,true)) then begin
