@@ -280,7 +280,7 @@ begin
     if (Attachr.FileName==WCr.ThumbnailImage) then begin
       base = GetLinkToStruct(WCSr.HandlerAppNode,true);
       link = base & WCr.SerNr & "/images?image=" & Attachr.FileName;
-      res = res & "<img class='imageRespon' src='" & link & "' alt='" & WTr.Comment & " " & i & "'>";
+      res = res & "<img class='imageRespon'  src='/web/img/placeholder.svg' data-src='" & link & "' alt='" & WTr.Comment & " " & i & "'>";
     end;
     i = i + 1;
   end;
