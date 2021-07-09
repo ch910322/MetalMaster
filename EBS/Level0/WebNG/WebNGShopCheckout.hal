@@ -1104,6 +1104,7 @@ begin
 				CUr.eMail = WebGetArg("E-mail");
 				CUr.AllowLogin = 1;
 				CUr.CustCat = "WWW";
+				CUr.CustType = 1;
 				GetNextWebCustNr(passw);
 				CUr.Code = passw;
 				RecordCopy(tempCUr,CUr);
