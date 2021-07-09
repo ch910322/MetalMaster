@@ -1432,6 +1432,11 @@ begin
   blockload(MMWebDMb);
   if(deltype=="2")then begin
     WSBr.DelMode = MMWebDMb.Delivery;
+    WSBr.Addr0 = webgetarg("country");
+    WSBr.Addr1 = webgetarg("city");
+    WSBr.Addr2 = webgetarg("street");
+    WSBr.Addr3 = webgetarg("houseNumber");
+    WSBr.Addr4 = webgetarg("zipCode");    
     PutSessionString("delmodecode",WSBr.DelMode);
     recordstore(WSBr,true);
   end;

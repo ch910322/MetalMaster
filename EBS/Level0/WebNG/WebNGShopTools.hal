@@ -809,6 +809,12 @@ begin
 		ORr.PlanShip = ORr.OrdDate;
 	end;
   ORr.ShipMode = WSBr.DelMode;
+  
+  ORr.ShipAddr1 = WSBr.Addr1;
+  ORr.ShipAddr2 = WSBr.Addr2;
+  ORr.ShipAddr3 = WSBr.Addr3;
+  ORr.DelAddr3 = WSBr.Addr4;
+  ORr.DelAddr4 = WSBr.Addr5;
 
 	if(ORr.ShipMode==MMWebDelModeb.Delivery)then begin
 		ORr.ShipDeal = "DAP";
