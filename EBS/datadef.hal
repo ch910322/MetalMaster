@@ -207,14 +207,14 @@ begin
 		ArrayField(Classification,M4Code,50,0); // _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- Anton Preisinger 10:39 04.07.2019
   EndRecordAdd;
   
-  /*RecordAddBegin(WebNGShopBasketVc,"WebNGShopBasketVc_Custom");
+  RecordAddBegin(WebNGShopBasketVc,"WebNGShopBasketVc_Custom");
 		RecordField(Addr0,M4Str,255,0); 
 		RecordField(Addr1,M4Str,255,0); 
 		RecordField(Addr2,M4Str,255,0); 
 		RecordField(Addr3,M4Str,255,0); 
 		RecordField(Addr4,M4Str,255,0);
 		RecordField(Addr5,M4Str,255,0);
-  EndRecordAdd;*/
+  EndRecordAdd;
   
 	
 	//Edit **********************************************Vas-P 15/06/2021
