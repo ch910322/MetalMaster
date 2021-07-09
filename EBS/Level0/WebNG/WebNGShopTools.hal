@@ -668,7 +668,7 @@ begin
     MatRowPut(ORr,rwcnt,ORrw);
     if (ORVc_PasteArtCode(ORr,rwcnt,warning,warning,false)) then begin end;
     MatRowGet(ORr,rwcnt,ORrw);
-
+    ORrw.VATCode = WSBrw.VATCode;
     ORrw.vRebate = WSBrw.Discount;
     MatRowPut(ORr,rwcnt,ORrw);
     
