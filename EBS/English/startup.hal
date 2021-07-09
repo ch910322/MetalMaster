@@ -16,7 +16,7 @@ begin
   
   Setting("MM Web Product Settings",MMWebProdSetTClass,modWebShopNG);
   Setting("MM Country Prices List",WebNGCountryPricesLClass,modWebShopNG);
-  Setting("MM Delivery Mode",MMWebDelModeTClass,modWebShopNG);
+  Setting("MM Additional WEB Settings",MMWebDelModeTClass,modWebShopNG);
   Setting("MM WebShop Rebate",MMWebShopRebateTClass,modWebShopNG);  
   Setting("WebNumber Contact Defaults",WebSRTClass,modSY); //Edit **********************************************Vas-P	05/07/2021
 	

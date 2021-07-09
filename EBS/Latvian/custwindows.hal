@@ -355,12 +355,14 @@ window MMWebDelModeTClass:1
 begin
   real h,v,vs,v2,vs2,hm,tilenr,h2,h3;
   vs = 20; h2 = 350; h3 = 500;
-  WindowBegin("Web Delivery Modes",MMWebDelModeTClass,CGSbl,SRType);
+  WindowBegin("Web Additional WEB Settings",MMWebDelModeTClass,CGSbl,SRType);
   SetBlid(MMWebDelModeBlock);
   SetWRect(20,80,600,298);
   Sizeable(-1,-1,0,0);
   EditField(h=150,v=20,100,"Delivery",Normal,Delivery,false,DMSClass);
   EditField(h,v+=20,100,"Self Pick Up",Normal,SelfPick,false,DMSClass);
+  EditField(h,v+=20,100,"Pay Deal",Normal,PayDeal,false,PDSClass);
+	EditField(h,v+=20,100,"Person VAT Code",Normal,CompVatCode,false,VATCodeSClass);
   EndWindow;
 end;
 

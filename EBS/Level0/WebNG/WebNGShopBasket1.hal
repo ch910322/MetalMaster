@@ -806,15 +806,17 @@ begin
 		logtext(0,"vatcode1 - " & vatcode);
 		CUr.Code = WSBr.CustCode;
 		if(ReadFirstMain(CUr,1,true))then begin
-			if(CUr.CustType==0)then begin
-				vatcode = MMWebDMb.CompVatCode;
-			end else begin
+			if(CUr.CustType==1)then begin
 				ContactRelr.ContactCode = CUr.Code;
 				if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
 					CU2r.Code = ContactRelr.CustCode;
 					if(readfirstmain(CU2r,1,true))then begin
-						vatcode = MMWebDMb.CompVatCode;
+						if(CU2r.CustType==1)then begin
+							vatcode = MMWebDMb.CompVatCode;
+						end;
 					end;
+				end else begin
+					vatcode = MMWebDMb.CompVatCode;
 				end;
 			end;
 		end;
