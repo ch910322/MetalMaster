@@ -836,29 +836,33 @@ BEGIN
     testf = ((CUr.Code==IVb.DefCustCode)==false);
   end; 
   if (testf) then begin
-    BlockLoad(SRRec);
-		BlockLoad(WebSRRec);
-    SplitAlphaDigit(SRRec.LastCustCode,lastcustr,lastcunr);
-    SplitAlphaDigit(CUr.Code,curcustr,curcunr);
-    if (curcustr==lastcustr) then begin
-      if (curcunr!=lastcunr) then begin
-				if(CUr.CustCat=="WWW")then begin
+		if(CUr.CustCat=="WWW")then begin
+			BlockLoad(WebSRRec);
+			SplitAlphaDigit(WebSRRec.LastCustCode,lastcustr,lastcunr);
+			SplitAlphaDigit(CUr.Code,curcustr,curcunr);
+			if (curcustr==lastcustr) then begin
+				if (curcunr!=lastcunr) then begin
 					WebSRRec.LastCustCode = CUr.Code;
 					BlockStore(WebSRRec);
-				end else begin
+				end;
+			end else begin
+				WebSRRec.LastCustCode = CUr.Code;
+				BlockStore(WebSRRec);
+			end;  
+		end else begin
+			BlockLoad(SRRec);
+			SplitAlphaDigit(SRRec.LastCustCode,lastcustr,lastcunr);
+			SplitAlphaDigit(CUr.Code,curcustr,curcunr);
+			if (curcustr==lastcustr) then begin
+				if (curcunr!=lastcunr) then begin
 					SRRec.LastCustCode = CUr.Code;
 					BlockStore(SRRec);
 				end;
-      end;
-    end else begin
-			if(CUr.CustCat=="WWW")then begin
-				WebSRRec.LastCustCode = CUr.Code;
-				BlockStore(WebSRRec);
 			end else begin
 				SRRec.LastCustCode = CUr.Code;
 				BlockStore(SRRec);
-			end;
-    end;  
+			end;  
+		end;
   end; 
 
 //  RemoveNormalizedNumbers(CUr); // No need when saving...
