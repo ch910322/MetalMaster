@@ -826,6 +826,7 @@ BEGIN
   LongInt lastcunr,curcunr;
   Boolean testf;
   record IVTBlock IVb;
+	record WebSRBlock WebSRRec;
   string 255 autmsgfunciontags;
   val t;
   
@@ -836,16 +837,27 @@ BEGIN
   end; 
   if (testf) then begin
     BlockLoad(SRRec);
+		BlockLoad(WebSRRec);
     SplitAlphaDigit(SRRec.LastCustCode,lastcustr,lastcunr);
     SplitAlphaDigit(CUr.Code,curcustr,curcunr);
     if (curcustr==lastcustr) then begin
       if (curcunr!=lastcunr) then begin
-        SRRec.LastCustCode = CUr.Code;
-        BlockStore(SRRec);
+				if(CUr.CustCat=="WWW")then begin
+					WebSRRec.LastCustCode = CUr.Code;
+					BlockStore(WebSRRec);
+				end else begin
+					SRRec.LastCustCode = CUr.Code;
+					BlockStore(SRRec);
+				end;
       end;
     end else begin
-      SRRec.LastCustCode = CUr.Code;
-      BlockStore(SRRec);
+			if(CUr.CustCat=="WWW")then begin
+				WebSRRec.LastCustCode = CUr.Code;
+				BlockStore(WebSRRec);
+			end else begin
+				SRRec.LastCustCode = CUr.Code;
+				BlockStore(SRRec);
+			end;
     end;  
   end; 
 
