@@ -220,6 +220,32 @@ begin
   return;
 end;
 
+//Edit **********************************************Vas-P	23/07/2021
+function string 255 GetItemUnit(record INVc INr,string lang)
+begin
+  string 255 res;
+  row INVc INrw;
+	record UnitVc Unitr;
+	row UnitVc Unitrw;
+  Integer i,rwcnt;
+  
+  res = INr.Unittext;
+	Unitr.Code = INr.Unittext;
+	if(readfirstmain(Unitr,1,true))then begin
+		rwcnt = MatRowCnt(Unitr);
+		for(i=0;i<rwcnt;i=i+1) begin
+			MatRowGet(Unitr,i,Unitrw);
+			if(Unitrw.LangCode==lang) then begin
+				res = Unitrw.Text;
+				i = rwcnt;
+			end;
+		end;
+	end;
+
+  GetItemUnit = res;
+return;
+end;
+
 function string 255 GetItemDescription(record INVc INr,string lang)
 begin
   string 255 res;
@@ -481,7 +507,8 @@ begin
 	//for(i=0;i<aItems.length;i=i+1)begin
 		INr.Code = vItems[aTypes[0]];
 		readfirstmain(INr,1,true);
-		tstr = INr.Unittext;
+		tstr = GetItemUnit(INr,lang);	//Edit **********************************************Vas-P	23/07/2021
+
 	//end;
 	
   if (aTypes.length>0) then begin
