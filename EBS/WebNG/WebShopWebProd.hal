@@ -241,7 +241,7 @@ begin
 			end;
 		end;
 	end;
-
+	
   GetItemUnit = res;
 return;
 end;
