@@ -30,6 +30,16 @@ begin
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_INSPECTIONSTANDARD",DCr.InspectionStandard,"NDP");
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_CONTROLCODE",DCr.ControlCode,"NDP");
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_COROSIONCLASS",DCr.CorosionClass,"NDP");
+    
+    OutputDecSingleValue(vVals,"F_FACILITYADDRESS",DCr.FacilityAddress,"NDP");
+    OutputDecSingleValue(vVals,"F_PERFOMANCECLASS",DCr.PerfomanceClass,"NDP");
+    OutputDecSingleValue(vVals,"F_DECLMETHOD",DCr.DeclMethod,"NDP");
+    OutputDecSingleValue(vVals,"F_FIRERESISTANCE",DCr.FireResistance,"NDP");
+    OutputDecSingleValue(vVals,"F_CADMIUM",DCr.Cadmium,"NDP");
+    OutputDecSingleValue(vVals,"F_RADIOACTIVITY",DCr.Radioactivity,"NDP");
+    OutputDecSingleValue(vVals,"F_INSPECTIONSTANDARD",DCr.InspectionStandard,"NDP");
+    OutputDecSingleValue(vVals,"F_CONTROLCODE",DCr.ControlCode,"NDP");
+    OutputDecSingleValue(vVals,"F_COROSIONCLASS",DCr.CorosionClass,"NDP");
 
   end;
 
@@ -71,19 +81,22 @@ begin
         if(vitemused[INr.Code]==false and INr.Group==RepSpec.f10)then begin
           MM_DECr.ItemGroup = RepSpec.f10;
           readfirstmain(MM_DECr,1,true);
+          vVals["F_FACILITYADDRESS"] = MM_DECr.FacilityAddress;
           vVals["F_PERFORMANCECLASS"] = MM_DECr.PerfomanceClass;
           vVals["F_DECLMETHOD"] = MM_DECr.DeclMethod;
           vVals["F_CONTROLCODE"] = MM_DECr.ControlCode;
           vVals["F_MATERIAL"] = INr.Materials;
           vVals["F_FIRERESISTANCE"] = MM_DECr.FireResistance;
           vVals["F_CADMIUM"] = MM_DECr.Cadmium;
-          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;          
+          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;  
+          if(blank(INr.ENstandarts))then begin
+            INr.ENstandarts = "NDP";
+          end; 
+          vVals["F_ENSTANDARD"] = INr.ENstandarts;
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = ORrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = ORrw.Spec;
-          if(blank(INr.ENstandarts))then begin
-            INr.ENstandarts = "NDP";
-          end;
+          
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
           vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
           ExportDeclarationValues(vVals,strnum,INr);
@@ -92,9 +105,7 @@ begin
       end;
     end;
   end;
-  
-  
-  
+    
   vVals["F_ORDERNR"] = ORr.SerNr;
   vVals["F_CUSTNAME"] = ORr.Addr0;
   vVals["F_DELADDR"] = ORr.ShipAddr1;
@@ -185,15 +196,17 @@ begin
           vVals["F_MATERIAL"] = INr.Materials;
           vVals["F_FIRERESISTANCE"] = MM_DECr.FireResistance;
           vVals["F_CADMIUM"] = MM_DECr.Cadmium;
-          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;          
+          vVals["F_RADIOACTIVITY"] = MM_DECr.Radioactivity;  
+          if(blank(INr.ENstandarts))then begin
+            INr.ENstandarts = "NDP";
+          end; 
+          vVals["F_ENSTANDARD"] = INr.ENstandarts;     
           vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
-          if(blank(INr.ENstandarts))then begin
-            INr.ENstandarts = "NDP";
-          end;
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
           vVals["ROW_" & strnum & "_F_MATERIAL"] = INr.Materials;
+          
           ExportDeclarationValues(vVals,strnum,INr);
           num = num + 1;
         end;
