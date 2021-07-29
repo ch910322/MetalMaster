@@ -183,7 +183,6 @@ begin
           vVals["ROW_" & strnum & "_F_QTY"] = qty;
           vVals["ROW_" & strnum & "_F_SUM"] = sum;
           
-          logtext(0,"sum " & sum);
           ITr.Code = RepSpec.f10;
           readfirstmain(ITr,1,true);
           vVals["F_ITEMGROUPNAME"] = ITr.Comment;
