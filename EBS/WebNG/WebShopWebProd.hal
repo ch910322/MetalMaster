@@ -997,3 +997,42 @@ begin
   return;
 end;
 
+
+//Edit **********************************************Vas-P	17/08/2021
+global webpublic
+procedure WebGetRoofMaterial()
+begin 
+  Integer i,j,rwcnt;
+  boolean isfirst,testf;
+	record FilterInfoBlock FIBb;
+	row FilterInfoBlock FIBrw;
+	vector boolean vtype;
+	array string 255 atype;
+	
+	
+	logtext(0,"WebGetRoofMaterial");
+	SetCompany(3,false);
+	blockload(FIBb);
+  weboutstring("{");
+	
+	rwcnt = MatRowCnt(FIBb);
+	for(i=0;i<rwcnt;i=i+1)begin
+		MatRowGet(FIBb,i,FIBrw);
+		if(FIBrw.Category=="5")then begin
+			testf = true;
+			vtype[FIBrw.Type] = true;
+		end;
+	end;
+	GetVectorTags(vtype,atype);
+	if(isfirst)then begin
+		weboutstring(",");
+	end;
+	for(j=0;j<atype.length;j=j+1)begin
+		weboutstring("\"TYPE_" & atype[j] & "");
+		isfirst = true;
+	end;
+
+  weboutstring("}");
+  
+  return;
+end;
