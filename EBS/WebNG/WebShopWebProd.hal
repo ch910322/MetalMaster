@@ -997,6 +997,26 @@ begin
   return;
 end;
 
+function string 255 GetWebMMItemTypeVcTranslation(record MMItemTypeVc MMItemTyper)
+begin
+  Integer i,rwcnt;
+  row MMItemTypeVc MMItemTyperw;
+  string 255 lang,res;
+
+  lang = CurrentWebLang;  
+  res = MMItemTyper.Name;
+  rwcnt = MatRowCnt(MMItemTyper);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(MMItemTyper,i,MMItemTyperw);
+    if (MMItemTyperw.LangCode==lang) then begin
+      res = MMItemTyperw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetWebMMItemTypeVcTranslation = res;
+  return;
+end;
 
 //Edit **********************************************Vas-P	17/08/2021
 global webpublic
@@ -1006,14 +1026,18 @@ begin
   boolean isfirst,testf;
 	record FilterInfoBlock FIBb;
 	row FilterInfoBlock FIBrw;
+	record WebNGProductCatVc WebNGProductCatr;
+	record MMItemTypeVc MMItemTyper;
 	vector boolean vtype;
-	array string 255 atype;
+	vector string 255 vtransl;
+	array string 255 atype,atransl;
+	string 255 vals,tstr;
 	
 	
 	logtext(0,"WebGetRoofMaterial");
 	SetCompany(3,false);
 	blockload(FIBb);
-  weboutstring("{");
+  weboutstring("[");
 	
 	rwcnt = MatRowCnt(FIBb);
 	for(i=0;i<rwcnt;i=i+1)begin
@@ -1023,15 +1047,19 @@ begin
 		end;
 	end;
 	GetVectorTags(vtype,atype);
-	if(isfirst)then begin
-		weboutstring(",");
-	end;
 	for(j=0;j<atype.length;j=j+1)begin
-		weboutstring("\"TYPE_" & atype[j] & "");
+		if(isfirst)then begin
+			weboutstring(",");
+		end;
+		MMItemTyper.Code = atype[j];
+    if(ReadFirstKey("Code",MMItemTyper,1,true))then begin
+      tstr = GetWebMMItemTypeVcTranslation(MMItemTyper);
+			weboutstring(tstr);
+    end;
 		isfirst = true;
 	end;
 
-  weboutstring("}");
+  weboutstring("]");
   
   return;
 end;
