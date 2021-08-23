@@ -815,7 +815,13 @@ begin
   ORr.ShipAddr3 = WSBr.Addr2;
   ORr.DelAddr3 = WSBr.Addr3;
   ORr.DelAddr4 = WSBr.Addr4;
-
+	
+	logtext(0,"ORr.ShipAddr1 - " & ORr.ShipAddr1);
+	logtext(0,"ORr.ShipAddr2 - " & ORr.ShipAddr2);
+	logtext(0,"ORr.ShipAddr3 - " & ORr.ShipAddr3);
+	logtext(0,"ORr.DelAddr3 - " & ORr.DelAddr3);
+	logtext(0,"ORr.DelAddr4 - " & ORr.DelAddr4);
+	
 	if(ORr.ShipMode==MMWebDelModeb.Delivery)then begin
 		ORr.ShipDeal = "DAP";
 		rwcnt = MatRowCnt(ORr);
