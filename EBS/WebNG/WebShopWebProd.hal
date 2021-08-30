@@ -449,7 +449,7 @@ begin
   WebOutStringFormatNL("  <h1 class='Title'>" & GetTranslatedNameProduct(WebNGProductr) & "</h1>");
   WebOutStringFormatNL("<div class='row justify-content-end'>");
     WebOutStringFormatNL("<div class='col-auto'>");
-      WebOutStringFormatNL("<a href='/veikals/catalog#products' type='button' style='margin-bottom: 25px' class='btns-blue-dark'>" & ToolWebNGTranslateText2(90006) & "</a>");
+      WebOutStringFormatNL("<a href='#' hrefff='/veikals/catalog#products' type='button' onclick='backToProductCatalog()' style='margin-bottom: 25px' class='btns-blue-dark'>" & ToolWebNGTranslateText2(90006) & "</a>");
     WebOutStringFormatNL("</div>");
   WebOutStringFormatNL("</div>");
   WebOutStringFormatNL("  <div class='row Margin40'>");
