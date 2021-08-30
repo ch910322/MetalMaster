@@ -824,39 +824,31 @@ begin
 	logtext(0,"WebSubmitNewsLetter");
 	
   tstr = WebGetArg("id");
-	// logtext(0,"tstr - " & tstr);
   GetNextSubString(tstr,pos,":",el);
   GetNextSubString(tstr,pos,":",id);
   PersColr.Code = id;
   email = WebGetArg("email");
-	// logtext(0,"email - " & email);
   if (ReadFirstMain(PersColr,1,true) and nonblank(email)) then begin
-		// logtext(0,"1");
     Wer.Code = el;
     if (ReadFirstMain(WEr,1,true) and WEr.HALFunc==id) then begin
-			// logtext(0,"2");
       CUr.eMail = email;
       if (ReadFirstKey("eMail",Cur,1,true)) then begin
-				// logtext(0,"CUr.Code1 - " & CUr.Code);
         AddContactToMailingList(PersColr,CUr);
-        res = ToolWebNGTranslateText2(90004);
+        res = ToolWebNGTranslateText2(90014);
       end else begin
         RecordNew(CUr);
         GetNextCustNr(tstr);//
         CUr.Code = tstr;
         CUr.eMail = email;
-				// logtext(0,"CUr.Code2 - " & CUr.Code);
         if (RecordInsert(CUr,true)) then begin
           AddContactToMailingList(PersColr,CUr);
-					// logtext(0,"CUr.Code3 - " & CUr.Code);
-          res = ToolWebNGTranslateText2(90004);
+          res = ToolWebNGTranslateText2(90014);
         end;
       end;
     end;
   end;
   if (blank(res)) then begin
-		// logtext(0,"3");
-    res = ToolWebNGTranslateText2(90003);
+    res = ToolWebNGTranslateText2(90013);
   end;
   ResetCompanyBasedOnCountry(oldcomp);
   WebOutString("<res msg='" & res & "'></res>");
