@@ -831,6 +831,7 @@ begin
     if (ReadFirstMain(WEr,1,true) and WEr.HALFunc==id) then begin
       CUr.eMail = email;
       if (ReadFirstKey("eMail",Cur,1,true)) then begin
+				logtext("CUr.Code1 - " & CUr.Code);
         AddContactToMailingList(PersColr,CUr);
         res = ToolWebNGTranslateText2(90004);
       end else begin
@@ -838,8 +839,10 @@ begin
         GetNextCustNr(tstr);//
         CUr.Code = tstr;
         CUr.eMail = email;
+				logtext("CUr.Code2 - " & CUr.Code);
         if (RecordInsert(CUr,true)) then begin
           AddContactToMailingList(PersColr,CUr);
+					logtext("CUr.Code3 - " & CUr.Code);
           res = ToolWebNGTranslateText2(90004);
         end;
       end;
