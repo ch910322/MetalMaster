@@ -31,6 +31,7 @@ external inner function Boolean FindStringInString(string,string);
 
 external inner updating function Boolean AddContactCUDsmRemote(record CUVc,string);
 external inner procedure NextM4Number(string,var string);
+external inner function Boolean ValidEmailAddress(string);
 
 //Added **********************************************Vas-P	05/07/2021
 global function Boolean GetNextWebCustNr(var string custnr)
@@ -828,28 +829,33 @@ begin
   GetNextSubString(tstr,pos,":",id);
   PersColr.Code = id;
   email = WebGetArg("email");
-  if (ReadFirstMain(PersColr,1,true) and nonblank(email)) then begin
-    Wer.Code = el;
-    if (ReadFirstMain(WEr,1,true) and WEr.HALFunc==id) then begin
-      CUr.eMail = email;
-      if (ReadFirstKey("eMail",Cur,1,true)) then begin
-        AddContactToMailingList(PersColr,CUr);
-        res = ToolWebNGTranslateText2(90014);
-      end else begin
-        RecordNew(CUr);
-        GetNextCustNr(tstr);//
-        CUr.Code = tstr;
-        CUr.eMail = email;
-        if (RecordInsert(CUr,true)) then begin
-          AddContactToMailingList(PersColr,CUr);
-          res = ToolWebNGTranslateText2(90014);
-        end;
-      end;
-    end;
-  end;
-  if (blank(res)) then begin
-    res = ToolWebNGTranslateText2(90013);
-  end;
+
+	if (ReadFirstMain(PersColr,1,true) and nonblank(email)) then begin
+		if(ValidEmailAddress(email)) then begin
+			Wer.Code = el;
+			if (ReadFirstMain(WEr,1,true) and WEr.HALFunc==id) then begin
+				CUr.eMail = email;
+				if (ReadFirstKey("eMail",Cur,1,true)) then begin
+					AddContactToMailingList(PersColr,CUr);
+					res = ToolWebNGTranslateText2(90015);
+				end else begin
+					RecordNew(CUr);
+					GetNextCustNr(tstr);//
+					CUr.Code = tstr;
+					CUr.eMail = email;
+					if (RecordInsert(CUr,true)) then begin
+						AddContactToMailingList(PersColr,CUr);
+						res = ToolWebNGTranslateText2(90015);
+					end;
+				end;
+			end;
+		end else begin
+			res = ToolWebNGTranslateText2(90014);
+		end;
+	end else begin
+		res = ToolWebNGTranslateText2(90013);
+	end;
+
   ResetCompanyBasedOnCountry(oldcomp);
   WebOutString("<res msg='" & res & "'></res>");
 
