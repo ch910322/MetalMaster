@@ -820,7 +820,9 @@ begin
   Integer oldcomp;
 
   oldcomp = SetCompanyBasedOnCountry;
-
+	
+	logtext("WebSubmitNewsLetter");
+	
   tstr = WebGetArg("id");
   GetNextSubString(tstr,pos,":",el);
   GetNextSubString(tstr,pos,":",id);
