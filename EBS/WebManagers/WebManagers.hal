@@ -2490,7 +2490,7 @@ begin
   return;
 end;
 
-function string 255 GetItemLocation(string item)
+function string 255 GetItemLocationf(string item)
 begin
   string 255 res;
   record INVc INr;
@@ -2504,7 +2504,7 @@ begin
     end;
   end;
 
-  GetItemLocation = res;
+  GetItemLocationf = res;
   return;
 end;
 
@@ -2522,7 +2522,7 @@ begin
   for (i=0;i<rwcnt;i=i+1) begin
     MatRowGet(ORr,i,ORrw);
     if (nonblank(ORrw.ArtCode)) then begin
-      tstr = GetItemLocation(ORrw.ArtCode);
+      tstr = GetItemLocationf(ORrw.ArtCode);
       if (nonblank(tstr)) then begin
         ORrw.Location = tstr;
         MatRowPut(ORr,i,ORrw);

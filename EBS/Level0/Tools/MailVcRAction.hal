@@ -604,7 +604,7 @@ begin
   return;
 end;
 
-procedure TextAutoMailToEMailQue(record MailVc Mailp,record EMailQueVc EMailQuep)
+procedure TextAutoMailToEMailQue1(record MailVc Mailp,record EMailQueVc EMailQuep)
 begin
   string 255 tstr;
   Integer pos,textsize;
@@ -690,10 +690,10 @@ begin
   EMailQuer.QueDate = CurrentDate;
   EMailQuer.QueTime = CurrentTime;
   if (EMailQuer.HtmlFlag==0) then begin
-    TextAutoMailToEMailQue(Mailp,EMailQuer);
+    TextAutoMailToEMailQue1(Mailp,EMailQuer);
   end else begin
     AddHtmlRecordToHtmlRecord(Mailp,EMailQuer,true);
-    TextAutoMailToEMailQue(Mailp,EMailQuer);
+    TextAutoMailToEMailQue1(Mailp,EMailQuer);
   end;
   if (RecordInsert(EMailQuer,false)) then begin 
     CopyAutoEmailFilesToEMailQue(Mailp,EMailQuer);

@@ -628,35 +628,6 @@ LGetItemDescription:;
   return;
 end;
 
-function string 255 GetItemDescription(record INVc INr,string lang)
-begin
-  string 255 res;
-  record NotePadVc Noter;
-  record RLinkVc RLr;
-  Integer i;
-  Longint pos;
-
-  i = 1;
-  while (ReadRecordLink(INr,i,Noter,RLr)) begin
-    if (blank(Noter.LangCode) or Noter.LangCode==lang) then begin
-      pos = 0;
-      res = "";
-      while (pos<SizeTextCnt(Noter)) begin
-        res = res & StringFromText(Noter,pos,255);
-        pos = pos + 255;
-      end;
-      if (nonblank(Noter.LangCode)) then begin
-        goto LGetItemDescription;
-      end;
-    end;
-    i = i + 1;
-  end;  
-
-LGetItemDescription:;
-  GetItemDescription = res;
-  return;
-end;
-
 procedure AddToArray(string tstr,array string arr)
 begin
   Integer i;
