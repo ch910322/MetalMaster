@@ -2157,7 +2157,7 @@ end;
 
 procedure PasteExcelRows(var record ORVc ORr,string tstr,var string errstr)
 begin
-  string 255 artcode,coefficient,zval,vRebate;
+  string 255 artcode,coefficient,zval,vRebate,vQuotiety;
   Longint pos,pos2;
   string 255 tmp;
   row ORVc ORrw;
@@ -2184,6 +2184,7 @@ begin
     GetNextSubstring(tmp,pos2,chr(9),zval);
     GetNextSubstring(tmp,pos2,chr(9),coefficient);
     GetNextSubstring(tmp,pos2,chr(9),vRebate);
+    GetNextSubstring(tmp,pos2,chr(9),vQuotiety);
 
     if (nonblank(artcode)) begin
       ClearRow(ORr,ORrw,1);
