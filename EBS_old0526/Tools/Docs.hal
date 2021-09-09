@@ -30,7 +30,7 @@ begin
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_INSPECTIONSTANDARD",DCr.InspectionStandard,"NDP");
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_CONTROLCODE",DCr.ControlCode,"NDP");
     OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_COROSIONCLASS",DCr.CorosionClass,"NDP");
-
+    OutputDecSingleValue(vVals,"ROW_" & strnum & "_F_GEOMETRICINSPECTION",DCr.GeometricInspection,"NDP");
   end;
 
   return;
