@@ -2157,7 +2157,7 @@ end;
 
 procedure PasteExcelRows(var record ORVc ORr,string tstr,var string errstr)
 begin
-  string 255 artcode,coefficient,zval,vRebate,vQuotiety;
+  string 255 artcode,coefficient,zval,vRebate,vQuant;
   Longint pos,pos2;
   string 255 tmp;
   row ORVc ORrw;
@@ -2184,7 +2184,7 @@ begin
     GetNextSubstring(tmp,pos2,chr(9),zval);
     GetNextSubstring(tmp,pos2,chr(9),coefficient);
     GetNextSubstring(tmp,pos2,chr(9),vRebate);
-    GetNextSubstring(tmp,pos2,chr(9),vQuotiety);
+    GetNextSubstring(tmp,pos2,chr(9),vQuant);
 
     if (nonblank(artcode)) begin
       ClearRow(ORr,ORrw,1);
@@ -2198,6 +2198,13 @@ begin
         WebOrdersCalculateDimentions(ORr,rowpos);
         MatRowGet(ORr,rowpos,ORrw);
       end;  
+      if (nonblank(vQuant)) then begin
+        MatRowGet(ORr,rowpos,ORrw);
+        ORrw.Quant = StringToVal(vQuant,M4Val);
+        MatRowPut(ORr,rowpos,ORrw);
+        ORVc_PasteQuant(ORr,rowpos,true,chsum);
+      end;
+      
       ORrw.Coefficient = StringToLongint(coefficient);
       MatRowPut(ORr,rowpos,ORrw);
       WebOrdersCoefficientAfter(ORr,rowpos);
