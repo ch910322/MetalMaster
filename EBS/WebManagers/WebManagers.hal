@@ -2198,6 +2198,12 @@ begin
         WebOrdersCalculateDimentions(ORr,rowpos);
         MatRowGet(ORr,rowpos,ORrw);
       end;  
+      
+      if(nonblank(coefficient))then begin
+        ORrw.Coefficient = StringToLongint(coefficient);
+        MatRowPut(ORr,rowpos,ORrw);
+        WebOrdersCoefficientAfter(ORr,rowpos);
+      end;
       if (nonblank(vQuant)) then begin
         MatRowGet(ORr,rowpos,ORrw);
         ORrw.Quant = StringToVal(vQuant,M4Val);
@@ -2205,9 +2211,6 @@ begin
         ORVc_PasteQuant(ORr,rowpos,true,chsum);
       end;
       
-      ORrw.Coefficient = StringToLongint(coefficient);
-      MatRowPut(ORr,rowpos,ORrw);
-      WebOrdersCoefficientAfter(ORr,rowpos);
       if (nonblank(vRebate)) then begin
         MatRowGet(ORr,rowpos,ORrw);
         ORrw.vRebate = StringToVal(vRebate,M4Val);
