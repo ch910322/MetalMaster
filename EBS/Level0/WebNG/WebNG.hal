@@ -526,6 +526,7 @@ begin
         goto LHandlePath;
       end;
       if (WSr.ForceHTTPSRedirect and CanRedirectToSecurePage) then begin
+        logtext(0,"FormatSimpleLink " & FormatSimpleLink(WebGetArg("path"),true));
         ShowRedirectHtmlWithArgs(FormatSimpleLink(WebGetArg("path"),true),true,kHttpStatusTemporaryRedirect);
         goto LHandlePathOut;
       end;

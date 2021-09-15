@@ -1068,9 +1068,13 @@ begin
   if (ReadFirstMain(WCr,1,true)) then begin
     switch (type) begin
       case 1:
-        link = WebGetArg("path") & "/" & code & "/images?image=" & WCr.ThumbnailImage;
+        if (nonblank(WCr.ThumbnailImage)) then begin
+          link = WebGetArg("path") & "/" & code & "/images?image=" & WCr.ThumbnailImage;
+        end;
       case 2:
-        link = WebGetArg("path") & "/images?image=" & WCr.CoverImage;
+        if (nonblank(WCr.CoverImage)) then begin
+          link = WebGetArg("path") & "/images?image=" & WCr.CoverImage;
+        end;
     end;
   end;
   switch (type) begin
@@ -1295,31 +1299,33 @@ end;
 
 //SECTION: REDIRECT TOOLS
 global
-function string 255 GetWebHostAndPort(boolean secure)
+function string 255 GetWebHostAndPort(boolean securef)
 begin
   string 255 res;
   longint l,httpsport,httpport;
   
-  res = "";
-  if (secure==WebSecureMode) then begin
-    res = WebHost;
-  end else begin
-    res = WebHost;
-    l = InString(res,":");
-    if (l!=0) then begin
-      res = left(res,l-1);
+  res = WebHost;
+  if (securef==true) then begin
+    res = WebHost; // The SSL certificate is usually created for the server's public hostname
+  end;
+  
+  logtext(0,"WebHost " & WebHost);
+  logtext(0,"res " & res);
+  
+  l = InString(res,":");
+  if (l!=0) then begin
+    res = left(res,l-1);
+  end;
+  
+  if (securef) then begin
+    httpsport = ServerHttpsPort;
+    if (httpsport!=443) then begin
+      res = res & ":" & httpsport;
     end;
-    
-    if (secure) then begin
-      httpsport = ServerHttpsPort;
-      if (httpsport!=443) then begin
-        res = res & ":" & httpsport;
-      end;
-    end else begin
-      httpport = ServerHttpPort;
-      if (ServerHttpPort!=80) then begin
-        res = res & ":" & ServerHttpPort;
-      end;
+  end else begin
+    httpport = ServerHttpPort;
+    if (ServerHttpPort!=80) then begin
+      res = res & ":" & ServerHttpPort;
     end;
   end;
 
@@ -1374,11 +1380,13 @@ begin
 end;
 
 global
-procedure ShowRedirectHtml2(string link,boolean secure,Integer status)
+procedure ShowRedirectHtml3(string link,boolean secure,Boolean withargsf,Integer status)
 begin
   string 255 mlink,hostport;
   transaction boolean gDontOutputHTMLDoctype;
 
+
+  logtext(0,"ShowRedirectHtml3 ");
   if (link!="#") then begin
     mlink = link;
   end else begin
@@ -1396,7 +1404,13 @@ begin
   if (secure!=WebSecureMode) then begin
     mlink = hostport & mlink;
   end;
-  SetHttpRedirect2(mlink,status);
+  
+  if (withargsf) then begin
+    SetHttpRedirectWithArgs(mlink,status);
+  end else begin
+    SetHttpRedirect2(mlink,status);
+  end;
+  
   if (gDontOutputHTMLDoctype==false) then begin
     WebOutStringFormatNL("<!DOCTYPE html>");
   end;
@@ -1419,11 +1433,25 @@ begin
 end;
 
 global
+procedure ShowRedirectHtml2(string link,boolean secure,Integer status)
+begin
+  ShowRedirectHtml3(link,secure,false,status);
+  return;
+end;
+
+global
 procedure ShowRedirectHtml(string link,boolean secure)
 begin
 
   ShowRedirectHtml2(link,secure,kHttpStatusFound);
 
+  return;
+end;
+
+global
+procedure ShowRedirectHtmlWithArgs(string link,boolean secure,Integer status)
+begin
+  ShowRedirectHtml3(link,secure,true,status);
   return;
 end;
 
@@ -2034,5 +2062,22 @@ begin
     i = i + 1;
   end;
 
+  return;
+end;
+
+global
+function boolean ToolWebOutItemNotesTextFormat(record INVc INr)
+begin
+  boolean res;
+
+  if (SizeTextCnt(INr)>0) then begin
+    WebOutString("<h1>" & INr.Name & "</h1>");
+    WebOutTagOpen("<div>");
+    WebOutText(INr,true,"");
+    WebOutTagClose("</div>");
+    res = true;
+  end;
+
+  ToolWebOutItemNotesTextFormat = res;
   return;
 end;
