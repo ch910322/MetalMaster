@@ -7,6 +7,7 @@ external procedure LogWebNGMarketplaceClick();
 external function string 255 removenextnode(var string);
 external function string 255 CleanPath(string);
 external procedure ShowRedirectHtml(string,boolean);
+external procedure ShowRedirectHtmlWithArgs(string,Boolean,Integer);
 external function string 255 FormatLink(string,string,boolean,boolean);
 external function string 255 FormatSimpleLink(string,boolean);
 external function string 255 GetStartStructLink();
@@ -62,6 +63,8 @@ external function string 255 ConvertXml(string);
 external procedure SendHansaWorldID();
 external outer function Boolean ShowInternalWebApp(Integer,record WebNGStructVc,string);
 external procedure WebNGFastLinkApp(record WebNGStructVc,string);
+external procedure StandardWebShopMain(record WebNGStructVc,string);
+external function Boolean HasStandardWebShop();
 
 procedure SetCountryAndLanguage(var string path)
 begin
@@ -397,6 +400,27 @@ LPathIsWebshop:;
   return;
 end;
 
+function Boolean CanRedirectToSecurePage()
+begin
+  Boolean res;
+  record ProgramStatusBlock PSb;
+  
+  BlockLoad(PSb);
+  if (PSb.UseHttps==0) then begin
+    goto LCanRedirectToSecurePage;
+  end;
+  
+  if (WebSecureMode) then begin
+    goto LCanRedirectToSecurePage;
+  end;
+
+  res = true;
+  
+LCanRedirectToSecurePage:;
+  CanRedirectToSecurePage = res;
+  return;
+end;
+
 function Boolean CheckAndRedirectToSecurePage(string path)
 begin
   Boolean redirectf;
@@ -501,6 +525,10 @@ begin
         lasttype = -2;
         goto LHandlePath;
       end;
+      if (WSr.ForceHTTPSRedirect and CanRedirectToSecurePage) then begin
+        ShowRedirectHtmlWithArgs(FormatSimpleLink(WebGetArg("path"),true),true,kHttpStatusTemporaryRedirect);
+        goto LHandlePathOut;
+      end;
       if (WSr.NeedsLogin) then begin
         if (LoginState==false) then begin
           if (justloggedout) then begin
@@ -573,6 +601,7 @@ LHandlePath:;
     case kStructTypeProductionPlan: ProdPlanApp(WSr,mpath);
     case kStructTypeWebVideoApp: WebVideoApp(WSr,mpath);
     case kStructTypeFastLinkApp: WebNGFastLinkApp(WSr,mpath);
+    case kStructTypeStandardWebShop: StandardWebShopMain(WSr,mpath);
     otherwise
       if (ShowInternalWebApp(lasttype,WSr,mpath)==false) then begin
         RollbackOneRequestURL;
