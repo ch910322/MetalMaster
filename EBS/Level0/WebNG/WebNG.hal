@@ -459,7 +459,7 @@ begin
   record WebNGStructVc WSr;
   string 255 mpath,node,tpath,tnode;
   integer lasttype,cnt;
-  boolean rootrequested,justloggedout;
+  boolean rootrequested,justloggedout,managflag;
   array longint visitednodes;
   transaction string 60 gCountryCode;
   transaction string 20 gLangcode;
@@ -525,7 +525,15 @@ begin
         lasttype = -2;
         goto LHandlePath;
       end;
-      if (WSr.ForceHTTPSRedirect and CanRedirectToSecurePage) then begin
+      logtext(0,"WebGetArg(\"path\") " & WebGetArg("path"));
+      managflag = true;
+      if(WebGetArg("path")=="/login")then begin
+        managflag = false;
+      end;
+      if(WebHost=="91.203.70.77")then begin
+        managflag = false;
+      end;
+      if (WSr.ForceHTTPSRedirect and CanRedirectToSecurePage and managflag) then begin
         logtext(0,"FormatSimpleLink " & FormatSimpleLink(WebGetArg("path"),true));
         ShowRedirectHtmlWithArgs(FormatSimpleLink(WebGetArg("path"),true),true,kHttpStatusTemporaryRedirect);
         goto LHandlePathOut;

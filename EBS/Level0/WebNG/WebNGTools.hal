@@ -1306,7 +1306,8 @@ begin
   
   res = WebHost;
   if (securef==true) then begin
-    res = WebHost; // The SSL certificate is usually created for the server's public hostname
+    //res = PublicHostName; // The SSL certificate is usually created for the server's public hostname
+    res = WebHost;
   end;
   
   logtext(0,"WebHost " & WebHost);
