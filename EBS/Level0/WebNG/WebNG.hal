@@ -525,7 +525,6 @@ begin
         lasttype = -2;
         goto LHandlePath;
       end;
-      logtext(0,"WebGetArg(\"path\") " & WebGetArg("path"));
       managflag = true;
       if(WebGetArg("path")=="/login")then begin
         managflag = false;
