@@ -473,7 +473,7 @@ begin
     if (FileNameIsImage(Attachr.FileName)) then begin
       imglink = base & "images/";
       imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/" & num,true);
-
+			logtext(0,"webshopwebprod imglink = " & imglink);
       WebOutStringFormatNL("<div class='sp-slide'>");
       WebOutStringFormatNL("<img class='sp-image' src='" & imglink & "' data-src='" & imglink & "'>");
       WebOutStringFormatNL("</div>");
