@@ -2228,7 +2228,12 @@ begin
           curncy = "EUR";
 				  reb = blankval;
 				  itemprice = valtostring(round(ShopGetItemPrice(vItems[aTypes[i]],1,reb,vatcode,curncy,0),defaultcurroundoff),m4VAL,"",".",0);
-          WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - &euro;" & itemprice & "</option>");
+					
+					if(blank(GetVarTypeName(aTypes[i],lang)))then begin
+						logtext(0,"GetVarTypeName(aTypes[i],lang)");
+					end else begin
+						WebOutStringFormatNL("<option value='" & aTypes[i] & "'>" & GetVarTypeName(aTypes[i],lang) & " - &euro;" & itemprice & " </option>");
+					end;
         end;
 				
         WebOutStringFormatNL("                          </select>");
