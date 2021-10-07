@@ -1848,10 +1848,10 @@ begin
   end;
   
   foundf = true;
-  WebNGProductr.Code = UrlDecode(product);
+  /*WebNGProductr.Code = UrlDecode(product);
   if (ReadFirstMain(WebNGProductr,1,true)) then begin
     
-  end;
+  end;*/
   WebOutString(" ");
   if (foundf) then begin
     if (MM_FindItemVar(product,type,color,itemcode)) then begin
@@ -1861,7 +1861,8 @@ begin
   end else begin
     //RedirectToProductCatalog;
   end;
-
+  
+  totqty = 0;
   if (GetShoppingBasket(WSBr,0)) then begin
     rwcnt = MatRowCnt(WSBr);
     for (i=0;i<rwcnt;i=i+1) begin
