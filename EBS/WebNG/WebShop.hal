@@ -1870,7 +1870,8 @@ begin
       totqty = totqty + WSBrw.Qty;
     end;
   end;
-
+  
+  logtext(0,"<basketres><res res='" & res & "' qty='" & totqty & "' sum='" & WSBr.Sum & "'></res></basketres>");
   WebOutString("<basketres><res res='" & res & "' qty='" & totqty & "' sum='" & WSBr.Sum & "'></res></basketres>");
   
   return;

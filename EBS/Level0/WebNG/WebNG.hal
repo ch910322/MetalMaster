@@ -532,6 +532,7 @@ begin
       if(WebHost=="91.203.70.77")then begin
         managflag = false;
       end;
+      //logtext(0,"WebGetArg(\"path\") " & WebGetArg("path"));
       if (WSr.ForceHTTPSRedirect and CanRedirectToSecurePage and managflag) then begin
         ShowRedirectHtmlWithArgs(FormatSimpleLink(WebGetArg("path"),true),true,kHttpStatusTemporaryRedirect);
         goto LHandlePathOut;

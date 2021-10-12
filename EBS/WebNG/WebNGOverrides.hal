@@ -105,22 +105,14 @@ updating function Boolean InternalUpdatingActions(string action)
 begin
   Boolean res;
   string 255 naction,app,fn;
-
-  if (InString(action,".")>0) then begin
-    naction = action;
-    app = removenextlistitem(naction,".");
-/*
-    switch (app) begin
-
-    end;
-*/
-  end;
-  if (res==false) then begin
-    switch (action) begin
-      case "mm_addtobasket":
-        MM_ShopAddToBasket;
-        res = true;
-    end;
+  
+  logtext(0,"InternalUpdatingActions " & action);
+  
+  switch (action) begin
+    case "mm_addtobasket":
+      logtext(0,"InternalUpdatingActions goto " & "MM_ShopAddToBasket");
+      MM_ShopAddToBasket;
+      res = true;
   end;
 
   InternalUpdatingActions = res;
