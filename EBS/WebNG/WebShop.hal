@@ -1265,7 +1265,7 @@ begin
     WebOutStringFormatNL("                  </div>");
     WebOutStringFormatNL("              </div>");
   end;
-  if (aTypes.length>0) then begin
+  // if (aTypes.length>0) then begin
     WebOutStringFormatNL("              <div class='ProdLi'>");
     WebOutStringFormatNL("                  <div class='row'>");
     WebOutStringFormatNL("                      <div class='col-xl-4 col-lg-12 col-md-12 col-12'>");
@@ -1281,7 +1281,7 @@ begin
     WebOutStringFormatNL("                      </div>");
     WebOutStringFormatNL("                  </div>");
     WebOutStringFormatNL("              </div> ");
-  end;
+  // end;
   WebOutStringFormatNL("              <div class='ProdLi'>");
   WebOutStringFormatNL("                  <div class='row no-gutters'>");
   WebOutStringFormatNL("                      <div class='col-md-4 col-4'>");
