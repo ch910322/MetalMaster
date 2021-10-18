@@ -44,7 +44,6 @@ external outer procedure MM_ShopWebProductInfoApp(record WebNGStructVc,string);
 external outer procedure MM_ShopBasketApp(record WebNGStructVc,string);
 external outer procedure MM_ShowDeliveryOptions(record WebNGStructVc,string);
 external outer updating procedure MM_Orderdone(record WebNGStructVc,string);
-external outer procedure MM_ShowOrders(record WebNGStructVc,Boolean);
 
 //CUST-END
 
@@ -150,8 +149,8 @@ begin
   integer newcompany;
   
   res = false;
-  /*
-  if (LoginState==false and nonblank(country)) then begin
+  
+  /*if (LoginState==false and nonblank(country)) then begin
     newcompany = -1;
     foundf = true;
     WCCr.Country = country;
@@ -171,9 +170,13 @@ begin
     if (newcompany!=-1 and newcompany!=CurrentCompany) then begin
       res = SetCompany(WCCr.CompanyNr,false);
     end;
-  end;
-  */
-  res = SetCompany(3,false);
+  end;*/
+  
+  //cust
+    if(currentcompany!=3)then begin
+      res = SetCompany(3,false);
+    end;
+  //cust  
   
   ShopSetCompany = res;
   return;
@@ -231,14 +234,16 @@ begin
 end;
 
 global
-updating procedure ShopApp2(record WebNGStructVc WSr,string path,Boolean simplef)
+procedure ShopApp2(record WebNGStructVc WSr,string path,Boolean simplef)
 begin
   string 255 node,mpath;
   boolean usenextnode;
   integer oldcompany;
   boolean res;
   longint structnode;
-    
+  
+  logtext(0,"ShopApp2 start");
+  
   mpath = path;
   node = removenextnode(mpath);
 
@@ -261,7 +266,7 @@ begin
     RedirectToShopPage(path);
     goto LShopApp;
   end;
-  res = ShopSetCompany(ToolWebNGGetCountry);
+  
   //TODO: a bit of a workaround function
   if (nonblank(WSr.HALFunc)) begin
     if (CountRecords("WebNGProductVc")==0) then begin
@@ -276,6 +281,7 @@ begin
   if (usenextnode) then begin
     node = removenextnode(mpath);
   end;
+  logtext(0,"node= " & node);
   switch (node) begin
     case "":
       //TempWelcomePage(WSr);
@@ -290,8 +296,8 @@ begin
       //ShopProductInfoApp(WSr,mpath);
       //MM_ShopProductInfoApp(WSr,mpath);
       MM_ShopWebProductInfoApp(WSr,mpath);
-    case "orders":
-      MM_ShowOrders(WSr,true);
+    // case "orders":
+      // MM_ShowOrders(WSr,true);
     case "manage":
       ShopManageFavouriteItem(mpath);
     case "configureproduct":
@@ -300,7 +306,7 @@ begin
       ShopNotImplemented(WSr,"EDITCONFIG");
       //make sure that the incoming parameter (sernr or productconfig record) belongs to the current user
     case "recommendations":
-      ShopNotImplemented(WSr,"RECOMMEND");
+      //ShopNotImplemented(WSr,"RECOMMEND");//TODO// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 11 06 2021 y. at 11:52:57 AM
       //ShopListRecommendations(WSr,mpath); //TODO: add this functionality
     case "justadded":
       ShopAfterAddingToBasketApp(WSr,mpath);
@@ -319,7 +325,7 @@ begin
     case "delivery":
       MM_ShowDeliveryOptions(WSr,mpath);
     case "orderdone":
-      MM_Orderdone(WSr,mpath);
+      qupdating.MM_Orderdone(WSr,mpath);
 //CUST-END
     otherwise
       RedirectToShopStartPage;
@@ -330,11 +336,14 @@ begin
   end;
 
 LShopApp:
+
+  logtext(0,"ShopApp2 end");
+  
   return;
 end;
 
 global
-updating procedure ShopApp(record WebNGStructVc WSr,string path)
+procedure ShopApp(record WebNGStructVc WSr,string path)
 begin
   ShopApp2(WSr,path,false);
 end;

@@ -999,6 +999,7 @@ begin
   record PLVc PLr;
   val reb;
   
+  logtext(0,"MM_ShowProductCatalog");
   
   /*country = ToolWebNGGetCountry;
   if(country!="global")then begin
