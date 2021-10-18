@@ -843,7 +843,7 @@ begin
         WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
         WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
         WebOutString("</div></div>");
-        modal = "";
+        modal = " data-toggle='modal'";
         WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89990) & "</a></div>");
       end else begin
         modal = " data-toggle='modal'";
@@ -866,7 +866,7 @@ begin
         WebOutString("<div class='col-md-4 col-4'><div class='number-plus-minus'>");
         WebOutString("<input type='number' min='1' max='100' step='1' value='1' name='qty'>");
         WebOutString("</div></div>");
-        modal = "";
+        modal = " data-toggle='modal'";
         WebOutString("<div class='col-md-4 col-4'><a href='#' class='btns-red' " & modal & " data-target='#ModalAddCart'>" & ToolWebNGTranslateText2(89990) & "</a></div>");
       end else begin
         WebOutString("<div class='row no-gutters'><div class='col-md-8 col-8'><div class='Price'>&euro;" & price & "</div></div>");
