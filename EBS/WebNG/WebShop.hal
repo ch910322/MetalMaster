@@ -2214,7 +2214,7 @@ begin
 		// INr.Code = WebNGProductr.Code;
     // readfirstmain(INr,1,true);
     GetProductVars(WebNGProductr,aTypes,aColors,vItems);
-    if (aTypes.length>0) then begin
+    // if (aTypes.length>0) then begin
       WebOutStringFormatNL("              <form><input type='hidden' name='item' value='" & URLEncodeCS(WebNGProductr.Code) & "'>");
       if (aTypes.length>0) then begin
         WebOutStringFormatNL("              <div class='ModProdLi'>");
@@ -2289,7 +2289,7 @@ begin
       WebOutStringFormatNL("<div class='col-md-4 col-4'> <input type='button' class='btns-white-red' value='" & ToolWebNGTranslateText2(89007) & "'> </div>");
       WebOutStringFormatNL("              </div>");
       WebOutStringFormatNL("          </form>  ");
-    end;
+    // end;
   end;
   OutputColorClasses;
 
