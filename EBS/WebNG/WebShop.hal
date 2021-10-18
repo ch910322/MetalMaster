@@ -631,15 +631,13 @@ end;
 procedure AddToArray(string tstr,array string arr)
 begin
   Integer i;
-  
-  if(nonblank(tstr))then begin
-    for (i=0;i<arr.length;i=i+1) begin
-      if (arr[i]==tstr) then begin
-        goto LAddToArray;
-      end;
+
+  for (i=0;i<arr.length;i=i+1) begin
+    if (arr[i]==tstr) then begin
+      goto LAddToArray;
     end;
-    arr[arr.length] = tstr;
   end;
+  arr[arr.length] = tstr;
 LAddToArray:;
   return;
 end;
