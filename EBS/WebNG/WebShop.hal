@@ -1024,11 +1024,16 @@ begin
       end;
     end;
   end else begin*/
+  
+  logtext(0,"Get Item Prices start");
+  
   while(loopmain(INr,1,true))begin
     reb = blankval;
     curncy = "EUR";
     vItemPrice[INr.Code] = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
   end;
+  
+  logtext(0,"Get Item Prices end");
   //end;
 
   //sorting?
@@ -1039,15 +1044,21 @@ begin
     WPr.Code = WSr.WebPage;
   end;
   if (ReadFirstMain(WPr,1,true)) then begin end;
-
+  
+  
+  logtext(0,"ShowWebAppPageStart start");
   ShowWebAppPageStart(WPr,"");
+  logtext(0,"ShowWebAppPageStart end");
 
   BlockLoad(WSb);
+  logtext(0,"ReadFilters start");
   ReadFilters(vFilters);
+  logtext(0,"ReadFilters end");
 
   DIr.CType = WSb.WebShowClass;
   TrHs = true;
   
+  logtext(0,"Loop products start");
   while(loopmain(WebNGProductr,1,true))begin
     if(setinset(vFilters["Option1"],getWebProductFilters(WebNGProductr)))then begin
       minprice = 99999999;
@@ -1086,6 +1097,8 @@ begin
       arrWebNGProductr[arrWebNGProductr.length] = WebNGProductr;
     end;
   end;
+  
+  logtext(0,"Loop products end");
   /*while (LoopKey("CType",DIr,1,TrHs)) begin
     if (DIr.CType!=WSb.WebShowClass) then begin
       TrHs = false;
@@ -1105,11 +1118,19 @@ begin
   //sort list
 
   //Show filters
+  
+  logtext(0,"ShowFilterOptions start");
   ShowFilterOptions(WSb,vFilters);
+  logtext(0,"ShowFilterOptions end");
   //show items
+  logtext(0,"ShowWebProductCatalog start");
   ShowWebProductCatalog(arrWebNGProductr,vFilters["DisplayOption"],WSb);
+  logtext(0,"ShowWebProductCatalog end");
   //ShowProductCatalog(arrINr,vFilters["DisplayOption"],WSb);
+  
+  logtext(0,"ShowWebAppPageEnd start");
   ShowWebAppPageEnd(WPr);
+  logtext(0,"ShowWebAppPageEnd end");
 
   return;
 end;
