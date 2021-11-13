@@ -1,0 +1,826 @@
+external inner updating function Integer AddProductToBasket(string,val,Integer);
+external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
+external inner function string 10 CurrentWebLang();
+external function string 255 GetVarTypeName(string,string);
+external function string 255 GetVarColorName(string,string);
+external function string 255 GetVarTypeName2(record MMItemTypeVc,string);
+external function string 255 GetVarColorName2(record MMItemColorVc,string);
+external inner function boolean FileNameIsImage(string);
+external inner function string 255 GetLinkToShop();
+external inner procedure ORVc_PasteQuant(var record ORVc,Integer,Boolean,var Boolean);
+external inner function string 255 ToolWebNGTranslateText2(Longint);
+external inner function string 10 CurrentWebLang();
+external inner function val StringToValue(string,Integer,string,string);
+external inner function Boolean ORVc_PasteArtCode(var record ORVc,Integer,var string,var string,Boolean);
+external inner function Boolean ORDchrsum(var record ORVc,Integer);
+external inner procedure ORDchsum(var record ORVc,Integer);
+external inner procedure ORSumup(var record ORVc);
+external function Integer SetCompanyBasedOnCountry();
+external procedure ResetCompanyBasedOnCountry(Integer);
+
+procedure ShowDimentionInput(string label,string icon,string cls)
+begin
+  
+  WebOutString("<div class='diminput " & cls & "'><label for='" & cls & "'>" & label & "</label><input class='rooftype' name='" & cls & "'>");
+  WebOutString("<span class='input_icon'>" & icon & "</span></div>");
+
+  return;
+end;
+
+function Boolean DoToolWebFindTranslation(string code,string lang,Integer filename,var record WebNGTranslateVc tWTr)
+begin
+  string 200 ckey;
+  Boolean foundf,testf;
+  Boolean res;
+  record WebNGTranslateVc WTr;
+  
+  res = false;
+  WTr.FileName = filename;
+  WTr.Code = code;
+  WTr.LangCode = lang;
+  if (ReadFirstKey("FileName",WTr,3,true)) begin
+    if (SizeTextCnt(WTr)>0) then begin
+      res = true;
+      RecordCopy(tWTr,WTr);
+    end;
+  end;
+  DoToolWebFindTranslation = res;
+  return;
+end;
+
+procedure ToolGetRoofCalcTextFormat(record MMRoofCalcItemVc RCIr,var record WebNGTranslateVc WTr)
+begin
+
+  if (DoToolWebFindTranslation(RCIr.Code,CurrentWebLang,5,WTr)) then begin
+  end else begin
+    if (DoToolWebFindTranslation(RCIr.Code,"",5,WTr)) then begin
+    end;
+  end;
+
+  return;
+end;
+
+procedure ShowRoofType(Integer num)
+begin
+  
+  WebOutString("<div class='roof_type_box' data-type='" & num & "'>");
+  WebOutString("<div class='roof_type_image'><img src='/calculator/images/roofs/roof-type-" & num & ".png'></div>");
+  WebOutString("<div class='roof_type_name'>" & ToolWebNGTranslateText2(60014+num) & "</div>");
+  WebOutString("</div>"); //roof_type_box
+  return;
+end;
+
+procedure ShowCalcHeader(Integer step)
+begin
+  Integer i;
+  string 255 act;
+  val width;
+
+  //show steps
+  WebOutString("<div class='step_header'>");
+  for (i=1;i<4;i=i+1) begin
+    act = "";
+    if (i<=step) then begin
+      act = " active_step";
+    end;
+    WebOutString("<div class='step_header_item" & act & "'>" & ToolWebNGTranslateText2(60020+i) & "</div>");
+  end;
+  width = (100/3*step);
+  if (step==3) then begin
+    width = 100;
+  end;
+  WebOutString("<div class='step_progress' style='width:" & width & "%'></div>");
+  WebOutString("<div class='step_list_line'></div>");
+  WebOutString("<div class='step_list_shadow'></div>");
+  
+  WebOutString("</div>");
+
+  return;
+end;
+
+function string 255 GetImageLink(string item)
+begin
+  string 255 res,base;
+  Integer i;
+  record Attach2Vc Attachr;
+  record RLinkVc RLr;
+  record WebNGProductVc WPr;
+
+  WPr.Code = item;
+  if (ReadFirstMain(WPr,1,true)) then begin
+    base = GetLinkToShop;
+
+    i = 0;
+    while (ReadRecordLink(WPr,i,Attachr,RLr)) begin
+      if (FileNameIsImage(Attachr.FileName)) then begin
+        res = base & "images/" & WPr.Code & "/0";
+        goto LGetImageLink;
+      end;
+      i = i + 1;
+    end;
+  end;
+LGetImageLink:;
+
+  GetImageLink = res;
+  return;
+end;
+
+procedure ShowMaterialType(record MMRoofCalcItemVc RCIr)
+begin
+  record WebNGTranslateVc WTr;
+  Integer i;
+  string 255 tstr,comment,imglink;
+  record MMItemSetVc ISr;
+  row MMItemSetVc ISrw;
+
+  ToolGetRoofCalcTextFormat(RCIr,WTr);
+  WebOutString("<div class='mat_type_wrap' ");
+  WebOutString("  id='" & RCIr.Code & "' ");
+  WebOutString("  default_tile='" & RCIr.DefaultTileLen & "' ");
+  WebOutString("  min_tile='" & RCIr.DefaultTileLen & "' ");
+  WebOutString("  tilewidth='" & RCIr.TileWidth & "' ");
+  WebOutString("  tileextrawidth='" & RCIr.TileExtraWidth & "' ");
+  WebOutString("  max_tile='" & RCIr.DefaultTileLen & "' ");
+  ISr.ArtCode = RCIr.DefaultItem;
+  if (ReadFirstMain(ISr,1,true)) then begin
+    MatRowGet(ISr,0,ISrw);
+  end;
+  WebOutString("  default_item='" & ISrw.Item & "' ");
+  WebOutString("  mattype='" & ISrw.Type & "' ");
+  WebOutString("  color='" & ISrw.Color & "' ");
+  WebOutString("  base_item='" & RCIr.DefaultItem & "' ");
+  WebOutString(">");
+  WebOutString("<div class='mat_icon'></div>");
+  comment = WTr.Comment;
+  if (blank(comment)) then begin
+    comment = RCIr.Name;
+  end;
+  WebOutString("<div class='roof_name'>" & comment & "</div>");
+  for (i=0;i<LineTextCnt2(WTr);i=i+1) begin
+    tstr = tstr & LineTextGet2(WTr,i);
+  end;
+  if (nonblank(tstr)) then begin
+    WebOutString("<div class='roof_help_icon'>?</div>");
+    WebOutString("<div class='roof_help_text'>" & tstr);
+    imglink = GetImageLink(RCIr.DefaultItem);
+    if (nonblank(imglink)) then begin
+      WebOutString("<div class='tooltip_images'><img src='" & imglink & "'></div>");
+    end;
+    WebOutString("</div>");
+  end;  
+  WebOutString("</div>"); //mat_type_wrap
+
+  return;
+end;
+
+procedure ShowCalcStep1()
+begin
+  Integer i;
+  record MMRoofCalcItemVc RCIr;
+  
+  WebOutString("<div class='calc_step'>"); 
+  ShowCalcHeader(1);
+  WebOutString("<div class='calc_step_inner'>"); 
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60030) & "<div class='title_helper'><div class='title_helper_title'>" & ToolWebNGTranslateText2(60058) & "</div><div class='title_helper_link'><a href='/kontakti#smallContacts2' target='_blank'>" & ToolWebNGTranslateText2(60059) & "</a></div></div></div>");
+  WebOutString("<div id='roof_type_list'>"); 
+  for (i=1;i<6;i=i+1) begin
+    ShowRoofType(i);
+  end;
+  WebOutString("</div>"); //roof_type_list
+  WebOutString("<div class='section_divider'></div>");
+  WebOutString("<div class='roof_dyn_section'>");
+  WebOutString("<div class='roof_input_section'>");
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60032) & "</div>");
+  WebOutString("<div class='roof_input_list'>");
+  ShowDimentionInput(ToolWebNGTranslateText2(60000),ToolWebNGTranslateText2(60001),"dimw");
+  ShowDimentionInput(ToolWebNGTranslateText2(60002),ToolWebNGTranslateText2(60003),"dimw1");
+  ShowDimentionInput(ToolWebNGTranslateText2(60004),ToolWebNGTranslateText2(60005),"dimw2");
+  ShowDimentionInput(ToolWebNGTranslateText2(60012),ToolWebNGTranslateText2(60013),"dimw3");
+  ShowDimentionInput(ToolWebNGTranslateText2(60006),ToolWebNGTranslateText2(60007),"dimh");
+  ShowDimentionInput(ToolWebNGTranslateText2(60008),ToolWebNGTranslateText2(60009),"dimh1");
+  ShowDimentionInput(ToolWebNGTranslateText2(60010),ToolWebNGTranslateText2(60011),"dimh2");
+  WebOutString("</div>"); //roof_input_list
+  WebOutString("</div>"); //roof_input_section
+  WebOutString("<div class='roof_image_wrap'>");
+  WebOutString("<div class='roof_image'><img src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' style='max-height:200px'></div>");
+  WebOutString("</div>"); //roof_image
+  WebOutString("</div>"); //roof_dyn_section
+  WebOutString("<div class='section_divider'></div>");
+  WebOutString("<div class='step_action'><div class='doCalc'>" & ToolWebNGTranslateText2(60033) & "</div></div>");
+
+  WebOutString("</div>"); //calc_step_inner
+  WebOutString("</div>"); //calc_step
+
+  return;
+end;
+
+procedure RoofMaterialType2Frame()
+begin
+  record MMRoofCalcItemVc RCIr;
+  row MMRoofCalcItemVc RCIrw;
+  Longint pos;
+  string 255 tstr;
+  Integer i,rwcnt;
+  
+  WebOutString("<div class='material_type_wrap'>");
+  WebOutString("<div class='small_title'>" & ToolWebNGTranslateText2(60034) & "</div>");
+  WebOutString("<div class='mat_type_list'>");
+  while (LoopMain(RCIr,1,true)) begin
+    ShowMaterialType(RCIr);
+  end;
+  WebOutString("</div>");
+/*
+  while (LoopMain(RCIr,1,true)) begin
+    pos = -1;
+    rwcnt = MatRowCnt(RCIr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(RCIr,i,RCIrw);
+      WebOutString("<div class='mat_type_wrap' id='" & RCIrw.Item & "'><div class='mat_icon'></div><div class='mat_text'>" & RCIrw.Spec & "</div><div class='mat_help'></div><div class='mat_help_text'></div></div>");
+    end;
+    WebOutString("</div>");
+  end;
+*/
+  WebOutString("</div>"); //material_type_wrap
+
+  return;
+end;
+
+procedure RoofSheetDimentions(Integer side)
+begin
+  
+  WebOutString("<div class='roof_side side" & side & "' side='" & side & "'>");
+  WebOutString("<div class='roof_side_text'>" & ToolWebNGTranslateText2(60035) & " " & side & "</div>");
+  WebOutString("<div class='roof_side_input_wrap'><div class='smal_title'>" & ToolWebNGTranslateText2(60036) & "</div><div class='roof_side_input'><div class='input_button less'>-</div><input type='text'><div class='input_button more'>+</div></div></div>");
+  WebOutString("</div>"); //roof_side
+
+  return;
+end;
+
+// profile type based on material
+procedure ShowCalcStep2()
+begin
+  
+  WebOutString("<div class='calc_step step2'>"); 
+  ShowCalcHeader(2);
+  WebOutString("<div class='calc_step_inner'>"); 
+  WebOutString("<div class='roof_dyn_section'>");
+  RoofMaterialType2Frame;
+  
+  WebOutString("<div class='roof_visual_section'>");
+  WebOutString("<div class='roof_side_dims'>");
+  RoofSheetDimentions(1);
+  RoofSheetDimentions(2);
+  WebOutString("</div>"); //roof_side_dims
+  WebOutString("<div class='roof_projection'><div class='svg_frame'><svg id='projection' style='width: 600px; height: 346.923px;''></svg></div>");
+  WebOutString("</div>"); //roof_projection
+  WebOutString("</div>"); //roof_visual_section
+  WebOutString("</div>"); //roof_dyn_section
+  WebOutString("</div>"); //calc_step_inner
+  WebOutString("</div>"); //calc_step
+
+  return;
+end;
+
+procedure ShowSimpleSelect(string label,string class)
+begin
+
+  WebOutString("<div class='modal_select_line " & class & "'><div class='select_label'>" & label & "</div><div class='select_form'><select></select></select></div></div>");
+  
+
+  return;
+end;
+
+//choose roof item
+procedure ShowCalcStep3()
+begin
+  record MMItemTypeVc ITr;
+  record MMItemColorVc ICr;
+  string 255 lang;
+  
+  WebOutString("<div class='calc_step step3'>"); 
+  WebOutString("<div class='calc_step_inner'>"); 
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60038) & "</div>");
+  WebOutString("<div id='selected_item' class='item_display'>");
+  WebOutString("<div class='item_start'><div class='item_image'><img></div><div class='item_info'><div class='item_name'></div><div class='item_dims' mat_text='" & ToolWebNGTranslateText2(60043) & "' color_text='" & ToolWebNGTranslateText2(60044) & "'></div></div></div><div class='item_end'><div class='item_price'></div><div class='choose_item'>" & ToolWebNGTranslateText2(60037) & "</div></div>");
+  WebOutString("</div>"); 
+  WebOutString("</div>"); //calc_step_inner
+  WebOutString("</div>"); //calc_step
+
+  WebOutString("<div class='item_select_modal'>");
+  WebOutString("<div class='item_select_modal_exit'><i class='fal fa-times-circle'></i></div>");
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60042) & "</div>");
+  WebOutString("<div class='section_divider'></div>");
+
+  WebOutString("<div class='item_select_inner'>");
+  ShowSimpleSelect(ToolWebNGTranslateText2(60039),"mat_type");
+  ShowSimpleSelect(ToolWebNGTranslateText2(60040),"color");
+  WebOutString("<div class='select_item_button'>" & ToolWebNGTranslateText2(60041) & "</div>");
+  WebOutString("</div>"); //item_select_inner
+  WebOutString("<div class='modal_helper'>");
+
+  lang = CurrentWebLang;
+  WebOutString("<div class='hidden_type_list' style='display:none'>");
+  while (LoopMain(ITr,1,true)) begin
+    WebOutString("<div class='list_mat_type' id='" & ITr.Code & "'>" & GetVarTypeName2(ITr,lang) & "</div>");
+  end;
+  WebOutString("</div>"); //hidden_type_list
+
+  WebOutString("<div class='hidden_color_list' style='display:none'>");
+  while (LoopMain(ICr,1,true)) begin
+    WebOutString("<div class='list_mat_color' id='" & ICr.Code & "' code='" & ICr.ColorCode & "'>" & GetVarColorName2(ICr,lang) & "</div>");
+    WebOutString("<style>.color_code" & ICr.Code & "::before{color: " & ICr.ColorCode & ";}</style>");
+  end;
+  WebOutString("</div>"); //hidden_color_list
+
+  WebOutString("</div>"); //modal_helper
+  WebOutString("</div>"); //item_select_modal
+
+  return;
+end;
+procedure ShowCalcStep4()
+begin
+  
+  WebOutString("<div class='calc_step step4'>"); 
+  ShowCalcHeader(3);
+
+  WebOutString("<div class='roof_final_section'>");
+  WebOutString("<div class='roof_item_section'>");
+  WebOutString("</div>"); //roof_item_section
+  WebOutString("<div class='roof_checkout_section'>");
+  //some info
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60049) & "</div>");
+  WebOutString("<div class='section_divider'></div>");
+  WebOutString("<div class='total_info total_dim1'><div class='label'>" & ToolWebNGTranslateText2(60047) & "</div><div class='value'></div></div>");
+  WebOutString("<div class='total_info total_dim2'><div class='label'>" & ToolWebNGTranslateText2(60048) & "</div><div class='value'></div></div>");
+  WebOutString("<div class='section_divider'></div>");
+  WebOutString("<div class='total_info total_dim3'><div class='label'>" & ToolWebNGTranslateText2(60050) & "</div><div class='value'></div></div>");
+  WebOutString("<div class='total_addto_basket'>" & ToolWebNGTranslateText2(60051) & "</div>");
+  WebOutString("<div class='basket_message'>" & ToolWebNGTranslateText2(60052) & "</div>");
+  WebOutString("</div>"); //roof_final_section
+  WebOutString("</div>"); //roof_checkout_section
+  WebOutString("</div>"); //calc_step
+  WebOutString("<div class='final_item_template'>");
+  WebOutString("<div class='group_item_single_item'><div class='item_top'><div class='item_remove'><i class='fal fa-times-circle'></i></div><div class='item_start'><div class='item_image'><img></div><div class='item_info'><div class='item_name'></div><div class='item_dims' mat_text='" & ToolWebNGTranslateText2(60043) & "' color_text='" & ToolWebNGTranslateText2(60044) & "'></div></div></div><div class='item_end'><div class='item_price'></div></div></div><div class='item_bottom'><div class='item_qty' text='" & ToolWebNGTranslateText2(60045) & "'></div><div class='item_total' text='" & ToolWebNGTranslateText2(60046) & "'></div></div></div>");
+  WebOutString("</div>");
+
+  return;
+end;
+
+global
+procedure ShowRoofCalculatorPage()
+begin
+  
+  WebOutString("<div id='calc_main' class='roofcalculator'>"); 
+  ShowCalcStep1;
+  ShowCalcStep2;
+  ShowCalcStep3;
+  ShowCalcStep4;
+
+  WebOutString("</div>"); //calc_main
+
+  return;
+end;
+
+procedure ReadRoofMetaData(JSON js,var vector val vSpecs)
+begin
+  
+  vSpecs["TileTotLen"] = StringToValue(JSONGet(js,"TileTotLen"),M45Val,"",".");
+  vSpecs["TileTotCnt"] = StringToValue(JSONGet(js,"TileTotCnt"),M45Val,"",".");
+  vSpecs["RoofArea"] = StringToValue(JSONGet(js,"RoofArea"),M45Val,"",".");
+  vSpecs["RoofPerimeter"] = StringToValue(JSONGet(js,"RoofPerimeter"),M45Val,"",".");
+  vSpecs["SideLength"] = StringToValue(JSONGet(js,"SideLength"),M45Val,"",".");
+  vSpecs["GableLength"] = StringToValue(JSONGet(js,"GableLength"),M45Val,"",".");//kore
+
+  return;
+end;
+
+function string 255 ShowJSONItemInfo(string item,string item2,string type,string color)
+begin
+  record INVc INr;
+  string 255 imglink,res;
+  val price,reb;
+  string 255 curncy,vatcode;
+
+  INr.Code = item;
+  ReadFirstMain(INr,1,true);
+  if (nonblank(item2)) then begin
+    imglink = GetImageLink(item2);
+  end else begin
+    imglink = GetImageLink(item);
+  end;
+
+  reb = blankval;
+  curncy = "EUR";
+  price = ShopGetItemPrice(INr.Code,1,reb,vatcode,curncy,0);
+  if (blank(price)) then begin
+    price = 0;
+  end;
+
+  res = "{";
+  res = res & "\"item_code\":\"" & item & "\",";
+  res = res & "\"item_name\":\"" & INr.Name & "\",";
+  res = res & "\"item_price\":" & ValToString(price,M4Val,"",".",0) & ",";
+  res = res & "\"item_image\":\"" & imglink & "\",";
+  if (nonblank(item2)) then begin
+    res = res & "\"item_dim1\":\"" & GetVarTypeName(type,CurrentWebLang) & "\",";
+    res = res & "\"item_dim2\":\"" & GetVarColorName(color,CurrentWebLang) & "\"";
+  end else begin
+    res = res & "\"item_dim1\":\"\",";
+    res = res & "\"item_dim2\":\"\"";
+  end;
+  res = res & "}";
+
+  ShowJSONItemInfo = res;
+  return;
+end;
+
+procedure GetItemQty(val inqty,row MMRoofCalcExtraVc RCErw,string color,string type,var string item,var string itemcode,var val outqty)
+begin
+  record MMItemSetVc ISr;
+  row MMItemSetVc ISrw;
+  val ratiotmp;
+  Integer ratio;
+  Integer i,rwcnt;
+  
+  itemcode = "";
+  item = "";
+  outqty = 0;
+
+  ratiotmp = inqty/RCErw.MeasureQty;
+  ratio = ratiotmp;
+  if (ratio!=ratiotmp) then begin
+    ratio = ratio + 1;
+  end;
+
+  outqty = ratio*RCErw.ItemQty;
+
+  if (nonblank(RCErw.Item)) then begin
+    itemcode = RCErw.Item;
+  end;
+  if (nonblank(RCErw.ItemSet)) then begin
+    ISr.ArtCode = RCErw.ItemSet;
+    if (ReadFirstMain(ISr,1,true)) then begin
+      rwcnt = MatRowCnt(ISr);
+      for (i=0;i<rwcnt;i=i+1) begin
+        MatRowGet(ISr,i,ISrw);
+        if (ISrw.Type==type and ISrw.Color==color) then begin
+          itemcode = ISrw.Item;
+          i = rwcnt;
+        end;
+      end;
+    end;
+  end;
+  
+  item = ShowJSONItemInfo(itemcode,ISr.ArtCode,type,color);
+
+  return;
+end;
+
+procedure GetItemSetColorAndType(string base_item,string selected_item,var string color,var string type)
+begin
+  record MMItemSetVc ISr;
+  row MMItemSetVc ISrw;
+  Integer i,rwcnt;
+  
+  ISr.ArtCode = base_item;
+  if (ReadFirstMain(ISr,1,true)) then begin
+    rwcnt = MatRowCnt(ISr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(ISr,i,ISrw);
+      if (ISrw.Item==selected_item) then begin
+        type = ISrw.Type;
+        color = ISrw.Color;
+        i = rwcnt;
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+procedure AddHeaderToOrder(var record ORVc ORr,string tstr)
+begin
+  row ORVc ORrw;
+  
+  ClearRow(ORr,ORrw,kInvoiceRowTypeHeader);
+  ORrw.Spec = tstr;
+  MatRowPut(ORr,MatRowCnt(ORr),ORrw);
+
+  return;
+end;
+
+procedure AddItemRowToOrder(var record ORVc ORr,string item,val qty)
+begin
+  Integer num;
+  string 255 warning;
+  row ORVc ORrw;
+  
+  num = MatRowCnt(ORr);
+  ClearRow(ORr,ORrw,1);
+  ORrw.ArtCode = item;
+  ORrw.Quant = qty;
+  MatRowPut(ORr,num,ORrw);
+  //item after
+  ORVc_PasteArtCode(ORr,num,warning,warning,false);
+
+  return;
+end;
+
+global
+procedure AddCalculatorExtraItems(vector val vSpecs,string itemlist,string type,string color,var string jsstr,var record ORVc ORr)
+begin
+  record MMRoofCalcExtraVc RCEr;
+  row MMRoofCalcExtraVc RCErw;
+  Integer i,rwcnt;
+  string 255 tstr,itemcode,item;
+  Boolean firstitemf,chsum;
+  val qty;
+
+  RCEr.Code = itemlist;
+  if (ReadFirstMain(RCEr,1,true)) then begin
+    rwcnt = MatRowCnt(RCEr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(RCEr,i,RCErw);
+      switch (RCErw.MeasureType) begin
+        case 1:
+          //must start with this
+          jsstr = jsstr & "]},";
+          tstr = ToolWebNGTranslateText2(StringToLongint(RCErw.Item));
+          jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
+          firstitemf = true;
+          AddHeaderToOrder(ORr,tstr);
+        case 2:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["TileTotLen"],RCErw,color,type,item,itemcode,qty);            
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 3:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["TileTotCnt"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 4:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["RoofArea"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 5:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["RoofPerimeter"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 6:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["SideLength"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 7:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["GableLength"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 8:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["SideLength"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 9:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["Height"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 10:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["A"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+        case 11:
+          if (firstitemf==false) then begin
+            jsstr = jsstr & ",";
+          end;
+          firstitemf = false;
+          GetItemQty(vSpecs["Hooks"],RCErw,color,type,item,itemcode,qty);
+          jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
+          AddItemRowToOrder(ORr,itemcode,qty);
+      end;
+    end;
+  end;
+  jsstr = jsstr & "]}";
+
+  rwcnt = MatRowCnt(ORr);
+  ORVc_PasteQuant(ORr,rwcnt,true,chsum);
+  chsum = ORDchrsum(ORr,rwcnt);
+  if (chsum) then begin
+    ORDchsum(ORr,rwcnt);
+    ORSumup(ORr);
+  end;
+
+  return;
+end;
+
+procedure GetRoofCalc()
+begin
+  string 255 jsstr,tstr,root;
+  JSON js;
+  string 255 mattype,selected_item,base_item,color,type,item,itemcode;
+  record ORVc ORr;
+  Integer i,rwcnt,oldcomp;
+  Boolean firstitemf,chsum;
+  record MMRoofCalcItemVc RCIr;
+  val qty,tilearea,tilelength;
+  vector val vSpecs;
+
+  //get roof specs
+  js = ParseJSONString(WebGetArg("js"));
+  mattype = JSONGet(js,"materialtype");
+  ReadRoofMetaData(js,vSpecs);
+  RCIr.Code = mattype;
+  //firstf = true;
+  jsstr = "{\"groups\": [";
+  if (ReadFirstMain(RCIr,1,true)) then begin
+    //get default item
+    selected_item = JSONGet(js,"item");
+    base_item = JSONGet(js,"base_item");
+    //find the item - color, type
+    GetItemSetColorAndType(base_item,selected_item,color,type);
+    //tstr = ToolWebNGTranslateText2(222222);
+    jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
+    AddHeaderToOrder(ORr,tstr);
+
+    //output tile items
+    i = 0;
+    tilearea = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
+    qty = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
+    jsstr = jsstr & "{\"item\":" & ShowJSONItemInfo(selected_item,base_item,type,color) & ",\"qty\":" & qty  & ",\"area\":" & qty & "}";
+    AddItemRowToOrder(ORr,selected_item,qty);
+
+    AddCalculatorExtraItems(vSpecs,RCIr.ExtraItems,type,color,jsstr,ORr);
+  end;
+  jsstr = jsstr & "]";
+  jsstr = jsstr & ",\"totalvalue\": " & ValToString(ORr.Sum4,M4Val,"",".",0);
+  //get subtotal and vat and total
+  //jsstr = jsstr & ""put values
+
+  jsstr = jsstr & "}";
+  WebOutString(jsstr);
+
+  return;
+end;
+
+procedure GetRoofItems()
+begin
+  val reb;
+  string 255 vatcode,curncy,tstr,jsstr,base_item;
+  Integer i,rwcnt;
+  vector string 255 vTypes,vItems;
+  array string 255 aTypes;
+  val price;
+  Longint pos;
+  Boolean firstf;
+  record MMItemSetVc ISr;
+  row MMItemSetVc ISrw;
+  
+  reb = blankval;
+  curncy = "EUR";
+  base_item = WebGetArg("base_item");
+  ISr.ArtCode = base_item;
+  if (ReadFirstMain(ISr,1,true)) then begin
+    rwcnt = MatRowCnt(ISr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(ISr,i,ISrw);
+      if (ISrw.ShowOnWeb==1) then begin
+        if (nonblank(vTypes[ISrw.Type])) then begin
+          vTypes[ISrw.Type] = vTypes[ISrw.Type] & ",";
+        end;
+        vItems[ISrw.Type] = ISrw.Item;
+        vTypes[ISrw.Type] = vTypes[ISrw.Type] & ISrw.Color & ":" & ISrw.Item;
+      end;
+    end;
+  end;
+
+  jsstr = jsstr & "[";
+  GetVectorTags(vTypes,aTypes);
+  for (i=0;i<aTypes.length;i=i+1) begin
+    price = ShopGetItemPrice(vItems[aTypes[i]],1,reb,vatcode,curncy,0);
+    if (i>0) then begin
+      jsstr = jsstr & ",";
+    end;
+    jsstr = jsstr & "{\"type\":\"" & aTypes[i] & "\",\"price\":" & ValToString(price,M4Val,"",".",0) & ",\"colors\":[";
+    pos = -1;
+    firstf = true;
+    while (GetNextSubString(vTypes[aTypes[i]],pos,",",tstr)) begin
+      if (firstf==false) then begin
+        jsstr = jsstr & ",";
+      end;
+      firstf = false;
+      jsstr = jsstr & "\"" & tstr & "\"";
+    end;
+    jsstr = jsstr & "]}";
+  end;
+  jsstr = jsstr & "]";
+  WebOutString(jsstr);
+
+  return;
+end;
+
+procedure RecalculateItems()
+begin
+  JSON js;
+  Integer i;
+  val qty;
+  string 255 item,root;
+  record ORVc ORr;
+  Integer rwcnt;
+  Boolean chsum;
+  
+  
+  js = ParseJSONString(WebGetArg("js"));
+  i = 0;
+  while (JSONNodeExists(js,"items/[" & i & "]")) begin
+    root = "items/[" & i & "]/";
+    item = JSONGet(js,root & "item");
+    qty = StringToValue(JSONGet(js,root & "qty"),M45Val,"",".");
+    
+    
+    AddItemRowToOrder(ORr,item,qty);
+    i = i + 1;
+  end;
+  ORVc_PasteQuant(ORr,rwcnt,true,chsum);
+  chsum = ORDchrsum(ORr,rwcnt);
+  if (chsum) then begin
+    ORDchsum(ORr,rwcnt);
+    ORSumup(ORr);
+  end;
+
+  WebOutString("{\"totalvalue\":" & ValToString(ORr.Sum4,M4Val,"",".",0) & "}");
+
+  return;
+end;
+
+global
+procedure RoofActions(string action)
+begin
+  Integer oldcomp;
+
+  oldcomp = SetCompanyBasedOnCountry;
+  switch (action) begin
+    case "getroofcalc":
+      GetRoofCalc;
+    case "getroofitems":
+      GetRoofItems;
+    case "recalculate":
+      RecalculateItems;
+  end;
+  ResetCompanyBasedOnCountry(oldcomp);
+
+  return;
+end;
+
+global
+updating procedure RoofCalcAddToBasket()
+begin
+  JSON js;
+  Integer i;
+  val qty;
+  string 255 item,root;
+  
+  js = ParseJSONString(WebGetArg("js"));
+  i = 0;
+  while (JSONNodeExists(js,"items/[" & i & "]")) begin
+    root = "items/[" & i & "]/";
+    item = JSONGet(js,root & "item");
+    qty = StringToValue(JSONGet(js,root & "qty"),M45Val,"",".");
+    
+    AddProductToBasket(item,qty,-1);
+    i = i + 1;
+  end;
+
+  return;
+end;

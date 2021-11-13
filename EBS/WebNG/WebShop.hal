@@ -1136,6 +1136,27 @@ begin
 end;
 
 global
+function string 255 GetVarTypeName2(record MMItemTypeVc ITr,string lang)
+begin
+  Integer i,rwcnt;
+  row MMItemTypeVc ITrw;
+  string 255 res;
+
+  res = ITr.Name;
+  rwcnt = MatRowCnt(ITr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ITr,i,ITrw);
+    if (ITrw.LangCode==lang) then begin
+      res = ITrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetVarTypeName2 = res;
+  return;
+end;
+
+global
 function string 255 GetVarTypeName(string code,string lang)
 begin
   Integer i,rwcnt;
@@ -1145,18 +1166,31 @@ begin
 
   ITr.Code = code;
   if (ReadFirstMain(ITr,1,true)) then begin
-    res = ITr.Name;
-    rwcnt = MatRowCnt(ITr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(ITr,i,ITrw);
-      if (ITrw.LangCode==lang) then begin
-        res = ITrw.Text;
-        i = rwcnt;
-      end;
-    end;
+    res = GetVarTypeName2(ITr,lang);
   end;
 
   GetVarTypeName = res;
+  return;
+end;
+
+global
+function string 255 GetVarColorName2(record MMItemColorVc ICr,string lang)
+begin
+  Integer i,rwcnt;
+  row MMItemColorVc ICrw;
+  string 255 res;
+
+  res = ICr.Name;
+  rwcnt = MatRowCnt(ICr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ICr,i,ICrw);
+    if (ICrw.LangCode==lang) then begin
+      res = ICrw.Text;
+      i = rwcnt;
+    end;
+  end;
+
+  GetVarColorName2 = res;
   return;
 end;
 
@@ -1170,15 +1204,7 @@ begin
 
   ICr.Code = code;
   if (ReadFirstMain(ICr,1,true)) then begin
-    res = ICr.Name;
-    rwcnt = MatRowCnt(ICr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(ICr,i,ICrw);
-      if (ICrw.LangCode==lang) then begin
-        res = ICrw.Text;
-        i = rwcnt;
-      end;
-    end;
+    res = GetVarColorName2(ICr,lang);
   end;
 
   GetVarColorName = res;

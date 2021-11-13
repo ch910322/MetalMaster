@@ -20,7 +20,10 @@ begin
   Setting("MM Country Prices List",WebNGCountryPricesLClass,modWebShopNG);
   Setting("MM Additional WEB Settings",MMWebDelModeTClass,modWebShopNG);
   Setting("MM WebShop Rebate",MMWebShopRebateTClass,modWebShopNG); 
-  
+  Setting("Jumtu kalkulatora tipi",MMRoofCalcItemLClass,modWebShopNG);
+  Setting("Noteku kalkulatora tipi",MMDrainCalcItemLClass,modWebShopNG);
+  Setting("Kalkulatoru papildu artikuli",MMRoofCalcExtraLClass,modWebShopNG);
+
   SetBegin(30100);
   SetText(0,"-");
   SetText(1,"Declaration 1");
@@ -40,6 +43,21 @@ begin
   SetText(1,"Pdf");
   SetText(2,"Doc");
   SetText(3,"Video");
+  EndSet;
+
+  SetBegin(30201);
+  SetText(0,"-");
+  SetText(1,"Sadaļas sākums");
+  SetText(2,"Lokšņu garums, M");
+  SetText(3,"Lokšņu skaits");
+  SetText(4,"Jumta laukums, M2");
+  SetText(5,"Jumta perimetrs, M");
+  SetText(6,"Malu garums, M");
+  SetText(7,"Kores garums, M");
+  SetText(8,"Malu garums, M (notekas)");
+  SetText(9,"Augstums, M (notekas)");
+  SetText(10,"Pārkare, M (notekas)");
+  SetText(11,"Āku skaits, gab (notekas)");
   EndSet;
 
 

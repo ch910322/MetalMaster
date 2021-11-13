@@ -17,7 +17,11 @@ external updating procedure MM_ShopAddToBasket();
 external procedure CustShowBasketElement();
 external procedure ShowItemVarsAjax();
 external procedure MM_ShowOrders(record WebNGElementVc);
-
+external procedure ShowRoofCalculatorPage(record WebNGElementVc);
+external procedure ShowDrainCalculatorPage(record WebNGElementVc);
+external procedure RoofActions(string);
+external procedure DrainActions(string);
+external updating procedure RoofCalcAddToBasket();
 
 global
 function boolean ShowSpecialWebElementInternal(record WebNGElementVc WEr)
@@ -47,6 +51,10 @@ begin
       CustDOCDocuments(WEr);
 		case 209:
 			MM_ShowOrders(WEr);
+    case 210:
+      ShowRoofCalculatorPage(WEr);
+    case 211:
+      ShowDrainCalculatorPage(WEr);
     otherwise
       res = false;
   end;
@@ -113,6 +121,9 @@ begin
       logtext(0,"InternalUpdatingActions goto " & "MM_ShopAddToBasket");
       MM_ShopAddToBasket;
       res = true;
+    case "roofcalc_addtobasket":
+      RoofCalcAddToBasket;
+      res = true;
   end;
 
   InternalUpdatingActions = res;
@@ -134,6 +145,12 @@ begin
   switch (app) begin
     case "getitemvars":
       ShowItemVarsAjax;
+      res = true;
+    case "roof":
+      RoofActions(naction);
+      res = true;
+    case "drain":
+      DrainActions(naction);
       res = true;
   end;
 
