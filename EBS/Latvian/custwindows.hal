@@ -415,7 +415,6 @@ begin
   real h,v,vs,v2,vs2,hm;
   WindowBegin("Jumtu kalkulatora tips",MMRoofCalcItemDClass,CGview,-);
   SetWRect(20,80,600,339);
-  Sizeable(-1,-1,0,0);
   UseView(MMRoofCalcItemVc);
   vs=20; h=150; vs2=16; hm=-100;
   EditField(h,v=6,100,"Kods",Normal,Code,false,);
@@ -448,9 +447,8 @@ end;
 window MMDrainCalcItemLClass:1
   wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
-  WindowBegin("Jumtu kalkulatora tipi",MMDrainCalcItemLClass,CGmlist,-);
+  WindowBegin("Noteku kalkulatora tipi",MMDrainCalcItemLClass,CGmlist,-);
   SetWRect(20,80,660,298);
-  Sizeable(-1,-1,0,0);
   SpawnClass(MMDrainCalcItemDClass);
   UseView(MMDrainCalcItemVc);
   RecordList(4,17,-21,-39);
@@ -464,9 +462,8 @@ window MMDrainCalcItemDClass:1
   wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs,v2,vs2,hm;
-  WindowBegin("Jumtu kalkulatora tips",MMDrainCalcItemDClass,CGview,-);
+  WindowBegin("Noteku kalkulatora tips",MMDrainCalcItemDClass,CGview,-);
   SetWRect(20,80,600,339);
-  Sizeable(-1,-1,0,0);
   UseView(MMDrainCalcItemVc);
   vs=20; h=150; vs2=16; hm=-100;
   EditField(h,v=6,100,"Kods",Normal,Code,false,);
@@ -499,7 +496,7 @@ begin
   MatCol(1,24,"Tips",0,MeasureType,false,SetSClass);
   MatCol(1,134,"Daudzums",0,MeasureQty,false,0);
   MatCol(1,204,"Artikuls",0,Item,false,INSClass);
-  MatCol(1,204,"Artikuls2",0,ItemSet,false,MMItemSetSClass);
+  MatCol(1,204,"Variācija",0,ItemSet,false,MMItemSetSClass);
   MatCol(1,304,"Nosaukums",0,Spec,false,0);
   MatCol(1,-90,"Daudzums",0,ItemQty,false,0);
   EndMatrix;

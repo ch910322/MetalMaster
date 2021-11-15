@@ -57,7 +57,7 @@ begin
   SetText(8,"Malu garums, M (notekas)");
   SetText(9,"Augstums, M (notekas)");
   SetText(10,"Pārkare, M (notekas)");
-  SetText(11,"Āku skaits, gab (notekas)");
+  SetText(11,"Āķu skaits, gab (notekas)");
   EndSet;
 
 

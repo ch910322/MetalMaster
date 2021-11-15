@@ -17,7 +17,7 @@ external inner procedure ORDchsum(var record ORVc,Integer);
 external inner procedure ORSumup(var record ORVc);
 external function Integer SetCompanyBasedOnCountry();
 external procedure ResetCompanyBasedOnCountry(Integer);
-external procedure AddCalculatorExtraItems(vector val,string,string,string,var string,var record ORVc);
+external procedure AddCalculatorExtraItems(vector val,string,string,string,var string,var record ORVc,Boolean);
 
 procedure ShowDimentionInput(string label,string icon,string cls)
 begin
@@ -52,9 +52,9 @@ end;
 procedure ToolGetRoofCalcTextFormat(record MMDrainCalcItemVc DCIr,var record WebNGTranslateVc WTr)
 begin
 
-  if (DoToolWebFindTranslation(DCIr.Code,CurrentWebLang,5,WTr)) then begin
+  if (DoToolWebFindTranslation(DCIr.Code,CurrentWebLang,6,WTr)) then begin
   end else begin
-    if (DoToolWebFindTranslation(DCIr.Code,"",5,WTr)) then begin
+    if (DoToolWebFindTranslation(DCIr.Code,"",6,WTr)) then begin
     end;
   end;
 
@@ -84,7 +84,7 @@ begin
     if (i<=step) then begin
       act = " active_step";
     end;
-    WebOutString("<div class='step_header_item" & act & "'>" & ToolWebNGTranslateText2(60020+i) & "</div>");
+    WebOutString("<div class='step_header_item" & act & "'>" & ToolWebNGTranslateText2(60065+i) & "</div>");
   end;
   width = (100/3*step);
   if (step==3) then begin
@@ -136,7 +136,7 @@ begin
   row MMItemSetVc ISrw;
 
   ToolGetRoofCalcTextFormat(DCIr,WTr);
-  WebOutString("<div class='mat_type_wrap' ");
+  WebOutString("<div class='roof_material' ");
   WebOutString("  id='" & DCIr.Code & "' ");
   ISr.ArtCode = DCIr.DefaultItem;
   if (ReadFirstMain(ISr,1,true)) then begin
@@ -238,13 +238,17 @@ begin
   string 255 tstr;
   Integer i,rwcnt;
   
-  WebOutString("<div class='material_type_wrap'>");
-  WebOutString("<div class='small_title'>" & ToolWebNGTranslateText2(60034) & "</div>");
+  WebOutString("<div class='drain_type_wrap'>");
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60060) & "</div>");
   WebOutString("<div class='mat_type_list'>");
   while (LoopMain(DCIr,1,true)) begin
     ShowMaterialType(DCIr);
   end;
   WebOutString("</div>");
+  WebOutString("</div>"); //drain_type_wrap
+
+  WebOutString("<div class='section_divider'></div>");
+  WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60061) & "</div>");
   WebOutString("<div class='drain_distance_list'>");
   ResetLoop(DCIr);
   RecordClear(DCIr);
@@ -253,6 +257,7 @@ begin
   end;
   WebOutString("</div>");
 
+  WebOutString("<div class='section_divider'></div>");
   WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60057) & "</div>");
   WebOutString("<div class='drain_type_color'>");
 
@@ -260,7 +265,6 @@ begin
   ShowSimpleSelect(ToolWebNGTranslateText2(60040),"color");
   WebOutString("</div>");
 
-  WebOutString("</div>"); //material_type_wrap
 
   return;
 end;
@@ -275,10 +279,8 @@ begin
   WebOutString("<div class='calc_step step2'>"); 
   ShowCalcHeader(2);
   WebOutString("<div class='calc_step_inner'>"); 
-  WebOutString("<div class='roof_dyn_section'>");
   DrainMaterialType2Frame;
   
-  WebOutString("</div>"); //roof_dyn_section
   WebOutString("</div>"); //calc_step_inner
 
   WebOutString("<div class='modal_helper'>");
@@ -314,9 +316,6 @@ begin
   WebOutString("<div class='roof_checkout_section'>");
   //some info
   WebOutString("<div class='medium_title'>" & ToolWebNGTranslateText2(60049) & "</div>");
-  WebOutString("<div class='section_divider'></div>");
-  WebOutString("<div class='total_info total_dim1'><div class='label'>" & ToolWebNGTranslateText2(60047) & "</div><div class='value'></div></div>");
-  WebOutString("<div class='total_info total_dim2'><div class='label'>" & ToolWebNGTranslateText2(60048) & "</div><div class='value'></div></div>");
   WebOutString("<div class='section_divider'></div>");
   WebOutString("<div class='total_info total_dim3'><div class='label'>" & ToolWebNGTranslateText2(60050) & "</div><div class='value'></div></div>");
   WebOutString("<div class='total_addto_basket'>" & ToolWebNGTranslateText2(60051) & "</div>");
@@ -433,14 +432,14 @@ begin
     //find the item - color, type
     GetItemSetColorAndType(base_item,selected_item,color,type);
     //tstr = ToolWebNGTranslateText2(222222);
-    jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
-    AddHeaderToOrder(ORr,tstr);
+//    jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
+//    AddHeaderToOrder(ORr,tstr);
 
     //output tile items
     i = 0;
-    tilearea = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
+    //tilearea = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
 
-    AddCalculatorExtraItems(vSpecs,DCIr.ExtraItems,type,color,jsstr,ORr);
+    AddCalculatorExtraItems(vSpecs,DCIr.ExtraItems,type,color,jsstr,ORr,true);
   end;
 
   jsstr = jsstr & "]";

@@ -527,13 +527,13 @@ begin
 end;
 
 global
-procedure AddCalculatorExtraItems(vector val vSpecs,string itemlist,string type,string color,var string jsstr,var record ORVc ORr)
+procedure AddCalculatorExtraItems(vector val vSpecs,string itemlist,string type,string color,var string jsstr,var record ORVc ORr,Boolean drainf)
 begin
   record MMRoofCalcExtraVc RCEr;
   row MMRoofCalcExtraVc RCErw;
   Integer i,rwcnt;
   string 255 tstr,itemcode,item;
-  Boolean firstitemf,chsum;
+  Boolean firstitemf,chsum,firstf;
   val qty;
 
   RCEr.Code = itemlist;
@@ -544,8 +544,15 @@ begin
       switch (RCErw.MeasureType) begin
         case 1:
           //must start with this
-          jsstr = jsstr & "]},";
-          tstr = ToolWebNGTranslateText2(StringToLongint(RCErw.Item));
+          if (drainf==false or firstf) then begin
+            jsstr = jsstr & "]},";
+          end;
+          firstf = true;
+          if (nonblank(RCErw.Item)) then begin
+            tstr = ToolWebNGTranslateText2(StringToLongint(RCErw.Item));
+          end else begin
+            tstr = "";
+          end;
           jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
           firstitemf = true;
           AddHeaderToOrder(ORr,tstr);
@@ -681,8 +688,9 @@ begin
     jsstr = jsstr & "{\"item\":" & ShowJSONItemInfo(selected_item,base_item,type,color) & ",\"qty\":" & qty  & ",\"area\":" & qty & "}";
     AddItemRowToOrder(ORr,selected_item,qty);
 
-    AddCalculatorExtraItems(vSpecs,RCIr.ExtraItems,type,color,jsstr,ORr);
+    AddCalculatorExtraItems(vSpecs,RCIr.ExtraItems,type,color,jsstr,ORr,false);
   end;
+  
   jsstr = jsstr & "]";
   jsstr = jsstr & ",\"totalvalue\": " & ValToString(ORr.Sum4,M4Val,"",".",0);
   //get subtotal and vat and total

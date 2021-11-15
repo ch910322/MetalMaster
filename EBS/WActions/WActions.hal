@@ -223,27 +223,6 @@ begin
 end;
 
 global
-procedure MMRoofCalcItemOpenExtrasDsm()
-begin
-  record MMRoofCalcItemVc RCIr;
-  record MMRoofCalcExtraVc RCEr;
-  Integer wn;
-  
-  wn = CurWindow;
-  if (WindowState(wn)==Rs_Normal) then begin
-    GetWindowRecord(wn,RCIr);
-    RCEr.Code = RCIr.Code;
-    if (ReadFirstMain(RCEr,1,true)==false) then begin
-      RecordNew(RCEr);
-      RCEr.Code = RCIr.Code;
-    end;
-    wn = OpenWindow("MMRoofCalcExtraDClass",1,0,"","",RCEr);    
-  end;
-
-  return;
-end;
-
-global
 function Boolean MMRoofCalcItemDClassUpdateWindowSubset(Integer wn,var string subsetname)
 begin
   record MMRoofCalcItemVc RCIr;
@@ -303,15 +282,21 @@ begin
   record MMRoofCalcExtraVc RCEr;
   row MMRoofCalcExtraVc RCErw;
   record MMItemSetVc ISr;
+  row MMItemSetVc ISrw;
+  record INVc INr;
 
   if (changedf) then begin
     GetWindowRecord(wn,RCEr);
     MatRowGet(RCEr,rownr,RCErw);
-    ISr.ArtCode = RCErw.Item;
+    ISr.ArtCode = RCErw.ItemSet;
     if (ReadFirstMain(ISr,1,true)) then begin
-      RCErw.Spec = ISr.Name;
-      MatRowPut(RCEr,rownr,RCErw);
-      PutWindowRecord(wn,RCEr);
+      MatRowGet(ISr,0,ISrw);
+      INr.Code = ISrw.Item;
+      if (ReadFirstMain(INr,1,true)) then begin
+        RCErw.Spec = INr.Name;
+        MatRowPut(RCEr,rownr,RCErw);
+        PutWindowRecord(wn,RCEr);
+      end;
     end;
   end;
   MMRoofCalcExtraDClassItemSetEFAfter = res;
@@ -396,3 +381,59 @@ begin
   MMRoofCalcExtraDClassSpecPasteName = psname;
   return;  
 end;
+
+
+global
+procedure MMDrainCalcItemNewTranslationDsm()
+begin
+  record MMDrainCalcItemVc DCIr;
+  record WebNGTranslateVc WebNGTranslater;
+  row WebNGTranslateVc WebNGTranslaterw;
+  Integer wn;
+  
+  wn = CurWindow;
+  if (WindowState(wn)==Rs_Normal) then begin
+    GetWindowRecord(wn,DCIr);
+    RecordNew(WebNGTranslater);
+    WebNGTranslater.Code = DCIr.Code;
+    WebNGTranslater.Comment = DCIr.Name;
+    MatRowPut(WebNGTranslater,0,WebNGTranslaterw);
+    WebNGTranslater.FileName = 6;
+    wn = OpenWindow("WebNGTranslateDClass",1,0,"","",WebNGTranslater);    
+  end;
+  return;
+end;
+
+global
+function Boolean MMDrainCalcItemDClassUpdateWindowSubset(Integer wn,var string subsetname)
+begin
+  record MMDrainCalcItemVc DCIr;
+  
+  GetWindowRecord(wn,DCIr);
+  subsetname = DCIr.Code;
+  MMDrainCalcItemDClassUpdateWindowSubset = true;
+  RETURN;
+END;
+
+global
+function Boolean MMDrainCalcItemDClassListDblClick(Integer wn)
+begin
+  Integer mwn;
+  record WebNGTranslateVc WebNGTranslater;
+  
+  if (WindowState(wn)==0) then begin
+    if (ReadMarkedRecord(wn,WebNGTranslater)) then begin
+      mwn = OpenWindow("WebNGTranslateDClass",1,0,"","",WebNGTranslater);
+    end;
+  end;
+  MMDrainCalcItemDClassListDblClick = true;
+  return;
+end;
+
+global
+procedure MMDrainCalcItemDClassButtonFlags(Integer wn,var Boolean duplOK,var Boolean newOK,var Boolean saveOK,var Boolean restOK)
+begin
+  saveOK = true;
+  return;
+end;
+

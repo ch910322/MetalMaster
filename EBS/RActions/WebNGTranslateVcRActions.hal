@@ -1,0 +1,21 @@
+global
+function LongInt WebNGTranslateVcRecordInIndex(record WebNGTranslateVc WTr,string indexname)
+BEGIN
+  LongInt res;
+ 
+  res = inner.WebNGTranslateVcRecordInIndex(WTr,indexname);
+  if (indexname=="RoofLangCode") then begin
+    if (WTr.FileName!=5) then begin
+      res = 0;
+    end;
+  end;
+  if (indexname=="DrainLangCode") then begin
+    if (WTr.FileName!=6) then begin
+      res = 0;
+    end;
+  end;
+
+  WebNGTranslateVcRecordInIndex = res;
+  RETURN;
+END;
+
