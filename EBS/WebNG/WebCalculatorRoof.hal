@@ -1,4 +1,4 @@
-external inner updating function Integer AddProductToBasket(string,val,Integer);
+external inner updating function Integer AddProductToBasket2(string,val,Integer,Boolean,val);
 external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
 external inner function string 10 CurrentWebLang();
 external function string 255 GetVarTypeName(string,string);
@@ -463,7 +463,7 @@ begin
       rwcnt = MatRowCnt(ISr);
       for (i=0;i<rwcnt;i=i+1) begin
         MatRowGet(ISr,i,ISrw);
-        if (ISrw.Type==type and ISrw.Color==color) then begin
+        if ((ISrw.Type==type or blank(ISrw.Type)) and ISrw.Color==color) then begin
           itemcode = ISrw.Item;
           i = rwcnt;
         end;
@@ -818,6 +818,7 @@ begin
   Integer i;
   val qty;
   string 255 item,root;
+  Longint tlen;
   
   js = ParseJSONString(WebGetArg("js"));
   i = 0;
@@ -825,8 +826,12 @@ begin
     root = "items/[" & i & "]/";
     item = JSONGet(js,root & "item");
     qty = StringToValue(JSONGet(js,root & "qty"),M45Val,"",".");
-    
-    AddProductToBasket(item,qty,-1);
+    tlen = StringToLongint(JSONGet(js,root & "tlen"));
+    if (tlen<=0) then begin
+      tlen = 0;
+    end;
+
+    AddProductToBasket2(item,qty,-1,true,tlen);
     i = i + 1;
   end;
 

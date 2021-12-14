@@ -1996,11 +1996,11 @@ global
 procedure MM_ShopBasketApp(record WebNGStructVc WSr,string mpath)
 begin
   record WebNGShopBasketVc WSBr;
-  row WebNGShopBasketVc WSBrw;
-  Integer i,rwcnt;
-  string 255 imglink,title,lang,base,currency,link,material,color;
+  row WebNGShopBasketVc WSBrw,WSB2rw;
+  Integer i,rwcnt,j,offset;
+  string 255 imglink,title,lang,base,currency,link,material,color,disabled;
   record INVc INr,mainINr;
-  val shippingcost,rowsum;
+  val shippingcost,rowsum,qty;
   record GeneralOptionBlock GenOptRec;
   record WebNGPageVc WPr;
   record WebNGShopBlock WSb;
@@ -2054,8 +2054,21 @@ begin
       imglink = FormatSimpleLink(imglink & URLEncodeCS(mainWebNGProductr.Code),true);
       link = FormatSimpleLink(base & "productinfo/" & URLEncodeCS(mainWebNGProductr.Code),true);      
       title = GetTranslatedNameProduct(mainWebNGProductr) & " " & material & " " & color;
-      CalcSum(WSBrw.Qty,WSBrw.Price,0,WSBrw.Discount,rowsum,GenOptRec.UseDiscount);
-
+      qty = WSBrw.Qty;
+      offset = 0;
+      disabled = "";
+      if (WSBrw.MaintPrice>0) then begin
+        disabled = "disabled";
+        for (j=i+1;j<rwcnt;j=j+1) begin
+          MatRowGet(WSBr,i,WSB2rw);
+          if (WSBrw.Product==WSB2rw.Product and WSB2rw.MaintPrice>0) then begin
+            qty = qty + WSB2rw.Qty;
+            offset = offset + 1;
+          end;
+        end;
+      end;
+      CalcSum(qty,WSBrw.Price,0,WSBrw.Discount,rowsum,GenOptRec.UseDiscount);
+      i = i + offset;
       WebOutString("            <div class='ListCartInner'>");
       WebOutString("                <div class='row'>");
       WebOutString("                    <div class='col-xl-4 col-lg-4 col-md-4 col-12'>");
@@ -2075,7 +2088,7 @@ begin
       WebOutString("                    <div class='col-xl-2 col-lg-2 col-md-2 col-5'>");
       WebOutString("                        <div class='InnerCartList'>");
       WebOutString("                            <div class='number-plus-minus'>");
-      WebOutString("                                <input rw='" & i & "' type='number' min='1' max='100' step='1' value='" & ValToString(WSBrw.Qty,M4Val,"",".",1) & "'>");
+      WebOutString("                                <input rw='" & i & "' type='number' " & disabled & " min='1' max='100' step='1' value='" & ValToString(qty,M4Val,"",".",1) & "'>");
       WebOutString("                            </div>");
       WebOutString("                        </div>");
       WebOutString("                    </div>");
