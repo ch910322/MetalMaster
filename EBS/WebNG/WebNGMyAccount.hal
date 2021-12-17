@@ -669,6 +669,9 @@ begin
 	array string 200 aspec,aprice,asernr,acomm,aaddr,aordate;
 	array string 200 aspec2,aprice2,asernr2,acomm2,aaddr2,aordate2;
 	array string 200 apict,apict2;
+	record MMItemSetVc INVr;
+  row MMItemSetVc INVrw;
+  record WebNGProductVc WebNGProductr;
 
   ORr.CustCode = CurrentCust;
   ORr.OrdDate = AddDay(CurrentDate,1);
@@ -702,9 +705,14 @@ begin
 				end;
 				
 				if(stestf)then begin
-					INr.Code = ORrw.ArtCode;
-					ReadFirstMain(INr,1,true);
-					if (ReadRecordLink(INr,j,Attachr,RLr)) begin
+					//INr.Code = ORrw.ArtCode;
+					//ReadFirstMain(INr,1,true);
+          if (readfirstkey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
+            WebNGProductr.Code = INVr.ArtCode;
+            ReadFirstMain(WebNGProductr,1,true);
+          end;
+          if (ReadRecordLink(WebNGProductr,j,Attachr,RLr)) begin
+					//if (ReadRecordLink(INr,j,Attachr,RLr)) begin
 						if(nonblank(Attachr.FileName))then begin
 							base = GetLinkToShop;
 							imglink = base & "images/" & Attachr.FileName;
@@ -723,9 +731,14 @@ begin
 				end;
 
 				if(stestf and ORrw.Shipd2-ORrw.Quant!=0)then begin
-					INr.Code = ORrw.ArtCode;
-					ReadFirstMain(INr,1,true);
-					if (ReadRecordLink(INr,j,Attachr,RLr)) begin
+					//INr.Code = ORrw.ArtCode;
+					//ReadFirstMain(INr,1,true);
+					if (readfirstkey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
+            WebNGProductr.Code = INVr.ArtCode;
+            ReadFirstMain(WebNGProductr,1,true);
+          end;
+          if (ReadRecordLink(WebNGProductr,j,Attachr,RLr)) begin
+					//if (ReadRecordLink(INr,j,Attachr,RLr)) begin
 						if(nonblank(Attachr.FileName))then begin
 							base = GetLinkToShop;
 							imglink = base & "images/" & Attachr.FileName;
