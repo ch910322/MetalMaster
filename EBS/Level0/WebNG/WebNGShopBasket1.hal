@@ -748,7 +748,7 @@ begin
 end;
 
 global
-updating function Integer AddProductToBasket(string product,val qty,Integer basketno)
+updating function Integer AddProductToBasket2(string product,val qty,Integer basketno,Boolean uniquef,val dim)
 begin
   Integer res;
   record WebNGShopBasketVc oldWSBr,WSBr;
@@ -772,16 +772,17 @@ begin
     if (GetShoppingBasket(WSBr,basketno)) then begin
       RecordCopy(oldWSBr,WSBr);
       
-      cnt = MatRowCnt(WSBr);
-      for (i=0;i<cnt;i=i+1) begin
-        MatRowGet(WSBr,i,WSBrw);
-        if (WSBrw.Product==product) then begin
-          foundf = true;
-          rownr = i;
-          i = cnt;
+      if (uniquef==false) then begin
+        cnt = MatRowCnt(WSBr);
+        for (i=0;i<cnt;i=i+1) begin
+          MatRowGet(WSBr,i,WSBrw);
+          if (WSBrw.Product==product) then begin
+            foundf = true;
+            rownr = i;
+            i = cnt;
+          end;
         end;
-      end;
-      
+      end;      
       if (foundf==false) then begin
         ClearRow(WSBr,WSBrw,1);
       end else begin
@@ -828,6 +829,7 @@ begin
     WSBrw.VATCode = vatcode;
     WSBrw.DateAdded = CurrentDate;
     WSBrw.TimeAdded = CurrentTime;
+    WSBrw.MaintPrice = dim;
     
     if (blank(custcurrency)) then begin
       GetBaseCurncy(1,custcurrency);
@@ -860,7 +862,15 @@ begin
 LAddProductToBasket:;
   RedirectToPageAfterAddingToBasket(product);
 LAddProductToBasketOut:;
-  AddProductToBasket = res;
+  AddProductToBasket2 = res;
+  return;
+end;
+
+global
+updating function Integer AddProductToBasket(string product,val qty,Integer basketno)
+begin
+
+  AddProductToBasket = AddProductToBasket2(product,qty,basketno,false,0);
   return;
 end;
 

@@ -21,7 +21,7 @@ begin
 end;
 
 window MMUserTitleLClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("Amats",MMUserTitleLClass,CGmlist,-);
   SetWRect(20,80,560,298);
@@ -35,7 +35,7 @@ begin
 end;
 
 window MMUserTitleSClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("Ievietot amatu",MMUserTitleSClass,CGslist,-);
   SetWRect(20,80,560,298);
@@ -49,7 +49,7 @@ begin
 end;
 
 window MMUserTitleDClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs,v2,vs2,hm;
   WindowBegin("Amats",MMUserTitleDClass,CGview,-);
@@ -66,9 +66,24 @@ begin
 end;
 
 window MMItemSetLClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
-  WindowBegin("MM Artikulu variācijass",MMItemSetLClass,CGmlist,-);
+  WindowBegin("MM Artikulu variācijas",MMItemSetLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MMItemSetDClass);
+  UseView(MMItemSetVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Artikuls",ArtCode,false,ArtCode);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMItemSetSClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("MM Artikulu variācijas",MMItemSetSClass,CGslist,-);
   SetWRect(20,80,660,298);
   Sizeable(-1,-1,0,0);
   SpawnClass(MMItemSetDClass);
@@ -81,7 +96,7 @@ begin
 end;
 
 window MMItemSetDClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs,v2,vs2,hm;
   WindowBegin("MM Artikulu variācijas",MMItemSetDClass,CGview,-);
@@ -100,7 +115,7 @@ begin
 end;
 
 window MMItemTypeLClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("MM Artikulu tipis",MMItemTypeLClass,CGmlist,-);
   SetWRect(20,80,660,298);
@@ -114,7 +129,7 @@ begin
 end;
 
 window MMItemTypeSClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("Paste MM Artikulu tipi",MMItemTypeSClass,CGslist,-);
   SetWRect(20,80,660,298);
@@ -128,7 +143,7 @@ begin
 end;
 
 window MMItemTypeDClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs,v2,vs2,hm;
   WindowBegin("MM Artikulu tipi",MMItemTypeDClass,CGview,-);
@@ -145,7 +160,7 @@ begin
 end;
 
 window MMItemColorLClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("MM Artikulu krāsass",MMItemColorLClass,CGmlist,-);
   SetWRect(20,80,660,298);
@@ -159,7 +174,7 @@ begin
 end;
 
 window MMItemColorSClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   WindowBegin("Paste MM Artikulu krāsas",MMItemColorSClass,CGslist,-);
   SetWRect(20,80,660,298);
@@ -173,7 +188,7 @@ begin
 end;
 
 window MMItemColorDClass:1
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs,v2,vs2,hm;
   WindowBegin("MM Artikulu krāsas",MMItemColorDClass,CGview,-);
@@ -379,3 +394,157 @@ begin
   EndWindow;
 end;
 
+window MMRoofCalcItemLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Jumtu kalkulatora tipi",MMRoofCalcItemLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MMRoofCalcItemDClass);
+  UseView(MMRoofCalcItemVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMRoofCalcItemDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Jumtu kalkulatora tips",MMRoofCalcItemDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MMRoofCalcItemVc);
+  vs=20; h=150; vs2=16; hm=-100;
+  EditField(h,v=6,100,"Kods",Normal,Code,false,);
+  EditField(h,v+=vs,-40,"Nosaukums",Normal,Name,false,0);
+  EditField(h,v+=vs,100,"Loksnes nokl. garums",Normal,DefaultTileLen,false,0);
+  EditField(h,v+=vs,100,"Loksnes min. garums",Normal,MinTileLen,false,0);
+  EditField(h,v+=vs,100,"Loksnes maks. garums",Normal,MaxTileLen,false,0);
+  EditField(h,v+=vs,100,"Loksnes platums",Normal,TileWidth,false,0);
+  EditField(h,v+=vs,100,"Loksnes savienojums",Normal,TileExtraWidth,false,0);
+  EditField(h,v+=vs,100,"Artikuls",Normal,DefaultItem,false,MMItemSetSClass);
+//  EditField(h,v+=vs,100,"Materiālu tipi",Normal,MaterialTypes,false,MMItemTypeSClass);
+  EditField(h,v+=vs,100,"Papildu Artikuli",Normal,ExtraItems,false,MMRoofCalcExtraSClass);
+
+  HalPushButton(h,v+=30,h+120,v+20,"MMRoofCalcItemNewTranslationDsm","Jauns tulkojums");
+//  HalPushButton(h+150,v,h+240,v+17,"MMRoofCalcItemOpenExtrasDsm","Papildu preces");
+
+  RecordList2(10,v+=60,-40,v+=130,"WebNGTranslateVc");
+  RlColKey(4,4,"Valoda",LangCode,false,RoofLangCode);
+  RlCol(90,90,"Izmainīts",LastChanged,false);
+  RlCol(270,270,"Komentārs",Comment,false);
+/*
+  MatrixBegin(10,v+=vs+20,-40,-20,-,99);
+  MatCol(1,24,"Artikuls",0,Item,false,MMItemSetSClass);
+  MatCol(1,124,"Nosaukums",0,Spec,false,0);
+  EndMatrix;
+*/
+  EndWindow;
+end;
+
+window MMDrainCalcItemLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Noteku kalkulatora tipi",MMDrainCalcItemLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  SpawnClass(MMDrainCalcItemDClass);
+  UseView(MMDrainCalcItemVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Name,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMDrainCalcItemDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Noteku kalkulatora tips",MMDrainCalcItemDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(MMDrainCalcItemVc);
+  vs=20; h=150; vs2=16; hm=-100;
+  EditField(h,v=6,100,"Kods",Normal,Code,false,);
+  EditField(h,v+=vs,-40,"Nosaukums",Normal,Name,false,0);
+  EditField(h,v+=vs,100,"Artikuls",Normal,DefaultItem,false,MMItemSetSClass);
+  EditField(h,v+=vs,100,"Āķu attālumi",Normal,Distance,false,0);
+  EditField(h,v+=vs,100,"Papildu Artikuli",Normal,ExtraItems,false,MMRoofCalcExtraSClass);
+
+  HalPushButton(h,v+=30,h+120,v+20,"MMDrainCalcItemNewTranslationDsm","Jauns tulkojums");
+
+  RecordList2(10,v+=60,-40,v+=130,"WebNGTranslateVc");
+  RlColKey(4,4,"Valoda",LangCode,false,DrainLangCode);
+  RlCol(90,90,"Izmainīts",LastChanged,false);
+  RlCol(270,270,"Komentārs",Comment,false);
+  EndWindow;
+end;
+
+window MMRoofCalcExtraDClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm;
+  WindowBegin("Kalkulatora papildinājumi",MMRoofCalcExtraDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  Sizeable(-1,-1,0,0);
+  UseView(MMRoofCalcExtraVc);
+  vs=20; h=120; vs2=16; hm=-100;
+  EditField(h,v=6,150,"Kods",Normal,Code,false,);
+  EditField(h+250,v,-40,"Nosaukums",Normal,Comment,false,0);
+  MatrixBegin(10,v+=40,-40,-20,-,99);
+  MatCol(1,24,"Tips",0,MeasureType,false,SetSClass);
+  MatCol(1,134,"Daudzums",0,MeasureQty,false,0);
+  MatCol(1,204,"Artikuls",0,Item,false,INSClass);
+  MatCol(1,204,"Variācija",0,ItemSet,false,MMItemSetSClass);
+  MatCol(1,304,"Nosaukums",0,Spec,false,0);
+  MatCol(1,-90,"Daudzums",0,ItemQty,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+
+window MMRoofCalcExtraLClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Kalkulatora papildinājumi",MMRoofCalcExtraLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MMRoofCalcExtraDClass);
+  UseView(MMRoofCalcExtraVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Comment,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window MMRoofCalcExtraSClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Kalkulatora papildinājumi",MMRoofCalcExtraSClass,CGslist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(MMRoofCalcExtraDClass);
+  UseView(MMRoofCalcExtraVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlCol(134,134,"Nosaukums",Comment,false);
+  SearchField("Meklēt");
+  EndWindow;
+end;
+
+window WebTextSClass:1
+  wtag("language","LAT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Tīmekļa teksti",WebTextSClass,CGslist,WebTextView);
+  SpawnClass(WebTextDClass);
+  SetWRect(64,80,509,298);
+  Sizeable(-1,-1,0,0);
+  UseView(WebTextVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"Kods",Code,false,Code);
+  RlColKey(104,104,"Komentārs",Comment,false,Comment);
+  SearchField("Meklēt");
+  EndWindow;
+end;

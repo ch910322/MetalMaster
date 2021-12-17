@@ -675,6 +675,11 @@ begin
     ORrw.Quant = WSBrw.Qty;
     ORrw.Price = WSBrw.Price;
     ORrw.Sum = WSBrw.Price * WSBrw.Qty;
+    //CUST-BEGIN
+    if (WSBrw.MaintPrice>0) then begin
+      ORrw.UnitZval = WSBrw.MaintPrice;
+    end;
+    //CUST-END
     MatRowPut(ORr,rwcnt,ORrw);
     chsum = false;
     BlockLoad(OptFeature);
