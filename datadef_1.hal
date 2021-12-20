@@ -24,6 +24,16 @@ begin
   ArrayField(RecipeLevel,M4Long,0,0);
   EndArray;
   EndBlock;
+
+  BlockBegin(WebAutoStockMovBlock,-,"");//2021.08.30
+  RecordField(Math,M4Matrix,0,0);
+  ArrayBegin(Math,-,1);
+  ArrayField(Item,M4Code,20,INVc);
+  ArrayField(ItemDispGroup,M4Code,5,DIVc);
+  ArrayField(ItemGroup,M4Code,5,ITVc);
+  ArrayField(ToLocation,M4Code,10,LocationVc);
+  EndArray;
+  EndBlock;
   
   BlockBegin(ItemCostLimitBlock,-,"");
   RecordField(Math,M4Matrix,0,0);

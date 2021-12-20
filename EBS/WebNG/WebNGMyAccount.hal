@@ -672,7 +672,7 @@ begin
 	record MMItemSetVc INVr;
   row MMItemSetVc INVrw;
   record WebNGProductVc WebNGProductr;
-
+  
   ORr.CustCode = CurrentCust;
   ORr.OrdDate = AddDay(CurrentDate,1);
   startdate = addyear(CurrentDate,-2);
@@ -707,16 +707,22 @@ begin
 				if(stestf)then begin
 					//INr.Code = ORrw.ArtCode;
 					//ReadFirstMain(INr,1,true);
-          if (readfirstkey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
+					INVr.ArtCode = "";
+          if (LoopKey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
             WebNGProductr.Code = INVr.ArtCode;
             ReadFirstMain(WebNGProductr,1,true);
           end;
-          if (ReadRecordLink(WebNGProductr,j,Attachr,RLr)) begin
+          resetloop(INVr);
+          if (ReadRecordLink(WebNGProductr,1,Attachr,RLr)) begin
 					//if (ReadRecordLink(INr,j,Attachr,RLr)) begin
 						if(nonblank(Attachr.FileName))then begin
 							base = GetLinkToShop;
 							imglink = base & "images/" & Attachr.FileName;
 							imglink = FormatSimpleLink(imglink,true);
+							
+							imglink = base & "images/";
+              imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/" & 0,true);
+							
 							apict[apict.length] = imglink;
 						end else begin
 							apict[apict.length] = "empty.jpg";
@@ -733,16 +739,22 @@ begin
 				if(stestf and ORrw.Shipd2-ORrw.Quant!=0)then begin
 					//INr.Code = ORrw.ArtCode;
 					//ReadFirstMain(INr,1,true);
-					if (readfirstkey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
+					INVr.ArtCode = "";
+					if (LoopKey("RowItem:" & ORrw.ArtCode,INVr,1,true)) then begin
             WebNGProductr.Code = INVr.ArtCode;
             ReadFirstMain(WebNGProductr,1,true);
           end;
-          if (ReadRecordLink(WebNGProductr,j,Attachr,RLr)) begin
+          resetloop(INVr);
+          if (ReadRecordLink(WebNGProductr,1,Attachr,RLr)) begin
 					//if (ReadRecordLink(INr,j,Attachr,RLr)) begin
 						if(nonblank(Attachr.FileName))then begin
 							base = GetLinkToShop;
 							imglink = base & "images/" & Attachr.FileName;
 							imglink = FormatSimpleLink(imglink,true);
+							
+							imglink = base & "images/";
+              imglink = FormatSimpleLink(imglink & URLEncodeCS(WebNGProductr.Code) & "/" & 0,true);
+							
 							apict2[apict2.length] = imglink;
 						end else begin
 							apict2[apict2.length] = "empty.jpg";
@@ -765,7 +777,7 @@ begin
     WebOutString("<div class='col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12'>");		
 		WebOutString("<div class='ListCabinet'>");
 		WebOutString("<div class='BoxTitleImageCab'>");
-		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict[j] & "'alt='image'></a> </div>");
+		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict[j] & "'alt='image' width=65px height=65px></a> </div>");
 		WebOutString("<div class='InfoBox'> <h2><a href=''>" & aspec[i] & "</a></h2> <div class='descrip'></div>");
 		WebOutString("<div class='price'>" & aprice[i] & "</div> </div> </div>");
 		WebOutString("<div class='ListInfoCab'>");
@@ -793,7 +805,7 @@ begin
   	WebOutString("<div class='col-xl-4 col-lg-4 col-md-6 col-sm-12 col-12'>");
 		WebOutString("<div class='ListCabinet'>");
 		WebOutString("<div class='BoxTitleImageCab'>");
-		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict2[j] & "'alt='image'></a> </div>");
+		WebOutString("<div class='ImageCab'> <a href=''><img src='" & apict2[j] & "'alt='image'  width=65px height=65px></a> </div>");
 		WebOutString("<div class='InfoBox'> <h2><a href=''>" & aspec2[i] & "</a></h2> <div class='descrip'></div>");
 		WebOutString("<div class='price'>" & aprice2[i] & "</div> </div> </div>");
 		WebOutString("<div class='ListInfoCab'>");

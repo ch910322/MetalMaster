@@ -1,0 +1,66 @@
+
+global
+procedure WebVerifyCustomer(string l,string p)
+begin
+  record CUVc CUr;
+  record UserVc Userr;
+
+  SetLangMode(LangLatvian,"LAT",1);
+  CUr.Code = l;
+  if (ReadFirstMain(CUr,1,true)) then begin
+     if (CUr.Password == CalcPassword(p,CUr.Code,0)) and nonblank(p) then begin
+        PutSessionString("MyWebLoginStatus","3");
+        PutSessionString("MyCurrentCust",l);
+        if (CUr.IsDriverFlag==1) then begin
+           PutSessionString("IsDriver","true");
+         end else begin
+           if (CUr.DealerType==1) then begin
+              PutSessionString("IsPartner","true");
+            end else begin
+              PutSessionString("IsCustomer","true");
+           end;
+        end;
+        PutSessionString("act","");
+        Logtext(0,"WEB - pieslçdzies klients: " & l);
+      end else begin
+        PutSessionString("MyWebLoginStatus","0");
+        PutSessionString("MyCurrentCust","");
+        PutSessionString("IsCustomer","");
+        PutSessionString("IsPartner","");
+        PutSessionString("IsDriver","");
+        PutSessionString("act","login");
+        Logtext(0,"WEB - nepareiza parole, klients: " & l);
+     end;
+   end else begin
+      Userr.Code = l;
+      if (ReadFirstMain(Userr,1,true)) then begin
+           if (Userr.NewPassWord == CalcPassword(p,Userr.Code,0)) and nonblank(p) then begin
+              PutSessionString("MyWebLoginStatus","3");
+              PutSessionString("MyCurrentCust",l);
+              PutSessionString("IsCustomer","false");
+              PutSessionString("IsPartner","false");
+              PutSessionString("IsDriver","false");
+              PutSessionString("act","");
+              Logtext(0,"WEB - pieslçdzies lietotâjs: " & l);
+            end else begin
+              PutSessionString("MyWebLoginStatus","0");
+              PutSessionString("MyCurrentCust","");
+              PutSessionString("IsCustomer","");
+              PutSessionString("IsPartner","");
+              PutSessionString("IsDriver","");
+              PutSessionString("act","login");
+              Logtext(0,"WEB - nepareiza parole, lietotâjs: " & l);
+           end;
+       end else begin
+           PutSessionString("MyWebLoginStatus","0");
+           PutSessionString("MyCurrentCust","");
+           PutSessionString("IsCustomer","");
+           PutSessionString("IsPartner","");
+           PutSessionString("IsDriver","");
+           PutSessionString("act","login");
+           Logtext(0,"WEB - persona nav reìistrçta: " & l);
+      end;
+  end;
+  
+return;
+end;

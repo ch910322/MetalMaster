@@ -26,6 +26,7 @@ SourceFile("halcust/OBS_Backup",3);
 SourceFile("halcust/PLVAT",3);
 SourceFile("halcust/PLVAT/Exports",3);
 SourceFile("halcust/PLVAT/Reports",3);
+//SourceFile("halcust/testf",3);
 
 SourceFile("halcust\\EBS",3);
 Exec_file("halcust\\EBS\\datadef.hal");
@@ -80,6 +81,8 @@ begin
   RecordField(SvarsNoRazojumiem,M4Int,0,0);//2021.03.23
   RecordField(PlatumsTM,M4Int,0,0);//2021.03.25
   RecordField(SvarsTM,M45Val,0,0);//2021.03.25
+  RecordField(SerNumNoIzmeriem,M4Int,0,0);//2021.10.30
+  RecordField(PapilduMaterials,M4UVal,0,0);//2021.11.18
   EndRecordAdd;
 
   RecordAddBegin(SDVc,"halSDVc");//2019.10.22
@@ -164,6 +167,7 @@ begin
   RecordField(AtjaunotRazPas,M4Int,0,0);
   RecordField(UzlimesForma,M4Code,20,0);
   ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
+  ArrayField(PapilduMaterials,M4Set,-904,0);//2021.11.18
   EndRecordAdd;
   
   RecordAddBegin(ProdVc,"halProdVc");
@@ -178,9 +182,14 @@ begin
   RecordField(CreateTime,M4Time,0,0);//2019.09.24
   RecordField(ProdResult,M4Set,-610,0);//2019.10.02
   RecordField(DefectiveQty,M4Qty,0,0);//2019.10.06
+  RecordField(PUSerNr,M4Long,0,0);//2021.08.29
   ArrayField(Izmers,M4Val,0,0);//2020.09.28
   ArrayField(IzejvielasVeids,M4Set,-903,0);//2020.10.08
   ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
+  ArrayField(PapilduMaterials,M4Set,-904,0);//2021.11.18
+  KeyBegin(RecName);//2021.11.03
+  KeySegment(RecName);
+  KeySegment(SerNr);
   EndRecordAdd;
 
   RecordAddBegin(ProdOrderVc,"halProdOrderVc");
@@ -213,6 +222,7 @@ begin
   ArrayField(LoksnesPlatums,M4Str,100,0);//2019.10.02
   ArrayField(IzejvielasVeids,M4Set,-903,0);//2020.10.08
   ArrayField(AtgriezumuProc,M4Val,0,0);//2021.03.23
+  ArrayField(PapilduMaterials,M4Set,-904,0);//2021.11.18
   KeyBegin(Comment2);//2015.04.23
   KeySegment(Comment2);
   KeySegment(SerNr);
@@ -375,6 +385,11 @@ begin
   AppendMatrixFieldToKeyName(Mailbox,AddrStatus);
   KeySegment(CustName2);
   KeySegment(SerNr);
+  EndRecordAdd;
+
+  RecordAddBegin(BarcodeVc,"halBarcodeVc2");
+  RecordField(Garums,M4UVal,0,0);
+  RecordField(Platums,M4UVal,0,0);
   EndRecordAdd;
 
   end;
