@@ -668,18 +668,18 @@ begin
   end;
   td = DateFromString(search,"YYYY-MM-DD");
 
-  if (ORr.OrdDate==td) then begin
+  /*if (ORr.OrdDate==td) then begin//Disabled for last date field Pieg. // Edit ************************** BPI Ukraine - KramarAlexandr - 02, 21 12 2021 y. at 3:32:51 PM
     res = true;
     goto LOrderSearchMatches;
   end;
-  if (ORr.PlanotsNosutit==td) then begin
+  if (ORr.PlanotsNosutit==td) then begin//Disabled for last date field Pieg. // Edit ************************** BPI Ukraine - KramarAlexandr - 02, 21 12 2021 y. at 3:32:51 PM
     res = true;
     goto LOrderSearchMatches;
   end;
-  if (ORr.PlanotsSanemt==td) then begin
+  if (ORr.PlanotsSanemt==td) then begin//Disabled for last date field Pieg. // Edit ************************** BPI Ukraine - KramarAlexandr - 02, 21 12 2021 y. at 3:32:51 PM
     res = true;
     goto LOrderSearchMatches;
-  end;
+  end;*/
   
   if (nonblankdate(td) and setinset(search,GetListOfDeliveriesSearch(ORr)) ) then begin
     res = true;
