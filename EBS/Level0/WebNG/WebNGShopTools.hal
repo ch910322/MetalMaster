@@ -678,6 +678,7 @@ begin
     //CUST-BEGIN
     if (WSBrw.MaintPrice>0) then begin
       ORrw.UnitZval = WSBrw.MaintPrice;
+      ORrw.Coefficient = ORrw.Quant/(ORrw.UnitXval*ORrw.UnitZval/1000000);
     end;
     //CUST-END
     MatRowPut(ORr,rwcnt,ORrw);
