@@ -3,9 +3,6 @@ begin
   string 255 bd;
   transaction string 255 gModFolder;
   bd = left(VersionBuild,4);
-  if (bd=="8131") then begin
-    SourceFile(gModFolder & "/ExternalDocs/8131/hal.hob",0);
-  end;
   if (bd=="8533") then begin
     SourceFile(gModFolder & "/ExternalDocs/8533/hal.hob",0);
   end;
@@ -14,6 +11,18 @@ begin
   end;
   if (bd=="8535") then begin
     SourceFile(gModFolder & "/ExternalDocs/8535/hal.hob",0);
+  end;
+  if (bd=="8536") then begin
+    SourceFile(gModFolder & "/ExternalDocs/8536/hal.hob",0);
+  end;
+  if (bd=="8538") then begin
+    SourceFile(gModFolder & "/ExternalDocs/8538/hal.hob",0);
+  end;
+  if (bd=="8539") then begin
+    SourceFile(gModFolder & "/ExternalDocs/8539/hal.hob",0);
+  end;
+  if (bd=="8540") then begin
+    SourceFile(gModFolder & "/ExternalDocs/8540/hal.hob",0);
   end;
   return;
 end;

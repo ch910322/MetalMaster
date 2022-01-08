@@ -89,6 +89,8 @@ begin
   MatCol(1,140,"Veidne",0,TemplateName,false,ExternalFormDefImgSClass);
   MatCol(1,-200,"Pirmais lauks tabulā",0,FirstField,false,0); 
   EndMatrix;
+  SpecialMenu("Dokumentu vēsture",' ',0,"FormHistDsm");
+  
   EndWindow;
 end;
 

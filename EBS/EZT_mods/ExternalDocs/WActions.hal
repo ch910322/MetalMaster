@@ -67,4 +67,19 @@ begin
   return;
 end;
 
+global
+procedure FormHistDsm()
+begin
+  record RcVc RepSpec;
+  record ExternalFormDefVc FDr;
+  
+  GetWindowRecord(CurWindow,FDr);
+  RepSpec.repname = "FormHistRn";
+  RepSpec.Media = mtScreen;
+  RepSpec.f1 = FDr.UUID;
+  RunReport(RepSpec,0);
+  
+
+  return;
+end;
 
