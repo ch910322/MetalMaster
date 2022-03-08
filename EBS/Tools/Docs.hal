@@ -123,7 +123,6 @@ begin
   row IVVc IVrw,IV2rw;
   Integer i,rwcnt,num,j;
   string 255 strnum;
-  vector boolean vitemused;
   record MM_DeclarationClassVc MM_DECr;
   val sum,qty;
   record ITVc ITr;
@@ -161,7 +160,7 @@ begin
         ExportDeclarationValues(vVals,strnum,INr);
         num = num + 1;
       end else begin
-        if(vitemused[INr.Code]==false and INr.Group==RepSpec.f10)then begin
+        if(INr.Group==RepSpec.f10)then begin
           sum = 0;
           if(setinset("SS",INr.DispGroups)==false)then begin
             for(j=0;j<rwcnt;j=j+1)begin
@@ -201,7 +200,6 @@ begin
             INr.ENstandarts = "NDP";
           end; 
           vVals["F_ENSTANDARD"] = INr.ENstandarts;     
-          vitemused[INr.Code] = true;
           vVals["ROW_" & strnum & "_F_ARTCODE"] = IVrw.ArtCode;
           vVals["ROW_" & strnum & "_F_ARTNAME"] = IVrw.Spec;
           vVals["ROW_" & strnum & "_F_ENSTANDARD"] = INr.ENstandarts;
