@@ -401,7 +401,7 @@ begin
 								
 								arealength = Getarealength(noterarea);
 
-								j = j + Getarealength(amiddle);
+								j = j + Getarealength(amiddle) - len(tstrr);
 							end;
 						end;
 						posstart = -1;
