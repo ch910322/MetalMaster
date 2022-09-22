@@ -58,6 +58,7 @@ external function string 255 StrReplace(string,string,string);	//Edit **********
 external updating function Boolean RecordAction_raEMailQue(var record MailVc,Boolean);
 
 external outer function Boolean GetNextWebCustNr(var string); //Edit **********************************************Vas-P	05/07/2021
+external function Boolean CheckRecaptcha(area);//CUST
 
 
 global
@@ -1180,25 +1181,38 @@ return;
 end;
 
 //Edit **********************************************Vas-P  14/06/2021
-global webpublic updating procedure WebRestorePasswordEmail()
+//1. forgot password email based on hardcoded comment of a web translation?? what? why can't this be a setting with standard text. It even supports html...
+//2. SetCompany(3,false)?? what if they start using this website (and I think they will or are already) in other companies?? This should be based on the domain name 
+//2. + we don't set back the company that we had before? who knows what kind of result this makes on the server...
+//2. + that's why you should make a single function with a switch, where you can figure it out in one place...
+global webpublic 
+updating procedure WebRestorePasswordEmail()
 begin
 	record CUVc CUr;
 	record MailVc Mailr;
 	record MailVc oldMailr;
 	record WebNGTranslateVc WTr;
-	string 255 tstr,newpass,lang;
+	string 255 tstr,newpass,lang,err;
 	Longint pos,spos;
-	boolean TrHs;
+	Boolean TrHs,res;
+  area WebPostArea;
   
   setcompany(3,false);
   
+  WebGetPostData(WebPostArea);
+  if (CheckRecaptcha(WebPostArea)==false) then begin 
+    err = ToolWebNGTranslateText2(90017);//Verification failed
+    goto LWebRestorePasswordEmail_Out;
+    LogText(0,"failed to verify CheckRecaptcha");
+  end;
+
   lang = CurrentWebLang;
 	newpass = Random(10000,99999);
 	WTr.Comment = "Restoring password";
 	TrHs = true;
 	while(LoopKey("Comment",WTr,1,TrHs))begin
 		if(WTr.Comment=="Restoring password")then begin
-			weboutstring("WTr.Comment - " & WTr.Comment);
+			//weboutstring("WTr.Comment - " & WTr.Comment);
 			if(WTr.LangCode==lang)then begin
 				pos = 0;
 				while (pos<SizeTextCnt(WTr)) begin
@@ -1234,12 +1248,16 @@ lWebRestorePasswordEmail:;
 			if(RecordAction_raEMailQue(Mailr,false))then begin
 				Mailr.SendFlag = 1;
 				RecordUpdate(oldMailr,Mailr,true);
-				weboutstring("Ok");
+				res = true;
 			end;
 		end;
-	end;
+	end else begin
+    err = ToolWebNGTranslateText2(90016);//Email was not found
+  end;
 
-return;
+LWebRestorePasswordEmail_Out:;
+  WebOutString("{\"stat\":\"" & res & "\",\"error\":\"" & StrReplace(err,"\"","'") & "\"}");
+  return;
 end;
 
 
