@@ -2113,7 +2113,7 @@ begin
     WebOutString("            <div class='CartColumList'>");
     WebOutString("                <div class='row'>");
     WebOutString("                    <div class='col-6 left'>" & ToolWebNGTranslateText2(89015) & "</div>  ");//Subtotal:
-    WebOutString("                    <div class='col-6 right'>" & WSBr.Sum & " " & WSBr.CurrencyCode & "</div> ");
+    WebOutString("                    <div class='col-6 right'>" & (WSBr.Sum-WSBr.VAT) & " " & WSBr.CurrencyCode & "</div> ");
     WebOutString("                </div>");
     WebOutString("            </div>");
     // VAT

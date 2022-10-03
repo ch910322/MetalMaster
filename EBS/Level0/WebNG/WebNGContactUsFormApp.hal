@@ -288,12 +288,14 @@ begin
   end else begin
     err = err + 2;
   end;
-  if (IsRecaptchaEnabled(kElementTypeContactUsForm2)) then begin
+
+//  if (IsRecaptchaEnabled(kElementTypeContactUsForm2)) then begin//CUST
     WebGetPostData(WebPostArea);
     if (CheckRecaptcha(WebPostArea)==false) then begin
       err = err + 8;
     end;
-  end;
+//  end;//CUST
+
   
   if (err==0) then begin
     SetupAndSendMail(Mailr,CFr);
