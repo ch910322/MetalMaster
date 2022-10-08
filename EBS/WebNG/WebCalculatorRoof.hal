@@ -1,4 +1,3 @@
-external inner function boolean GetShoppingBasket(var record WebNGShopBasketVc,integer);
 external inner updating function Integer AddProductToBasket2(string,val,Integer,Boolean,val);
 external inner function val ShopGetItemPrice(string,val,var val,var string,var string,integer);
 external inner function string 10 CurrentWebLang();
@@ -18,10 +17,6 @@ external inner procedure ORDchsum(var record ORVc,Integer);
 external inner procedure ORSumup(var record ORVc);
 external function Integer SetCompanyBasedOnCountry();
 external procedure ResetCompanyBasedOnCountry(Integer);
-external inner function Boolean PasteCustInOrder(var record ORVc,string,string,var string,var string);
-remote inner procedure ORVc_PasteCurncyCode(var record ORVc,string);
-remote inner procedure ORVc_PastePayDeal(var record ORVc);
-external inner function Integer AddBasketRow(record WebNGShopBasketVc,row WebNGShopBasketVc,Boolean,Integer,string,val,Boolean,val);
 
 procedure ShowDimentionInput(string label,string icon,string cls)
 begin
@@ -399,29 +394,6 @@ begin
   return;
 end;
 
-function string 255 GetItemDescr(record INVc INr,string langcode,boolean showallf)
-begin
-  string 255 res;
-  row INVc INrw;
-  Integer i,rwcnt;
-  
-  if (showallf) then begin
-    rwcnt = MatRowCnt(INr);
-    for (i=0;i<rwcnt;i=i+1) begin
-      MatRowGet(INr,i,INrw);
-      if (langcode==INrw.LangCode or blank(INrw.LangCode)) then begin
-        res = res & INrw.Text & "<br>";
-      end;
-    end;
-  end;
-  if (blank(res)) then begin
-    res = INr.Name;
-  end;
-
-  GetItemDescr = res;
-  return;
-end;
-
 function string 255 ShowJSONItemInfo(string item,string item2,string type,string color)
 begin
   record INVc INr;
@@ -446,7 +418,7 @@ begin
 
   res = "{";
   res = res & "\"item_code\":\"" & item & "\",";
-  res = res & "\"item_name\":\"" & GetItemDescr(INr,CurrentWebLang,true) & "\",";
+  res = res & "\"item_name\":\"" & INr.Name & "\",";
   res = res & "\"item_price\":" & ValToString(price,M4Val,"",".",0) & ",";
   res = res & "\"item_image\":\"" & imglink & "\",";
   if (nonblank(item2)) then begin
@@ -526,7 +498,6 @@ begin
   return;
 end;
 
-/*
 procedure AddHeaderToOrder(var record ORVc ORr,string tstr)
 begin
   row ORVc ORrw;
@@ -537,14 +508,11 @@ begin
 
   return;
 end;
-*/
 
-procedure AddItemRowToOrder(var record WebNGShopBasketVc WSBr,string item,val qty)
+procedure AddItemRowToOrder(var record ORVc ORr,string item,val qty)
 begin
   Integer num;
   string 255 warning;
-  row WebNGShopBasketVc WSBrw;
-  /*
   row ORVc ORrw;
   
   num = MatRowCnt(ORr);
@@ -554,15 +522,12 @@ begin
   MatRowPut(ORr,num,ORrw);
   //item after
   ORVc_PasteArtCode(ORr,num,warning,warning,false);
-*/
-  ClearRow(WSBr,WSBrw,1);
-  AddBasketRow(WSBr,WSBrw,true,0,item,qty,false,0);
 
   return;
 end;
 
 global
-procedure AddCalculatorExtraItems(vector val vSpecs,string itemlist,string type,string color,var string jsstr,var record WebNGShopBasketVc WSBr,Boolean drainf)
+procedure AddCalculatorExtraItems(vector val vSpecs,string itemlist,string type,string color,var string jsstr,var record ORVc ORr,Boolean drainf)
 begin
   record MMRoofCalcExtraVc RCEr;
   row MMRoofCalcExtraVc RCErw;
@@ -590,7 +555,7 @@ begin
           end;
           jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
           firstitemf = true;
-          //AddHeaderToOrder(ORr,tstr);
+          AddHeaderToOrder(ORr,tstr);
         case 2:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -598,7 +563,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["TileTotLen"],RCErw,color,type,item,itemcode,qty);            
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 3:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -606,7 +571,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["TileTotCnt"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 4:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -614,7 +579,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["RoofArea"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 5:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -622,7 +587,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["RoofPerimeter"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 6:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -630,7 +595,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["SideLength"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 7:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -638,7 +603,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["GableLength"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 8:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -646,7 +611,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["SideLength"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 9:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -654,7 +619,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["Height"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 10:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -662,7 +627,7 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["A"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
         case 11:
           if (firstitemf==false) then begin
             jsstr = jsstr & ",";
@@ -670,12 +635,12 @@ begin
           firstitemf = false;
           GetItemQty(vSpecs["Hooks"],RCErw,color,type,item,itemcode,qty);
           jsstr = jsstr & "{\"item\":" & item & ",\"qty\":" & qty & "}";
-          AddItemRowToOrder(WSBr,itemcode,qty);
+          AddItemRowToOrder(ORr,itemcode,qty);
       end;
     end;
   end;
   jsstr = jsstr & "]}";
-/*
+
   rwcnt = MatRowCnt(ORr);
   ORVc_PasteQuant(ORr,rwcnt,true,chsum);
   chsum = ORDchrsum(ORr,rwcnt);
@@ -683,7 +648,7 @@ begin
     ORDchsum(ORr,rwcnt);
     ORSumup(ORr);
   end;
-*/
+
   return;
 end;
 
@@ -692,17 +657,12 @@ begin
   string 255 jsstr,tstr,root;
   JSON js;
   string 255 mattype,selected_item,base_item,color,type,item,itemcode;
-  string 255 warning,errstr;
   record ORVc ORr;
   Integer i,rwcnt,oldcomp;
   Boolean firstitemf,chsum;
   record MMRoofCalcItemVc RCIr;
   val qty,tilearea,tilelength;
   vector val vSpecs;
-  record WebNGShopBasketVc WSBr;
-  record MMWebDelModeBlock MMWebDelModeb;
-
-  RecordNew(WSBr);
 
   //get roof specs
   js = ParseJSONString(WebGetArg("js"));
@@ -711,7 +671,6 @@ begin
   RCIr.Code = mattype;
   //firstf = true;
   jsstr = "{\"groups\": [";
-
   if (ReadFirstMain(RCIr,1,true)) then begin
     //get default item
     selected_item = JSONGet(js,"item");
@@ -720,20 +679,20 @@ begin
     GetItemSetColorAndType(base_item,selected_item,color,type);
     //tstr = ToolWebNGTranslateText2(222222);
     jsstr = jsstr & "{\"name\":\"" & tstr & "\",\"items\": [";
-    //AddHeaderToOrder(WSBr,tstr);
+    AddHeaderToOrder(ORr,tstr);
 
     //output tile items
     i = 0;
     tilearea = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
     qty = StringToValue(JSONGet(js,"tilearea"),M45Val,"",".");
     jsstr = jsstr & "{\"item\":" & ShowJSONItemInfo(selected_item,base_item,type,color) & ",\"qty\":" & qty  & ",\"area\":" & qty & "}";
-    AddItemRowToOrder(WSBr,selected_item,qty);
+    AddItemRowToOrder(ORr,selected_item,qty);
 
-    AddCalculatorExtraItems(vSpecs,RCIr.ExtraItems,type,color,jsstr,WSBr,false);
+    AddCalculatorExtraItems(vSpecs,RCIr.ExtraItems,type,color,jsstr,ORr,false);
   end;
-
+  
   jsstr = jsstr & "]";
-  jsstr = jsstr & ",\"totalvalue\": " & ValToString(WSBr.Sum,M4Val,"",".",0);
+  jsstr = jsstr & ",\"totalvalue\": " & ValToString(ORr.Sum4,M4Val,"",".",0);
   //get subtotal and vat and total
   //jsstr = jsstr & ""put values
 
@@ -863,7 +822,6 @@ begin
   
   js = ParseJSONString(WebGetArg("js"));
   i = 0;
-
   while (JSONNodeExists(js,"items/[" & i & "]")) begin
     root = "items/[" & i & "]/";
     item = JSONGet(js,root & "item");

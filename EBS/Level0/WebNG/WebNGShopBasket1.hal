@@ -748,83 +748,6 @@ begin
 end;
 
 global
-function Integer AddBasketRow(record WebNGShopBasketVc WSBr,row WebNGShopBasketVc WSBrw,Boolean updatef,Integer rownr,string product,val qty,Boolean foundf,val dim)
-begin
-	record CUVc CUr;
-	record CUVc CU2r;
-  record MMWebDelModeBlock MMWebDMb;
-	record ContactRelVc ContactRelr;
-  Integer b;
-  integer i,cnt;
-  string 255 custcurrency,vatcode,tstr;
-  val reb;
-  Integer res;
-  
-  WSBrw.Product = product;
-  if (WSBrw.QtyType==1) then begin
-    WSBrw.PalletQty = WSBrw.PalletQty + qty;
-  end else begin
-    WSBrw.Qty = WSBrw.Qty + qty;
-  end;
-  custcurrency = "";
-  reb = blankval;
-  logtext(0,"vatcode1 - " & vatcode);
-  if(blank(CurrentCust))then begin
-    vatcode = MMWebDMb.CompVatCode;
-  end else begin
-    CUr.Code = WSBr.CustCode;
-    if(ReadFirstMain(CUr,1,true))then begin
-      if(CUr.CustType==1)then begin
-        ContactRelr.ContactCode = CUr.Code;
-        if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
-          CU2r.Code = ContactRelr.CustCode;
-          if(readfirstmain(CU2r,1,true))then begin
-            if(CU2r.CustType==1)then begin
-              vatcode = MMWebDMb.CompVatCode;
-            end;
-          end;
-        end else begin
-          vatcode = MMWebDMb.CompVatCode;
-        end;
-      end;
-    end;
-  end;
-  logtext(0,"vatcode2 - " & vatcode);
-  WSBrw.Price = round(ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0),defaultcurroundoff);
-  WSBrw.Discount = reb;
-  WSBrw.VATCode = vatcode;
-  WSBrw.DateAdded = CurrentDate;
-  WSBrw.TimeAdded = CurrentTime;
-  WSBrw.MaintPrice = dim;
-  
-  if (blank(custcurrency)) then begin
-    GetBaseCurncy(1,custcurrency);
-  end;
-  
-  if (updatef) then begin
-    if (custcurrency!=WSBr.CurrencyCode) then begin
-      if (nonblank(WSBr.CustCode)) then begin
-        tstr = " - Customer: " & WSBr.CustCode & " (Company = " & WSBr.CompanyNr & ")";
-      end;
-      res = -1;
-    end;
-  end else begin
-    WSBr.CurrencyCode = custcurrency;
-  end;
-
-  if (updatef and foundf==false) then begin
-    InsertNewBasketRow(WSBr,WSBrw);
-  end else begin
-    MatRowPut(WSBr,rownr,WSBrw);
-  end;
-  
-  SumUpShopBasket(WSBr);
-
-  AddBasketRow = res;
-  return;
-end;
-
-global
 updating function Integer AddProductToBasket2(string product,val qty,Integer basketno,Boolean uniquef,val dim)
 begin
   Integer res;
@@ -871,11 +794,65 @@ begin
       ClearRow(WSBr,WSBrw,1);
       rownr = 0;
     end;
-
-    if (AddBasketRow(WSBr,WSBrw,updatef,rownr,product,qty,foundf,dim)==-1) then begin
-      goto LAddProductToBasket;
+    WSBrw.Product = product;
+    if (WSBrw.QtyType==1) then begin
+      WSBrw.PalletQty = WSBrw.PalletQty + qty;
+    end else begin
+      WSBrw.Qty = WSBrw.Qty + qty;
+    end;
+    custcurrency = "";
+    reb = blankval;
+    WSBrw.Price = round(ShopGetItemPrice(product,WSBrw.Qty,reb,vatcode,custcurrency,0),defaultcurroundoff);
+    WSBrw.Discount = reb;
+		logtext(0,"vatcode1 - " & vatcode);
+		if(blank(CurrentCust))then begin
+			vatcode = MMWebDMb.CompVatCode;
+		end else begin
+			CUr.Code = WSBr.CustCode;
+			if(ReadFirstMain(CUr,1,true))then begin
+				if(CUr.CustType==1)then begin
+					ContactRelr.ContactCode = CUr.Code;
+					if(ReadFirstKey("ContactCode",ContactRelr,1,true))then begin
+						CU2r.Code = ContactRelr.CustCode;
+						if(readfirstmain(CU2r,1,true))then begin
+							if(CU2r.CustType==1)then begin
+								vatcode = MMWebDMb.CompVatCode;
+							end;
+						end;
+					end else begin
+						vatcode = MMWebDMb.CompVatCode;
+					end;
+				end;
+			end;
+		end;
+		logtext(0,"vatcode2 - " & vatcode);
+    WSBrw.VATCode = vatcode;
+    WSBrw.DateAdded = CurrentDate;
+    WSBrw.TimeAdded = CurrentTime;
+    WSBrw.MaintPrice = dim;
+    
+    if (blank(custcurrency)) then begin
+      GetBaseCurncy(1,custcurrency);
+    end;
+    
+    if (updatef) then begin
+      if (custcurrency!=WSBr.CurrencyCode) then begin
+        if (nonblank(WSBr.CustCode)) then begin
+          tstr = " - Customer: " & WSBr.CustCode & " (Company = " & WSBr.CompanyNr & ")";
+        end;
+        goto LAddProductToBasket;
+      end;
+    end else begin
+      WSBr.CurrencyCode = custcurrency;
     end;
 
+    if (updatef and foundf==false) then begin
+      InsertNewBasketRow(WSBr,WSBrw);
+    end else begin
+      MatRowPut(WSBr,rownr,WSBrw);
+    end;
+    
+    SumUpShopBasket(WSBr);
     if (updatef) then begin
       if (RecordUpdate(oldWSBr,WSBr,false)) then begin end;
     end else begin
