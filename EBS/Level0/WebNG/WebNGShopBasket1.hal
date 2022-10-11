@@ -825,6 +825,7 @@ begin
 				end;
 			end;
 		end;
+		vatcode = MMWebDMb.CompVatCode;//customer always wants to have 21% on webshop
 		logtext(0,"vatcode2 - " & vatcode);
     WSBrw.VATCode = vatcode;
     WSBrw.DateAdded = CurrentDate;
